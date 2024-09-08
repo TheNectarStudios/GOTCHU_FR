@@ -6,6 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+<<<<<<< HEAD
     path: Assets/Scenes/JoinRoom.unity
     guid: 19cf3fd6cebbc834d8f9d0499859f1f8
   - enabled: 1
@@ -23,3 +24,8 @@ EditorBuildSettings:
       guid: 76783c0b9f00b9e45b8c9145979d9a1d, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: da5aa5e6ba44db44cb06a9e5639372b9, type: 2}
+=======
+    path: Assets/Scenes/LAN.unity
+    guid: 694a47f196c27004195583550181a1a7
+  m_configObjects: {}
+>>>>>>> 9293653f56e59d895a0054217ed1641624bfd2d4
