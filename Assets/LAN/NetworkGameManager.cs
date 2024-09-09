@@ -12,6 +12,7 @@ public class NetworkGameManager : MonoBehaviour
     void Start()
     {
         hostIP = GetLocalIPAddress();  // Get the host's local IP address
+        Debug.Log("Host IP detected: " + hostIP);  // Log the host IP for debugging
     }
 
     void OnGUI()
@@ -25,22 +26,54 @@ public class NetworkGameManager : MonoBehaviour
 
             if (GUILayout.Button("Host", GUILayout.Width(250), GUILayout.Height(80)))
             {
-                NetworkManager.Singleton.StartHost();  // Start the host (acts as both server and client)
-                isNetworkStarted = true;
+                Debug.Log("Attempting to start as Host...");
+                if (NetworkManager.Singleton.StartHost())
+                {
+                    isNetworkStarted = true;
+                    Debug.Log("Host started successfully.");
+                }
+                else
+                {
+                    Debug.LogError("Failed to start as Host.");
+                }
             }
 
             if (GUILayout.Button("Client", GUILayout.Width(250), GUILayout.Height(80)))
             {
-                // Use the host's IP to connect as a client
-                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(hostIP);
-                NetworkManager.Singleton.StartClient();
-                isNetworkStarted = true;
+                Debug.Log("Attempting to start as Client...");
+                
+                try
+                {
+                    // Start the client and connect to the host
+                    NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(hostIP);
+                    if (NetworkManager.Singleton.StartClient())
+                    {
+                        isNetworkStarted = true;
+                        Debug.Log("Client started successfully, attempting to connect to host at: " + hostIP);
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to start as Client.");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError("Client connection failed: " + ex.Message);
+                }
             }
 
             if (GUILayout.Button("Server", GUILayout.Width(250), GUILayout.Height(80)))
             {
-                NetworkManager.Singleton.StartServer();  // Start as a dedicated server
-                isNetworkStarted = true;
+                Debug.Log("Attempting to start as Server...");
+                if (NetworkManager.Singleton.StartServer())
+                {
+                    isNetworkStarted = true;
+                    Debug.Log("Server started successfully.");
+                }
+                else
+                {
+                    Debug.LogError("Failed to start as Server.");
+                }
             }
         }
 
@@ -57,9 +90,16 @@ public class NetworkGameManager : MonoBehaviour
             if (ip.AddressFamily == AddressFamily.InterNetwork)
             {
                 localIP = ip.ToString();
-                break;
+                Debug.Log("Detected IP: " + localIP);  // Log the IP for debugging
             }
         }
+
+        if (string.IsNullOrEmpty(localIP))
+        {
+            Debug.LogError("No IP address found.");
+        }
+
         return localIP;
     }
 }
+   
