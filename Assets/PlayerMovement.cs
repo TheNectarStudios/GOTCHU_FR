@@ -20,7 +20,7 @@ public class PlayerMovement : NetworkBehaviour
 
     [ServerRpc]
     private void MovePlayerServerRpc(Vector3 moveDelta)
-    {
+    {  
         // Update player position on the server and all clients
         transform.Translate(moveDelta, Space.World);
     }
