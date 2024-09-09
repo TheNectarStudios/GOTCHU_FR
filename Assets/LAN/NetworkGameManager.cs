@@ -1,29 +1,28 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;  // Ensure you have this namespace for UnityTransport
+using System.Net;
+using System.Net.Sockets;
 
 public class NetworkGameManager : MonoBehaviour
 {
-    // Track whether the server/client/host is running
+    // Track whether the server/client/host is running 
     private bool isNetworkStarted = false;
-    private string hostIP = "IP: Not Available";  // Default text
+    private string hostIP = "";
 
     void Start()
     {
-        // Display local IP address on startup
-        hostIP = GetLocalIPAddress();
+        hostIP = GetLocalIPAddress();  // Get the host's local IP address
     }
 
     void OnGUI()
     {
-        // Display the IP address on the screen
-        GUILayout.BeginArea(new Rect(10, 10, 300, 500));  // Increased the width of the area
-        GUILayout.Label("Host IP Address: " + hostIP, GUILayout.Width(300), GUILayout.Height(30));
+        GUILayout.BeginArea(new Rect(10, 10, 300, 500));
 
-        // If the network is already started, don't display the buttons
         if (!isNetworkStarted)
         {
-            // Make buttons larger using GUILayout.Width and GUILayout.Height
+            // Show the Host IP
+            GUILayout.Label("Host IP: " + hostIP);
+
             if (GUILayout.Button("Host", GUILayout.Width(250), GUILayout.Height(80)))
             {
                 NetworkManager.Singleton.StartHost();  // Start the host (acts as both server and client)
@@ -32,7 +31,9 @@ public class NetworkGameManager : MonoBehaviour
 
             if (GUILayout.Button("Client", GUILayout.Width(250), GUILayout.Height(80)))
             {
-                NetworkManager.Singleton.StartClient();  // Join the game as a client
+                // Use the host's IP to connect as a client
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(hostIP);
+                NetworkManager.Singleton.StartClient();
                 isNetworkStarted = true;
             }
 
@@ -46,24 +47,19 @@ public class NetworkGameManager : MonoBehaviour
         GUILayout.EndArea();
     }
 
-    // Function to get the local IP address
-    private string GetLocalIPAddress()
+    // Get the local IP address of the device (host)
+    string GetLocalIPAddress()
     {
-        string localIP = "IP: Not Available";
-
-        foreach (var iface in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+        string localIP = "";
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
         {
-            var ipProps = iface.GetIPProperties();
-            foreach (var addr in ipProps.UnicastAddresses)
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
             {
-                if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    localIP = addr.Address.ToString();
-                    return localIP;  // Return the first found IP address
-                }
+                localIP = ip.ToString();
+                break;
             }
         }
-
         return localIP;
     }
 }
