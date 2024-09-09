@@ -20,6 +20,7 @@ public class PlayerMovement : NetworkBehaviour
         // Continuously move the player in the current direction
         if (canMove)
         {
+            // Ensure movement in the right direction
             transform.Translate(currentDirection * speed * Time.deltaTime, Space.World);
         }
     }
@@ -54,13 +55,13 @@ public class PlayerMovement : NetworkBehaviour
             if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
             {
                 // Horizontal swipe
-                if (swipeDelta.x > 0 && lastDirection != Vector3.left)
+                if (swipeDelta.x > 0 && lastDirection != Vector3.right)
                 {
-                    currentDirection = Vector3.right;  // Move right
+                    currentDirection = Vector3.left;  // Inverted: Move left
                 }
-                else if (swipeDelta.x < 0 && lastDirection != Vector3.right)
+                else if (swipeDelta.x < 0 && lastDirection != Vector3.left)
                 {
-                    currentDirection = Vector3.left;  // Move left
+                    currentDirection = Vector3.right;  // Inverted: Move right
                 }
             }
             else
@@ -68,11 +69,11 @@ public class PlayerMovement : NetworkBehaviour
                 // Vertical swipe
                 if (swipeDelta.y > 0 && lastDirection != Vector3.back)
                 {
-                    currentDirection = Vector3.forward;  // Move up
+                    currentDirection = Vector3.back;  // Inverted: Move down
                 }
                 else if (swipeDelta.y < 0 && lastDirection != Vector3.forward)
                 {
-                    currentDirection = Vector3.back;  // Move down
+                    currentDirection = Vector3.forward;  // Inverted: Move up
                 }
             }
 
