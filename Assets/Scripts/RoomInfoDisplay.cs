@@ -2,18 +2,28 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using System.Collections.Generic;
 
 public class RoomInfoDisplay : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI playerListText;  // Reference to the UI Text to display the player list
     public TextMeshProUGUI roomKeyText;     // Reference to display the room key
+    public GameObject startGameButton;      // Reference to the Start Game button
 
     private void Start()
     {
         // Display the current room key in the UI
         roomKeyText.text = $"Room Key: {RoomManager.RoomKey}";
         UpdatePlayerList();
+
+        // Enable the start game button only for the host (the player who created the room)
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startGameButton.SetActive(true);
+        }
+        else
+        {
+            startGameButton.SetActive(false);
+        }
     }
 
     // Update the player list in the UI
@@ -39,5 +49,29 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerList();
+    }
+
+    // Called when the Start Game button is clicked by the host
+    public void OnStartGameButtonClicked()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // Load the game scene for all players
+            PhotonNetwork.LoadLevel("GameScene");
+        }
+    }
+
+    // Called when the current player is no longer the host
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        // Update the start game button visibility
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startGameButton.SetActive(true);
+        }
+        else
+        {
+            startGameButton.SetActive(false);
+        }
     }
 }
