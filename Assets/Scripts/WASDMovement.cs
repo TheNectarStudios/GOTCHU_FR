@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using System.Collections;
 
 public class WASDMovement : MonoBehaviourPun
 {
@@ -39,4 +40,6 @@ public class WASDMovement : MonoBehaviourPun
         // Move the object using the movement vector and speed
         transform.Translate(movement * moveSpeed * Time.deltaTime, Space.World);
     }
+
+    
 }
