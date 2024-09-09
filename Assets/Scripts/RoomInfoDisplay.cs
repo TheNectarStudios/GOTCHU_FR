@@ -56,6 +56,13 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            // Get the number of players in the room
+            int playerCount = PhotonNetwork.PlayerList.Length;
+
+            // Store the player count in PlayerPrefs so it can be accessed by the SpawnManager
+            PlayerPrefs.SetInt("PlayerCount", playerCount);
+            PlayerPrefs.Save();
+
             // Load the game scene for all players
             PhotonNetwork.LoadLevel("GameScene");
         }
