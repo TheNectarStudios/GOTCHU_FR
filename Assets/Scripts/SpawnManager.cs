@@ -6,9 +6,13 @@ using System.Collections.Generic;
 
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
-    public Transform spawnPoint;
+    // Separate spawn points for protagonist and antagonist
+    public Transform protagonistSpawnPoint;
+    public Transform antagonistSpawnPoint;
+
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
+
     public float bufferTime = 3.0f;  // Time to wait before assigning roles
 
     private void Start()
@@ -50,12 +54,14 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetProtagonist()
     {
-        PhotonNetwork.Instantiate(protagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
+        // Spawn protagonist at the designated spawn point
+        PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
     }
 
     [PunRPC]
     private void SetAntagonist()
     {
-        PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
+        // Spawn antagonist at the designated spawn point
+        PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
     }
 }
