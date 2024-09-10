@@ -1,14 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;  // Import Unity UI for button functionality
 
-public class PacManMovement : MonoBehaviour
+public class PacMan3DMovement : MonoBehaviour
 {
     public float speed = 5f;  // Movement speed
     public LayerMask obstacleLayer;  // LayerMask to detect obstacles
     private Vector3 direction = Vector3.zero;  // Current movement direction
     private Vector3 nextDirection = Vector3.zero;  // Next desired movement direction
 
-    private Vector3 initialPosition;  // Stores initial position to reset when needed
-    private Vector3[] directions = new Vector3[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down };  // Possible movement directions
+    private Vector3 initialPosition;  // Store the initial position to reset if needed
 
     void Start()
     {
@@ -17,21 +17,37 @@ public class PacManMovement : MonoBehaviour
 
     void Update()
     {
-        HandleInput();  // Handle player input
         Move();  // Handle movement
     }
 
-    // Handle player input for direction change
-    void HandleInput()
+    // Assign the movement functions to buttons
+    public void MoveUp()
     {
-        if (Input.GetKeyDown(KeyCode.W))
-            nextDirection = Vector3.up;  // Up
-        else if (Input.GetKeyDown(KeyCode.S))
-            nextDirection = Vector3.down;  // Down
-        else if (Input.GetKeyDown(KeyCode.A))
-            nextDirection = Vector3.left;  // Left
-        else if (Input.GetKeyDown(KeyCode.D))
-            nextDirection = Vector3.right;  // Right
+        SetNextDirection(Vector3.forward);  // Move up
+    }
+
+    public void MoveDown()
+    {
+        SetNextDirection(Vector3.back);  // Move down
+    }
+
+    public void MoveLeft()
+    {
+        SetNextDirection(Vector3.left);  // Move left
+    }
+
+    public void MoveRight()
+    {
+        SetNextDirection(Vector3.right);  // Move right
+    }
+
+    // Method to set the next direction if it's not the opposite direction
+    void SetNextDirection(Vector3 newDirection)
+    {
+        if (!IsOppositeDirection(newDirection))
+        {
+            nextDirection = newDirection;
+        }
     }
 
     // Movement and obstacle detection logic
@@ -65,6 +81,13 @@ public class PacManMovement : MonoBehaviour
         }
 
         return true;  // No obstacle detected, can move
+    }
+
+    // Check if the new direction is directly opposite to the current direction
+    bool IsOppositeDirection(Vector3 newDirection)
+    {
+        // Opposite direction is determined if their dot product is -1
+        return Vector3.Dot(direction, newDirection) < -0.9f;
     }
 
     // Reset Pac-Man to initial position (if needed, for example, after death or restart)
