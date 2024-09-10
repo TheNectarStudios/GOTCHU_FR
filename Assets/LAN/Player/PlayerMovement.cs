@@ -1,83 +1,77 @@
 using UnityEngine;
-using Unity.Netcode;
 
-public class PlayerMovement : NetworkBehaviour
+public class PacManMovement : MonoBehaviour
 {
-    public float speed = 5f;
-    private Vector3 currentDirection = Vector3.zero;
-    private Vector3 lastDirection = Vector3.zero;
-    
-    private bool canMove = true;
+    public float speed = 5f;  // Movement speed
+    public LayerMask obstacleLayer;  // LayerMask to detect obstacles
+    private Vector3 direction = Vector3.zero;  // Current movement direction
+    private Vector3 nextDirection = Vector3.zero;  // Next desired movement direction
 
-    private Vector2 startTouchPosition, endTouchPosition;
+    private Vector3 initialPosition;  // Stores initial position to reset when needed
+    private Vector3[] directions = new Vector3[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down };  // Possible movement directions
+
+    void Start()
+    {
+        initialPosition = transform.position;  // Store initial position
+    }
 
     void Update()
     {
-        if (!IsOwner) return;  // Only control the local player
+        HandleInput();  // Handle player input
+        Move();  // Handle movement
+    }
 
-        DetectSwipe();
+    // Handle player input for direction change
+    void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+            nextDirection = Vector3.up;  // Up
+        else if (Input.GetKeyDown(KeyCode.S))
+            nextDirection = Vector3.down;  // Down
+        else if (Input.GetKeyDown(KeyCode.A))
+            nextDirection = Vector3.left;  // Left
+        else if (Input.GetKeyDown(KeyCode.D))
+            nextDirection = Vector3.right;  // Right
+    }
 
-        // Continuously move the player in the current direction
-        if (canMove)
+    // Movement and obstacle detection logic
+    void Move()
+    {
+        // Try to move in the nextDirection if possible
+        if (nextDirection != direction && CanMoveInDirection(nextDirection))
         {
-            // Ensure movement in the right direction
-            transform.Translate(currentDirection * speed * Time.deltaTime, Space.World);
+            direction = nextDirection;
+        }
+
+        // If there's no obstacle in the current direction, keep moving
+        if (CanMoveInDirection(direction))
+        {
+            transform.Translate(direction * speed * Time.deltaTime, Space.World);
         }
     }
 
-    // Swipe detection logic
-    void DetectSwipe()
+    // Check if Pac-Man can move in the specified direction
+    bool CanMoveInDirection(Vector3 dir)
     {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
+        // Cast a ray in the intended direction to check for obstacles
+        Ray ray = new Ray(transform.position, dir);
+        RaycastHit hit;
 
-            if (touch.phase == TouchPhase.Began)
-            {
-                startTouchPosition = touch.position;
-            }
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                endTouchPosition = touch.position;
-                HandleSwipe();
-            }
+        // Perform raycast slightly beyond the current position to detect any obstacles
+        if (Physics.Raycast(ray, out hit, 1f, obstacleLayer))
+        {
+            // If an obstacle is detected within a small distance, return false
+            return false;
         }
+
+        return true;  // No obstacle detected, can move
     }
 
-    void HandleSwipe()
+    // Reset Pac-Man to initial position (if needed, for example, after death or restart)
+    public void ResetPosition()
     {
-        Vector2 swipeDelta = endTouchPosition - startTouchPosition;
-
-        // Check if swipe is significant
-        if (swipeDelta.magnitude > 50)
-        {
-            // Check if it's a horizontal or vertical swipe
-            if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
-            {
-                // Horizontal swipe
-                if (swipeDelta.x > 0 && lastDirection != Vector3.right)
-                {
-                    currentDirection = Vector3.left;  // Inverted: Move left
-                }
-                else if (swipeDelta.x < 0 && lastDirection != Vector3.left)
-                {
-                    currentDirection = Vector3.right;  // Inverted: Move right
-                }
-            }
-            else
-            {
-                // Vertical swipe
-                if (swipeDelta.y > 0 && lastDirection != Vector3.back)
-                {
-                    currentDirection = Vector3.back;  // Inverted: Move down
-                }
-                else if (swipeDelta.y < 0 && lastDirection != Vector3.forward)
-                {
-                    currentDirection = Vector3.forward;  // Inverted: Move up
-                }
-            }
-
-            lastDirection = currentDirection;  // Store the last direction to restrict opposite movement
-        }
+        transform.position = initialPosition;
+        direction = Vector3.zero;
+        nextDirection = Vector3.zero;
     }
 }
