@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1830259787114919159}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
   speed: 5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
 --- !u!114 &1830259787114919159
 MonoBehaviour:
   m_ObjectHideFlags: 0
