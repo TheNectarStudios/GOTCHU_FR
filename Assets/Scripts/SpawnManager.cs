@@ -1,6 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 using System.Collections.Generic;
 
 public class SpawnManager : MonoBehaviourPunCallbacks
@@ -8,31 +9,32 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Transform spawnPoint;
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
+    public float bufferTime = 3.0f;  // Time to wait before assigning roles
 
     private void Start()
     {
-        // Retrieve the number of players from PlayerPrefs (default to 4 if not set)
-        int playerCount = PlayerPrefs.GetInt("PlayerCount", 4);
-
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
-            AssignRoles(playerCount);
+            // Start the role assignment after a buffer period
+            StartCoroutine(WaitAndAssignRoles());
         }
     }
 
-    private void AssignRoles(int playerCount)
+    private IEnumerator WaitAndAssignRoles()
     {
-        // Retrieve the list of players currently in the room
+        // Wait for the buffer time to allow all players to join
+        yield return new WaitForSeconds(bufferTime);
+
+        // Now perform role assignment
+        AssignRoles();
+    }
+
+    private void AssignRoles()
+    {
         List<Player> players = new List<Player>(PhotonNetwork.PlayerList);
-        
-        // Ensure we are working with the correct number of players
-        playerCount = Mathf.Min(playerCount, players.Count);
+        int protagonistIndex = Random.Range(0, players.Count);
 
-        // Randomly select a protagonist
-        int protagonistIndex = Random.Range(0, playerCount);
-
-        // Assign roles to players
-        for (int i = 0; i < playerCount; i++)
+        for (int i = 0; i < players.Count; i++)
         {
             if (i == protagonistIndex)
             {
@@ -48,14 +50,12 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetProtagonist()
     {
-        // Instantiate the protagonist at the spawn point
         PhotonNetwork.Instantiate(protagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
     }
 
     [PunRPC]
     private void SetAntagonist()
     {
-        // Instantiate the antagonist at the spawn point
         PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
     }
 }
