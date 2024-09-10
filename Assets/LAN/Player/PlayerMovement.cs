@@ -74,7 +74,7 @@ public class PacMan3DMovement : MonoBehaviourPun
         if (CanMoveInDirection(direction))
         {
             transform.Translate(direction * speed * Time.deltaTime, Space.World);
-            photonView.RPC("UpdatePosition", RpcTarget.Others, transform.position);
+           
         }
     }
 
@@ -90,14 +90,14 @@ public class PacMan3DMovement : MonoBehaviourPun
         return Vector3.Dot(direction, newDirection) < -0.9f;
     }
 
-    [PunRPC]
+
     void SyncDirection(Vector3 direction)
     {
         if (photonView.IsMine) return;
         SetNextDirection(direction);
     }
 
-    [PunRPC]
+
     void UpdatePosition(Vector3 newPosition)
     {
         if (!photonView.IsMine)
@@ -113,7 +113,6 @@ public class PacMan3DMovement : MonoBehaviourPun
             transform.position = initialPosition;
             direction = Vector3.zero;
             nextDirection = Vector3.zero;
-            photonView.RPC("UpdatePosition", RpcTarget.Others, initialPosition);
         }
     }
 }
