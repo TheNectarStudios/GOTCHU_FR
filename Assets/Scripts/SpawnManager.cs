@@ -3,33 +3,34 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
-    // Separate spawn points for protagonist and antagonist
     public Transform protagonistSpawnPoint;
     public Transform antagonistSpawnPoint;
 
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
 
-    public float bufferTime = 3.0f;  // Time to wait before assigning roles
+    public Button buttonUp;
+    public Button buttonDown;
+    public Button buttonLeft;
+    public Button buttonRight;
+
+    public float bufferTime = 3.0f;
 
     private void Start()
     {
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
-            // Start the role assignment after a buffer period
             StartCoroutine(WaitAndAssignRoles());
         }
     }
 
     private IEnumerator WaitAndAssignRoles()
     {
-        // Wait for the buffer time to allow all players to join
         yield return new WaitForSeconds(bufferTime);
-
-        // Now perform role assignment
         AssignRoles();
     }
 
@@ -54,14 +55,39 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetProtagonist()
     {
-        // Spawn protagonist at the designated spawn point
-        PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
+        GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
+        AssignButtonControls(protagonist);
     }
 
     [PunRPC]
     private void SetAntagonist()
     {
-        // Spawn antagonist at the designated spawn point
-        PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
+        GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
+        AssignButtonControls(antagonist);
+    }
+
+    private void AssignButtonControls(GameObject player)
+    {
+        if (player.GetComponent<PhotonView>().IsMine)
+        {
+            PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
+
+            if (movementScript != null)
+            {
+                buttonUp.onClick.RemoveAllListeners();
+                buttonDown.onClick.RemoveAllListeners();
+                buttonLeft.onClick.RemoveAllListeners();
+                buttonRight.onClick.RemoveAllListeners();
+
+                buttonUp.onClick.AddListener(() => movementScript.MoveUp());
+                buttonDown.onClick.AddListener(() => movementScript.MoveDown());
+                buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
+                buttonRight.onClick.AddListener(() => movementScript.MoveRight());
+            }
+            else
+            {
+                Debug.LogError("PacMan3DMovement script not found on the player.");
+            }
+        }
     }
 }
