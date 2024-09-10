@@ -28,7 +28,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.12",
+      "version": "1.8.16",
       "depth": 2,
       "source": "registry",
       "dependencies": {
@@ -66,9 +66,9 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.mobile.android-logcat": "1.4.0",
+        "com.unity.mobile.android-logcat": "1.4.2",
         "com.unity.adaptiveperformance": "4.0.1",
-        "com.unity.mobile.notifications": "2.3.1"
+        "com.unity.mobile.notifications": "2.3.2"
       }
     },
     "com.unity.ide.rider": {
@@ -104,14 +104,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.mobile.android-logcat": {
-      "version": "1.4.0",
+      "version": "1.4.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.mobile.notifications": {
-      "version": "2.3.1",
+      "version": "2.3.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -120,12 +120,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.7.1",
+      "version": "1.9.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.transport": "1.4.0",
-        "com.unity.nuget.mono-cecil": "1.10.1"
+        "com.unity.nuget.mono-cecil": "1.10.1",
+        "com.unity.transport": "1.4.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -168,9 +168,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -180,8 +180,8 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.6.6",
         "com.unity.collections": "1.2.4",
+        "com.unity.burst": "1.6.6",
         "com.unity.mathematics": "1.2.6"
       },
       "url": "https://packages.unity.com"
