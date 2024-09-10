@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ghost
+  - Bullet
+  - button_up
+  - button_down
+  - button_left
+  - button_right
   layers:
   - Default
   - TransparentFX

@@ -8,16 +8,25 @@ public class PacMan3DMovement : MonoBehaviour
     private Vector3 direction = Vector3.zero;  // Current movement direction
     private Vector3 nextDirection = Vector3.zero;  // Next desired movement direction
 
+    private GameObject player;  // Reference to the player object
     private Vector3 initialPosition;  // Store the initial position to reset if needed
-
-    void Start()
-    {
-        initialPosition = transform.position;  // Store initial position
-    }
 
     void Update()
     {
-        Move();  // Handle movement
+        // If the player is not assigned, try to find it in the scene
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                initialPosition = player.transform.position;  // Store initial position
+            }
+        }
+
+        if (player != null)
+        {
+            Move();  // Handle movement
+        }
     }
 
     // Assign the movement functions to buttons
@@ -62,7 +71,7 @@ public class PacMan3DMovement : MonoBehaviour
         // If there's no obstacle in the current direction, keep moving
         if (CanMoveInDirection(direction))
         {
-            transform.Translate(direction * speed * Time.deltaTime, Space.World);
+            player.transform.Translate(direction * speed * Time.deltaTime, Space.World);
         }
     }
 
@@ -70,7 +79,7 @@ public class PacMan3DMovement : MonoBehaviour
     bool CanMoveInDirection(Vector3 dir)
     {
         // Cast a ray in the intended direction to check for obstacles
-        Ray ray = new Ray(transform.position, dir);
+        Ray ray = new Ray(player.transform.position, dir);
         RaycastHit hit;
 
         // Perform raycast slightly beyond the current position to detect any obstacles
@@ -93,8 +102,11 @@ public class PacMan3DMovement : MonoBehaviour
     // Reset Pac-Man to initial position (if needed, for example, after death or restart)
     public void ResetPosition()
     {
-        transform.position = initialPosition;
-        direction = Vector3.zero;
-        nextDirection = Vector3.zero;
+        if (player != null)
+        {
+            player.transform.position = initialPosition;
+            direction = Vector3.zero;
+            nextDirection = Vector3.zero;
+        }
     }
 }
