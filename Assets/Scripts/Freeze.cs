@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 public class Freeze : MonoBehaviour
 {
-    private WASDMovement playerMovement;
+    private PacMan3DMovement playerMovement;
     public float freezeDuration = 3f;
     private GameObject[] ghosts;
 
@@ -13,20 +13,21 @@ public class Freeze : MonoBehaviour
     {
         //playerMovement = collision.gameObject.GetComponent<WASDMovement>();
         ActivatePowerUp();
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
 
     }
 
     public void ActivatePowerUp()
     {
-        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        ghosts = GameObject.FindGameObjectsWithTag("Player");
 
 
         foreach (GameObject ghost in ghosts)
         {
-            ghost.GetComponent<WASDMovement>().enabled = false;
+            ghost.GetComponent<PacMan3DMovement>().enabled = false;
         }
+
+        GetComponent<Renderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
 
         StartCoroutine(UnfreezeAfterDelay());
     }
@@ -35,11 +36,11 @@ public class Freeze : MonoBehaviour
     {
         yield return new WaitForSeconds(freezeDuration);
 
-        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        ghosts = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (GameObject ghost in ghosts)
         {
-            ghost.GetComponent<WASDMovement>().enabled = true;
+            ghost.GetComponent<PacMan3DMovement>().enabled = true;
         }
         Destroy(gameObject);
     }
