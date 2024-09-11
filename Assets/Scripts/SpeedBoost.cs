@@ -4,27 +4,27 @@ public class SpeedBoost : MonoBehaviour
 {
     public float speedMultiplier = 1.5f;
     public float duration = 5f;
-    private WASDMovement playerMovement;
+    private PacMan3DMovement playerMovement;
 
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
-        playerMovement=collision.gameObject.GetComponent<WASDMovement>();
+        playerMovement = collision.gameObject.GetComponent<PacMan3DMovement>();
         ActivatePowerUp();
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
 
     }
     public void ActivatePowerUp()
     {
         StartCoroutine(SpeedBoostRoutine());
+        GetComponent<Renderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
     }
 
     private IEnumerator SpeedBoostRoutine()
     {
-        playerMovement.moveSpeed *= speedMultiplier;
+        playerMovement.speed *= speedMultiplier;
         yield return new WaitForSeconds(duration);
-        playerMovement.moveSpeed /= speedMultiplier;
+        playerMovement.speed /= speedMultiplier;
         Destroy(gameObject);
     }
 }
