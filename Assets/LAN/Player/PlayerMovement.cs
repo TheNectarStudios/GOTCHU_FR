@@ -5,9 +5,12 @@ public class PacMan3DMovement : MonoBehaviourPun
 {
     public float speed = 5f;
     public LayerMask obstacleLayer;
+    public Vector3 playerSize = new Vector3(1f, 1f, 1f);  // Size of the player for collision detection
     private Vector3 direction = Vector3.zero;
     private Vector3 nextDirection = Vector3.zero;
     private Vector3 initialPosition;
+    private bool hasQueuedDirection = false;
+    public float snapThreshold = 0.1f;  // The threshold for snapping to grid
 
     void Start()
     {
@@ -27,7 +30,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            SetNextDirection(Vector3.forward);
+            QueueDirection(Vector3.forward);
         }
     }
 
@@ -35,7 +38,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            SetNextDirection(Vector3.back);
+            QueueDirection(Vector3.back);
         }
     }
 
@@ -43,7 +46,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            SetNextDirection(Vector3.left);
+            QueueDirection(Vector3.left);
         }
     }
 
@@ -51,59 +54,67 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            SetNextDirection(Vector3.right);
+            QueueDirection(Vector3.right);
         }
     }
 
-    void SetNextDirection(Vector3 newDirection)
+    void QueueDirection(Vector3 newDirection)
     {
-        if (!IsOppositeDirection(newDirection))
-        {
-            nextDirection = newDirection;
-            photonView.RPC("SyncDirection", RpcTarget.Others, newDirection);
-        }
+        nextDirection = newDirection;
+        hasQueuedDirection = true;
+        photonView.RPC("SyncDirection", RpcTarget.Others, newDirection);
     }
 
     void Move()
     {
-        if (nextDirection != direction && CanMoveInDirection(nextDirection))
+        // Check if we can apply the next direction
+        if (hasQueuedDirection && CanMoveInDirection(nextDirection))
         {
             direction = nextDirection;
+            hasQueuedDirection = false;
         }
 
+        // Move in the current direction
         if (CanMoveInDirection(direction))
         {
             transform.Translate(direction * speed * Time.deltaTime, Space.World);
-           
         }
     }
 
     bool CanMoveInDirection(Vector3 dir)
     {
-        Ray ray = new Ray(transform.position, dir);
+        // Use a box cast to check for obstacles with the player's size
+        Vector3 halfExtents = playerSize / 2f;  // Half extents for the box cast (like a bounding box)
         RaycastHit hit;
-        return !Physics.Raycast(ray, out hit, 1f, obstacleLayer);
+        
+        // Cast the box slightly ahead in the direction of movement
+        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, 0.75f, obstacleLayer);
+
+        return !hitSomething;  // Return true if no obstacles were hit
     }
 
-    bool IsOppositeDirection(Vector3 newDirection)
+    // Check if the player's position is aligned for turning
+    bool IsAlignedForTurn()
     {
-        return Vector3.Dot(direction, newDirection) < -0.9f;
+        Vector3 currentPos = transform.position;
+
+        // Allow snapping along the X and Z axes depending on the direction
+        if (direction == Vector3.forward || direction == Vector3.back)
+        {
+            return Mathf.Abs(Mathf.Round(currentPos.x) - currentPos.x) < snapThreshold;
+        }
+        else if (direction == Vector3.left || direction == Vector3.right)
+        {
+            return Mathf.Abs(Mathf.Round(currentPos.z) - currentPos.z) < snapThreshold;
+        }
+
+        return false;
     }
 
-
-    void SyncDirection(Vector3 direction)
+    void SyncDirection(Vector3 newDirection)
     {
         if (photonView.IsMine) return;
-        SetNextDirection(direction);
-    }
-
-
-    void UpdatePosition(Vector3 newPosition)
-    {
-        if (!photonView.IsMine)
-        {
-            transform.position = newPosition;
-        }
+        nextDirection = newDirection;
     }
 
     public void ResetPosition()
@@ -113,6 +124,7 @@ public class PacMan3DMovement : MonoBehaviourPun
             transform.position = initialPosition;
             direction = Vector3.zero;
             nextDirection = Vector3.zero;
+            hasQueuedDirection = false;
         }
     }
 }
