@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2864278456403344489}
   m_Layer: 0
   m_Name: Pearl
-  m_TagString: Untagged
+  m_TagString: Pearl
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -123,7 +123,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 2
   observableSearch: 2
   ObservedComponents:
   - {fileID: 2864278456403344489}
