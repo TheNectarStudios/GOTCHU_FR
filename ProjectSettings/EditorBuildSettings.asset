@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 963c6a6d95c517b4698e0e79ffc0d5fe
+  - enabled: 0
+    path: Assets/Scenes/multiplayer but only for testing.unity
+    guid: 484e3f86eb953904ba4afe078a2af9ec
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000,
       guid: 56e45526f96be7645901bf35a9fd8c68, type: 2}

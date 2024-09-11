@@ -28,7 +28,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
+<<<<<<< HEAD
       "version": "1.8.15",
+=======
+      "version": "1.8.12",
+>>>>>>> 92382edf557d406fc870b164e9d9c89ebc66e450
       "depth": 2,
       "source": "registry",
       "dependencies": {
@@ -66,9 +70,15 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
+<<<<<<< HEAD
         "com.unity.mobile.android-logcat": "1.4.2",
         "com.unity.adaptiveperformance": "4.0.1",
         "com.unity.mobile.notifications": "2.3.2"
+=======
+        "com.unity.mobile.android-logcat": "1.4.0",
+        "com.unity.adaptiveperformance": "4.0.1",
+        "com.unity.mobile.notifications": "2.3.1"
+>>>>>>> 92382edf557d406fc870b164e9d9c89ebc66e450
       }
     },
     "com.unity.ide.rider": {
@@ -104,14 +114,22 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.mobile.android-logcat": {
+<<<<<<< HEAD
       "version": "1.4.2",
+=======
+      "version": "1.4.0",
+>>>>>>> 92382edf557d406fc870b164e9d9c89ebc66e450
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.mobile.notifications": {
+<<<<<<< HEAD
       "version": "2.3.2",
+=======
+      "version": "2.3.1",
+>>>>>>> 92382edf557d406fc870b164e9d9c89ebc66e450
       "depth": 1,
       "source": "registry",
       "dependencies": {
