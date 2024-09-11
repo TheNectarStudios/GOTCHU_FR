@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ReverseControls : MonoBehaviour
 {
-    private WASDMovement playerMovement;
+    private PacMan3DMovement playerMovement;
     public float reverseDuration = 5f;
     private GameObject[] ghosts;
 
@@ -13,22 +13,24 @@ public class ReverseControls : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        //playerMovement = collision.gameObject.GetComponent<WASDMovement>();
-        ActivatePowerUp();
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
-
+        if (collision.gameObject.name == "Hero(Clone)")
+        {
+            ActivatePowerUp();
+        }
     }
 
     public void ActivatePowerUp()
     {
-        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        ghosts = GameObject.FindGameObjectsWithTag("Player");
 
 
         foreach (GameObject ghost in ghosts)
         {
-            ghost.GetComponent<WASDMovement>().moveSpeed *= -1;
+            ghost.GetComponent<PacMan3DMovement>().speed *= -1;
         }
+
+        GetComponent<Renderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
 
         StartCoroutine(UnfreezeAfterDelay());
     }
@@ -37,11 +39,11 @@ public class ReverseControls : MonoBehaviour
     {
         yield return new WaitForSeconds(reverseDuration);
 
-        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        ghosts = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (GameObject ghost in ghosts)
         {
-            ghost.GetComponent<WASDMovement>().moveSpeed *= -1;
+            ghost.GetComponent<PacMan3DMovement>().speed *= -1;
         }
         Destroy(gameObject);
     }
