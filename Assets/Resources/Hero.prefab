@@ -147,6 +147,8 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 4294967295
+  playerSize: {x: 1, y: 1, z: 1}
+  snapThreshold: 0.2
 --- !u!114 &1830259787114919159
 MonoBehaviour:
   m_ObjectHideFlags: 0
