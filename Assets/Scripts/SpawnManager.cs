@@ -57,6 +57,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
         AssignButtonControls(protagonist);
+        AssignCamera(protagonist);  // Attach camera to protagonist
     }
 
     [PunRPC]
@@ -64,6 +65,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
         AssignButtonControls(antagonist);
+        AssignCamera(antagonist);  // Attach camera to antagonist
     }
 
     private void AssignButtonControls(GameObject player)
@@ -87,6 +89,29 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             else
             {
                 Debug.LogError("PacMan3DMovement script not found on the player.");
+            }
+        }
+    }
+
+    private void AssignCamera(GameObject player)
+    {
+        if (player.GetComponent<PhotonView>().IsMine)
+        {
+            // Find the main camera and assign it to follow this player
+            Camera mainCamera = Camera.main;
+
+            if (mainCamera != null)
+            {
+                TopDownCameraFollow cameraFollowScript = mainCamera.GetComponent<TopDownCameraFollow>();
+
+                if (cameraFollowScript == null)
+                {
+                    // If the camera doesn't have the TopDownCameraFollow script, add it
+                    cameraFollowScript = mainCamera.gameObject.AddComponent<TopDownCameraFollow>();
+                }
+
+                // Set the player as the target for the camera to follow
+                cameraFollowScript.target = player.transform;
             }
         }
     }
