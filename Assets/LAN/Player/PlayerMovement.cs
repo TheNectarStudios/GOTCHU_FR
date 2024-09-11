@@ -10,7 +10,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     private Vector3 nextDirection = Vector3.zero;
     private Vector3 initialPosition;
     private bool hasQueuedDirection = false;
-    public float snapThreshold = 0.1f;  // The threshold for snapping to grid
+    private float snapThreshold = 0.5f;  // The threshold for snapping to grid
 
     void Start()
     {
@@ -84,11 +84,11 @@ public class PacMan3DMovement : MonoBehaviourPun
     bool CanMoveInDirection(Vector3 dir)
     {
         // Use a box cast to check for obstacles with the player's size
-        Vector3 halfExtents = playerSize / 2f;  // Half extents for the box cast (like a bounding box)
+        Vector3 halfExtents = playerSize / 1.15f;  // Half extents for the box cast (like a bounding box)
         RaycastHit hit;
         
         // Cast the box slightly ahead in the direction of movement
-        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, 0.75f, obstacleLayer);
+        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, 0.15f, obstacleLayer);
 
         return !hitSomething;  // Return true if no obstacles were hit
     }
