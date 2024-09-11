@@ -38,6 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2253,6 +2254,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: maze_gotchu
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 79a2533e77500f64a8cd9e6ac3111ea4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1502877291743220047, guid: 79a2533e77500f64a8cd9e6ac3111ea4,
         type: 3}
@@ -5665,7 +5671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ad6244afb46bed45ad993d0f58649a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 10
+  gameDuration: 60
 --- !u!114 &1290347060
 MonoBehaviour:
   m_ObjectHideFlags: 0
