@@ -62,7 +62,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         nextDirection = newDirection;
         hasQueuedDirection = true;
-        photonView.RPC("SyncDirection", RpcTarget.Others, newDirection);
+        // photonView.RPC("SyncDirection", RpcTarget.Others, newDirection);
     }
 
     void Move()
@@ -113,7 +113,7 @@ public class PacMan3DMovement : MonoBehaviourPun
 
     void SyncDirection(Vector3 newDirection)
     {
-        if (photonView.IsMine) return;
+        if (!photonView.IsMine) return;
         nextDirection = newDirection;
     }
 
