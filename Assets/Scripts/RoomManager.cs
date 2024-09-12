@@ -139,21 +139,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
     private string GenerateRoomKey()
     {
         const string digits = "0123456789";
-        const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         System.Random random = new System.Random();
 
-        // Generate 6 random digits
-        string key = new string(Enumerable.Repeat(digits, 6)
+        // Generate a 4-digit numeric key
+        string key = new string(Enumerable.Repeat(digits, 4)
             .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        // Generate 2 random letters
-        key += new string(Enumerable.Repeat(letters, 2)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        // Shuffle the key to ensure randomness of letter positions
-        key = new string(key.ToCharArray().OrderBy(c => random.Next()).ToArray());
 
         return key;
     }
+
     #endregion
 }
