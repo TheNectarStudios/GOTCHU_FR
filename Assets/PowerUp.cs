@@ -1,24 +1,23 @@
 using UnityEngine;
+using Photon.Pun;
 
-public class PowerUp : MonoBehaviour
+public class PowerUp : MonoBehaviourPun
 {
-    // Define an event to notify when the power-up is picked up
     public delegate void PowerUpPickedUp();
     public event PowerUpPickedUp onPickedUp;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        // Check if the player has collided with the power-up
-        if (collision.gameObject.CompareTag("Player"))  
+        if (other.CompareTag("Player"))
         {
-            // Trigger the picked-up event
-            Debug.Log("Power-up picked up!");
-            onPickedUp?.Invoke();
-            // Hide or disable the power-up
-            GetComponent<Renderer>().enabled = false;
-            GetComponent<Collider>().enabled = false;
-            // Notify the spawner
-            Destroy(gameObject); // Remove the power-up from the scene
+            // Trigger the event for when the power-up is picked up
+            if (onPickedUp != null)
+            {
+                onPickedUp.Invoke();
+            }
+
+            // Notify all players that the power-up is picked up and destroy it across the network
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 }

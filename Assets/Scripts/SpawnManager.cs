@@ -97,7 +97,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (player.GetComponent<PhotonView>().IsMine)
         {
-            // Find the main camera and assign it to follow this player
             Camera mainCamera = Camera.main;
 
             if (mainCamera != null)
@@ -106,11 +105,9 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
                 if (cameraFollowScript == null)
                 {
-                    // If the camera doesn't have the TopDownCameraFollow script, add it
                     cameraFollowScript = mainCamera.gameObject.AddComponent<TopDownCameraFollow>();
                 }
 
-                // Set the player as the target for the camera to follow
                 cameraFollowScript.target = player.transform;
             }
         }

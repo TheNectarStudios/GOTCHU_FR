@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class PowerUpSpawner : MonoBehaviour
+public class PowerUpSpawner : MonoBehaviourPunCallbacks
 {
     public List<Transform> spawnPoints; // List of potential spawn points
     public List<GameObject> powerUpPrefabs; // List of power-up prefabs
@@ -12,14 +14,17 @@ public class PowerUpSpawner : MonoBehaviour
 
     void Start()
     {
-        // Start spawning power-ups at regular intervals
-        InvokeRepeating("TrySpawnPowerUp", 2.0f, 1.0f); // Check every second if a new power-up should spawn
+        // Only the MasterClient is responsible for spawning power-ups
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // Start spawning power-ups at regular intervals
+            InvokeRepeating("TrySpawnPowerUp", 2.0f, 1.0f);
+        }
     }
 
     void TrySpawnPowerUp()
     {
-        // Check if the current number of power-ups is less than the maximum allowed
-        if (activePowerUps.Count < maxPowerUps)
+        if (PhotonNetwork.IsMasterClient && activePowerUps.Count < maxPowerUps)
         {
             SpawnPowerUp();
         }
@@ -27,14 +32,20 @@ public class PowerUpSpawner : MonoBehaviour
 
     void SpawnPowerUp()
     {
+        if (spawnPoints.Count == 0 || powerUpPrefabs.Count == 0)
+        {
+            Debug.LogError("No spawn points or power-up prefabs set.");
+            return;
+        }
+
         // Pick a random spawn point
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
 
         // Pick a random power-up prefab
         GameObject selectedPowerUp = powerUpPrefabs[Random.Range(0, powerUpPrefabs.Count)];
 
-        // Spawn the power-up at the selected spawn point
-        GameObject newPowerUp = Instantiate(selectedPowerUp, spawnPoint.position, Quaternion.identity);
+        // Spawn the power-up at the selected spawn point (only the MasterClient can spawn)
+        GameObject newPowerUp = PhotonNetwork.Instantiate(selectedPowerUp.name, spawnPoint.position, Quaternion.identity);
         activePowerUps.Add(newPowerUp);
 
         // Ensure that the power-up is removed from the list once it is picked up
@@ -47,9 +58,17 @@ public class PowerUpSpawner : MonoBehaviour
 
     void HandlePowerUpPickedUp(GameObject powerUp)
     {
-        // Remove the power-up from the active list
         activePowerUps.Remove(powerUp);
-        // Optionally, add a delay before allowing respawn
         Destroy(powerUp);
+    }
+
+    // MasterClient changed (in case of disconnection)
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        // New MasterClient will take over the power-up spawning
+        if (PhotonNetwork.IsMasterClient)
+        {
+            InvokeRepeating("TrySpawnPowerUp", 2.0f, 1.0f);
+        }
     }
 }
