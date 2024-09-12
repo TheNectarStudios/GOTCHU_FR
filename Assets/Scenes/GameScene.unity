@@ -6129,7 +6129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ad6244afb46bed45ad993d0f58649a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 30
+  gameDuration: 80
   timerText: {fileID: 1060130840}
 --- !u!114 &1290347060
 MonoBehaviour:
@@ -8276,7 +8276,6 @@ MonoBehaviour:
   - {fileID: 2056009038309261749, guid: 4f61233481a1961419a826e6883351cd, type: 3}
   - {fileID: 8620414434606916835, guid: 76468de4246ab3644817181255da1245, type: 3}
   maxPowerUps: 3
-  respawnDelay: 5
 --- !u!1 &1942656002
 GameObject:
   m_ObjectHideFlags: 0
