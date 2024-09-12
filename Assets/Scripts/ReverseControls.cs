@@ -30,11 +30,10 @@ public class ReverseControls : MonoBehaviour
             }
         }
 
-        // Hide the power-up and disable its collider
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
+        // Instead of disabling the Renderer/Collider, just hide the object visually by setting it transparent
+        GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0); // Set alpha to 0 (make invisible)
 
-        // Start coroutine to restore controls after a delay
+        // Start the coroutine to restore controls after a delay
         StartCoroutine(UnreverseAfterDelay());
     }
 
@@ -56,7 +55,7 @@ public class ReverseControls : MonoBehaviour
             }
         }
 
-        // Destroy the power-up object
+        // Now destroy the power-up object after the effect duration
         Destroy(gameObject);
     }
 }

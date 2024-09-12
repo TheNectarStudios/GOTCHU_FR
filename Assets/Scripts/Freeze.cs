@@ -1,9 +1,9 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class Freeze : MonoBehaviour
 {
-    public float freezeDuration = 3f; // Duration for which the controls are frozen
+    public float freezeDuration = 3f; // Duration for which the freeze effect lasts
     private GameObject[] ghosts;
 
     private void OnTriggerEnter(Collider other)
@@ -20,21 +20,20 @@ public class Freeze : MonoBehaviour
         // Find all game objects with the tag "Ghost"
         ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
-        // Freeze the controls for all ghosts
+        // Disable movement for all ghosts
         foreach (GameObject ghost in ghosts)
         {
             PacMan3DMovement movement = ghost.GetComponent<PacMan3DMovement>();
             if (movement != null)
             {
-                movement.enabled = false; // Disable movement script to freeze the ghost
+                movement.enabled = false; // Disable movement
             }
         }
 
-        // Hide the power-up and disable its collider
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
+        // Instead of disabling the Renderer/Collider, just hide the object visually by setting it transparent
+        GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0); // Set alpha to 0 (make invisible)
 
-        // Start coroutine to restore controls after a delay
+        // Start the coroutine to unfreeze after the delay
         StartCoroutine(UnfreezeAfterDelay());
     }
 
@@ -46,17 +45,17 @@ public class Freeze : MonoBehaviour
         // Find all game objects with the tag "Ghost" again
         ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
-        // Restore the controls for all ghosts
+        // Re-enable movement for all ghosts
         foreach (GameObject ghost in ghosts)
         {
             PacMan3DMovement movement = ghost.GetComponent<PacMan3DMovement>();
             if (movement != null)
             {
-                movement.enabled = true; // Re-enable movement script
+                movement.enabled = true; // Re-enable movement
             }
         }
 
-        // Destroy the power-up object
+        // Now destroy the power-up object after the effect duration
         Destroy(gameObject);
     }
 }
