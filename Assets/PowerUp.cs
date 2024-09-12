@@ -9,9 +9,10 @@ public class PowerUp : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // Check if the player has collided with the power-up
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))  
         {
             // Trigger the picked-up event
+            Debug.Log("Power-up picked up!");
             onPickedUp?.Invoke();
             // Hide or disable the power-up
             GetComponent<Renderer>().enabled = false;

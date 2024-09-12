@@ -36,7 +36,7 @@ public class Freeze : MonoBehaviour
     {
         yield return new WaitForSeconds(freezeDuration);
 
-        ghosts = GameObject.FindGameObjectsWithTag("Player");
+        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
         foreach (GameObject ghost in ghosts)
         {
