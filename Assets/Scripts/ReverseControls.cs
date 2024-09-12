@@ -39,7 +39,7 @@ public class ReverseControls : MonoBehaviour
     {
         yield return new WaitForSeconds(reverseDuration);
 
-        ghosts = GameObject.FindGameObjectsWithTag("Player");
+        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
         foreach (GameObject ghost in ghosts)
         {

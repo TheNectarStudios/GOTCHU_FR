@@ -21,7 +21,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GameScene.unity
     guid: 963c6a6d95c517b4698e0e79ffc0d5fe
   - enabled: 0
-    path: Assets/Scenes/multiplayer but only for testing.unity
+    path: Assets/Scenes/GameScene Backup.unity
     guid: 484e3f86eb953904ba4afe078a2af9ec
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000,

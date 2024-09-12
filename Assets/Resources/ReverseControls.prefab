@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 7327383652993691476}
   - component: {fileID: 7177680205263676987}
   - component: {fileID: 5118813890883396198}
-  - component: {fileID: 8583331028592285502}
+  - component: {fileID: -5807446216259720894}
+  - component: {fileID: -7551491491399702940}
   m_Layer: 0
   m_Name: ReverseControls
   m_TagString: Untagged
@@ -106,7 +107,19 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8583331028592285502
+--- !u!114 &-5807446216259720894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5287299460218222280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a16d832cbfa8dab46bad4a7b205b02f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-7551491491399702940
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

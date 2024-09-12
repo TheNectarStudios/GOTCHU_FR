@@ -15,13 +15,12 @@ GameObject:
   - component: {fileID: 7059334521950520518}
   - component: {fileID: 8092038899016787820}
   - component: {fileID: 3255677996356333664}
-  - component: {fileID: 1830259787114919159}
   - component: {fileID: 5551491824537765346}
   - component: {fileID: -6287650828009777040}
   - component: {fileID: 6540559626351184442}
   m_Layer: 0
   m_Name: Hero
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,37 +162,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   playerSize: {x: 1, y: 1, z: 1}
---- !u!114 &1830259787114919159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2916944212718552625}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!114 &5551491824537765346
 MonoBehaviour:
   m_ObjectHideFlags: 0
