@@ -10,6 +10,7 @@ TagManager:
   - button_down
   - button_left
   - button_right
+  - Pearl
   layers:
   - Default
   - TransparentFX

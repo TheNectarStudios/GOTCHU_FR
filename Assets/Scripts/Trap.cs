@@ -6,7 +6,7 @@ public class Trap : MonoBehaviour
     public float slowDownFactor = 0.5f;
     public float trapDuration = 10f;
     public float slowDownDuration = 3f;
-    private WASDMovement playerMovement;
+    private PacMan3DMovement playerMovement;
 
 
     void Start()
@@ -14,27 +14,29 @@ public class Trap : MonoBehaviour
         Destroy(gameObject, trapDuration);
     }
 
-    
+
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.name =="Prot") {
-            playerMovement = collision.gameObject.GetComponent<WASDMovement>();
+        if (collision.gameObject.name == "Hero(Clone)")
+        {
+            playerMovement = collision.gameObject.GetComponent<PacMan3DMovement>();
             ActivatePowerUp();
-            GetComponent<Renderer>().enabled = false;
-            GetComponent<Collider>().enabled = false;
+            Debug.Log("Fell in trap");
         }
-        
+
     }
     public void ActivatePowerUp()
     {
+        GetComponent<Renderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
         StartCoroutine(ApplySlowDown());
     }
 
     private IEnumerator ApplySlowDown()
     {
-        playerMovement.moveSpeed *= slowDownFactor;
+        playerMovement.speed *= slowDownFactor;
         yield return new WaitForSeconds(slowDownDuration);
-        playerMovement.moveSpeed /= slowDownFactor;
+        playerMovement.speed /= slowDownFactor;
         Destroy(gameObject);
     }
 }
