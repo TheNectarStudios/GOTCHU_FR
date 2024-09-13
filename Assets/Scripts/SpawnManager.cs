@@ -17,6 +17,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Button buttonDown;
     public Button buttonLeft;
     public Button buttonRight;
+    public Button buttoninvisible;
 
     public float bufferTime = 3.0f;
 
@@ -66,6 +67,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
         AssignButtonControls(antagonist);
         AssignCamera(antagonist);  // Attach camera to antagonist
+        AssignAbilities(antagonist);
     }
 
     private void AssignButtonControls(GameObject player)
@@ -73,7 +75,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         if (player.GetComponent<PhotonView>().IsMine)
         {
             PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
-
             if (movementScript != null)
             {
                 buttonUp.onClick.RemoveAllListeners();
@@ -109,6 +110,22 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 }
 
                 cameraFollowScript.target = player.transform;
+            }
+        }
+    }
+
+    private void AssignAbilities(GameObject player)
+    {
+        if (player.GetComponent<PhotonView>().IsMine)
+        {
+            Invisibility invisiblity = player.GetComponent<Invisibility>();
+
+            if(invisiblity!= null)
+            {
+                Debug.Log("Abilities Assigned");
+                buttoninvisible.interactable=true;
+                buttoninvisible.onClick.RemoveAllListeners();
+                buttoninvisible.onClick.AddListener(() => invisiblity.ActivateInvisibility());
             }
         }
     }
