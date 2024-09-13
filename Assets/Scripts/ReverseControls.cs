@@ -1,4 +1,5 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class BulletPowerUp : MonoBehaviour
 {
@@ -7,13 +8,14 @@ public class BulletPowerUp : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        // Ensure the player that picks up the power-up is controlled by the local client
+        if (other.CompareTag("Player") && other.GetComponent<PhotonView>().IsMine)
         {
             PlayerShooting playerShooting = other.GetComponent<PlayerShooting>();
 
             if (playerShooting != null)
             {
-                // Give the player the ability to shoot
+                // Give the player the ability to shoot by enabling shooting on the local player's script
                 playerShooting.EnableShooting(bulletPrefab);
 
                 // Optionally, hide the power-up and destroy it after a delay

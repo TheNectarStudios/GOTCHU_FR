@@ -125,8 +125,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a8fe53de6a295c44bafaf5b427e33d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 3820103123359011567, guid: d2ba9348fa1b06f4283c9df1d7fac1e6,
+    type: 3}
   firePoint: {fileID: 466337331178679867}
-  bulletSpeed: 20
+  bulletForce: 20
 --- !u!114 &7059334521950520518
 MonoBehaviour:
   m_ObjectHideFlags: 0
