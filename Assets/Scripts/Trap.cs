@@ -1,42 +1,47 @@
 using UnityEngine;
+using Photon.Pun;
 using System.Collections;
+using UnityEngine.UI;
+using System.Collections; 
 
-public class Trap : MonoBehaviour
+public class Trap : MonoBehaviourPun
 {
-    public float slowDownFactor = 0.5f;
-    public float trapDuration = 10f;
-    public float slowDownDuration = 3f;
-    private PacMan3DMovement playerMovement;
+    public GameObject trapPrefab;
+    public float trapLifetime = 15f;
+    public float cooldownTime = 15f;
+    private bool isOnCooldown = false;
 
+    public Button trapButton;
 
     void Start()
     {
-        Destroy(gameObject, trapDuration);
-    }
-
-
-    private void OnTriggerEnter(Collider collision)
-    {
-        if (collision.gameObject.name == "Hero(Clone)")
+        if (photonView.IsMine)
         {
-            playerMovement = collision.gameObject.GetComponent<PacMan3DMovement>();
-            ActivatePowerUp();
-            Debug.Log("Fell in trap");
+            trapButton.onClick.AddListener(PlaceTrap);
+            trapButton.interactable = true;
         }
-
-    }
-    public void ActivatePowerUp()
-    {
-        GetComponent<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
-        StartCoroutine(ApplySlowDown());
     }
 
-    private IEnumerator ApplySlowDown()
+    public void PlaceTrap()
     {
-        playerMovement.speed *= slowDownFactor;
-        yield return new WaitForSeconds(slowDownDuration);
-        playerMovement.speed /= slowDownFactor;
-        Destroy(gameObject);
+        if (!isOnCooldown)
+        {
+            Vector3 spawnPosition = transform.position - transform.forward * 1f;
+            GameObject trap = PhotonNetwork.Instantiate(trapPrefab.name, spawnPosition, Quaternion.identity);
+            StartCoroutine(TrapCooldown(trap));
+        }
+    }
+
+    private IEnumerator TrapCooldown(GameObject trap)
+    {
+        isOnCooldown = true;
+        trapButton.interactable = false;
+
+        yield return new WaitForSeconds(trapLifetime);
+        PhotonNetwork.Destroy(trap);
+
+        yield return new WaitForSeconds(cooldownTime);
+        isOnCooldown = false;
+        trapButton.interactable = true;
     }
 }

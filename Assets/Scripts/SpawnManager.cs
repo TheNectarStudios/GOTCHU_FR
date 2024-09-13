@@ -17,9 +17,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Button buttonDown;
     public Button buttonLeft;
     public Button buttonRight;
-    public Button buttoninvisible;
+    public Button powerButton;  // Single button for all powers
 
     public float bufferTime = 3.0f;
+    private bool isCooldown = false;  // To handle cooldown across powers
 
     private void Start()
     {
@@ -118,15 +119,44 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (player.GetComponent<PhotonView>().IsMine)
         {
-            Invisibility invisiblity = player.GetComponent<Invisibility>();
+            // Make the power button available and assign abilities to the single button
+            powerButton.interactable = true;
+            powerButton.onClick.RemoveAllListeners();
 
-            if(invisiblity!= null)
+            Invisibility invisibility = player.GetComponent<Invisibility>();
+            Dash dash = player.GetComponent<Dash>();
+            Trap trap = player.GetComponent<Trap>();
+
+            if (invisibility != null)
             {
-                Debug.Log("Abilities Assigned");
-                buttoninvisible.interactable=true;
-                buttoninvisible.onClick.RemoveAllListeners();
-                buttoninvisible.onClick.AddListener(() => invisiblity.ActivateInvisibility());
+                powerButton.onClick.AddListener(() => ActivatePower(invisibility.ActivateInvisibility, invisibility.cooldownTime));
+            }
+            if (dash != null)
+            {
+                powerButton.onClick.AddListener(() => ActivatePower(dash.ActivateDash, dash.cooldownTime));
+            }
+            if (trap != null)
+            {
+                powerButton.onClick.AddListener(() => ActivatePower(trap.PlaceTrap, trap.cooldownTime));
             }
         }
+    }
+
+    private void ActivatePower(System.Action powerAction, float cooldown)
+    {
+        if (!isCooldown)
+        {
+            powerAction.Invoke();
+            StartCoroutine(CooldownRoutine(cooldown));
+        }
+    }
+
+    private IEnumerator CooldownRoutine(float cooldown)
+    {
+        isCooldown = true;
+        powerButton.interactable = false;
+        yield return new WaitForSeconds(cooldown);
+        powerButton.interactable = true;
+        isCooldown = false;
     }
 }

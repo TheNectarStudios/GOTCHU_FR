@@ -1,54 +1,89 @@
 using UnityEngine;
 using Photon.Pun;
+using System.Collections;
 
 public class Invisibility : MonoBehaviourPun
 {
+    public Renderer playerRenderer;  // Assign the player's renderer
     public float invisibilityDuration = 5f;  // Duration of invisibility
-    private bool isInvisible = false;
+    public float cooldownTime = 15f;  // Cooldown time between uses
 
-    
-    public void ActivateInvisibility()
+    private bool isInvisible = false;
+    private bool isCooldown = false;
+
+    private void Start()
     {
-        if (photonView.IsMine)
+        // Ensure the playerRenderer is assigned, otherwise try to get it from the object
+        if (playerRenderer == null)
         {
-            // Find the hero player and make the ghost invisible only for that player
-            GameObject heroPlayer = FindHeroPlayer();
-            if (heroPlayer != null)
-            {
-                photonView.RPC("RPC_SetInvisibilityForHero", RpcTarget.All, heroPlayer.GetComponent<PhotonView>().ViewID, false);
-                Invoke("DeactivateInvisibility", invisibilityDuration);
-            }
+            playerRenderer = GetComponentInChildren<Renderer>();
+        }
+
+        if (playerRenderer == null)
+        {
+            Debug.LogError("Renderer not found. Please assign a Renderer to the Invisibility script.");
         }
     }
 
-    void DeactivateInvisibility()
+    public void ActivateInvisibility()
     {
+        if (isCooldown || playerRenderer == null) return;  // Prevent usage during cooldown
+
+        StartCoroutine(InvisibilityRoutine());
+    }
+
+    private IEnumerator InvisibilityRoutine()
+    {
+        // Make the player invisible for others but not for themselves
         if (photonView.IsMine)
         {
-            // Find the hero player and make the ghost visible again for that player
-            GameObject heroPlayer = GameObject.FindGameObjectWithTag("Player");
-            if (heroPlayer != null)
-            {
-                photonView.RPC("RPC_SetInvisibilityForHero", RpcTarget.All, heroPlayer.GetComponent<PhotonView>().ViewID, true);
-            }
+            // Make the player invisible to others
+            photonView.RPC("SetInvisibleForOthers", RpcTarget.Others, true);
         }
+
+        // Disable renderer for others but keep it visible for the player themselves
+        SetInvisibility(true);
+
+        // Invisibility lasts for a defined duration
+        yield return new WaitForSeconds(invisibilityDuration);
+
+        // Make the player visible again
+        if (photonView.IsMine)
+        {
+            // Notify others that the player is now visible
+            photonView.RPC("SetInvisibleForOthers", RpcTarget.Others, false);
+        }
+
+        SetInvisibility(false);
+
+        // Start cooldown
+        StartCoroutine(InvisibilityCooldown());
     }
 
     [PunRPC]
-    void RPC_SetInvisibilityForHero(int heroViewID, bool isVisible)
+    private void SetInvisibleForOthers(bool invisible)
     {
-        GameObject heroPlayer = PhotonView.Find(heroViewID).gameObject;
-        if (heroPlayer != null && heroPlayer.CompareTag("Player"))
+        playerRenderer.enabled = !invisible;
+    }
+
+    private void SetInvisibility(bool invisible)
+    {
+        if (photonView.IsMine)
         {
-            if (photonView.IsMine)
-            {
-                GetComponent<Renderer>().enabled = isVisible;
-            }
+            // Keep the renderer active for the player themselves
+            playerRenderer.enabled = true;
+        }
+        else
+        {
+            // Set visibility for other players
+            playerRenderer.enabled = !invisible;
         }
     }
 
-    GameObject FindHeroPlayer()
+    private IEnumerator InvisibilityCooldown()
     {
-        return GameObject.FindGameObjectWithTag("Player");
+        isCooldown = true;
+        yield return new WaitForSeconds(cooldownTime);
+        isCooldown = false;
     }
 }
