@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 5344467231375885591}
   - component: {fileID: 3057447524446487768}
   - component: {fileID: -4519600758552411608}
+  - component: {fileID: 6475696533587563428}
   m_Layer: 0
   m_Name: vilen
   m_TagString: Ghost
@@ -264,6 +265,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &6475696533587563428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2916944212718552625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cca2fa5c48b43514083e17392201a72c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  invisibilityDuration: 5
 --- !u!1 &7421185685277034193
 GameObject:
   m_ObjectHideFlags: 0
