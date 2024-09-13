@@ -277,7 +277,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cca2fa5c48b43514083e17392201a72c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerRenderer: {fileID: 6435029994198529038}
   invisibilityDuration: 5
+  cooldownTime: 15
 --- !u!1 &7421185685277034193
 GameObject:
   m_ObjectHideFlags: 0

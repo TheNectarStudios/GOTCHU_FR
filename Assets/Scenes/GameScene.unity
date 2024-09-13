@@ -38,6 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3688,7 +3689,7 @@ MonoBehaviour:
   buttonDown: {fileID: 1218805036}
   buttonLeft: {fileID: 1081663299}
   buttonRight: {fileID: 876303967}
-  buttoninvisible: {fileID: 171810064}
+  powerButton: {fileID: 171810064}
   bufferTime: 3
 --- !u!114 &812126122
 MonoBehaviour:
