@@ -55,7 +55,10 @@ MonoBehaviour:
   - RequestDestroyPearl
   - ReturnToCreateRoomScene
   - UpdateTimerDisplay
-  - Shoot
+  - SetGhostVisibility
+  - RPC_SetInvisibilityForHero
+  - SetInvisibility
+  - SetInvisibleForOthers
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
