@@ -18,6 +18,8 @@ public class Freeze : MonoBehaviour
     public void ActivatePowerUp()
     {
         // Find all game objects with the tag "Ghost"
+
+        Debug.Log("Freeze Power-Up Activated!");
         ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
         // Disable movement for all ghosts
