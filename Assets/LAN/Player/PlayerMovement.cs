@@ -1,16 +1,19 @@
 using UnityEngine;
 using Photon.Pun;
+using System.Collections;
 
 public class PacMan3DMovement : MonoBehaviourPun
 {
-    public float speed = 5f;
-    public LayerMask obstacleLayer;
+    public float speed = 5f;  // Player movement speed
+    public LayerMask obstacleLayer;  // Layer for obstacles (maze walls)
     public Vector3 playerSize = new Vector3(1f, 1f, 1f);  // Size of the player for collision detection
     private Vector3 direction = Vector3.zero;
     private Vector3 nextDirection = Vector3.zero;
     private Vector3 initialPosition;
     private bool hasQueuedDirection = false;
-    private float snapThreshold = 0.5f;  // The threshold for snapping to grid
+    private bool isMoving = false;  // Flag to track if the player is moving
+    private float checkDistance = 0.49f;  // Distance for obstacle check
+    private float moveDistance = 2f;  // Size of each grid block, 2 units
 
     void Start()
     {
@@ -23,7 +26,19 @@ public class PacMan3DMovement : MonoBehaviourPun
     void Update()
     {
         if (!photonView.IsMine) return;
-        Move();
+
+        // Check for a queued movement direction and apply if possible
+        if (hasQueuedDirection && CanMoveInDirection(nextDirection, checkDistance))
+        {
+            direction = nextDirection;
+            hasQueuedDirection = false;
+        }
+
+        // Move in the current direction if possible
+        if (CanMoveInDirection(direction, checkDistance))
+        {
+            MoveInDirection();
+        }
     }
 
     public void MoveUp()
@@ -62,59 +77,24 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         nextDirection = newDirection;
         hasQueuedDirection = true;
-        // photonView.RPC("SyncDirection", RpcTarget.Others, newDirection);
     }
 
-    void Move()
+    // Move the player in the current direction continuously
+    void MoveInDirection()
     {
-        // Check if we can apply the next direction
-        if (hasQueuedDirection && CanMoveInDirection(nextDirection))
-        {
-            direction = nextDirection;
-            hasQueuedDirection = false;
-        }
-
-        // Move in the current direction
-        if (CanMoveInDirection(direction))
-        {
-            transform.Translate(direction * speed * Time.deltaTime, Space.World);
-        }
+        transform.Translate(direction * speed * Time.deltaTime, Space.World);
     }
 
-    bool CanMoveInDirection(Vector3 dir)
+    bool CanMoveInDirection(Vector3 dir, float distance)
     {
         // Use a box cast to check for obstacles with the player's size
-        Vector3 halfExtents = playerSize / 1.15f;  // Half extents for the box cast (like a bounding box)
+        Vector3 halfExtents = playerSize / 1.18f;
         RaycastHit hit;
-        
-        // Cast the box slightly ahead in the direction of movement
-        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, 0.15f, obstacleLayer);
+
+        // Cast the box in the direction of movement
+        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, distance/2, obstacleLayer);
 
         return !hitSomething;  // Return true if no obstacles were hit
-    }
-
-    // Check if the player's position is aligned for turning
-    bool IsAlignedForTurn()
-    {
-        Vector3 currentPos = transform.position;
-
-        // Allow snapping along the X and Z axes depending on the direction
-        if (direction == Vector3.forward || direction == Vector3.back)
-        {
-            return Mathf.Abs(Mathf.Round(currentPos.x) - currentPos.x) < snapThreshold;
-        }
-        else if (direction == Vector3.left || direction == Vector3.right)
-        {
-            return Mathf.Abs(Mathf.Round(currentPos.z) - currentPos.z) < snapThreshold;
-        }
-
-        return false;
-    }
-
-    void SyncDirection(Vector3 newDirection)
-    {
-        if (!photonView.IsMine) return;
-        nextDirection = newDirection;
     }
 
     public void ResetPosition()
