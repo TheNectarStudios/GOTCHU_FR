@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6435029994198529038}
   - component: {fileID: 2713707471372533173}
   - component: {fileID: 7370725955950724425}
-  - component: {fileID: 7059334521950520518}
   - component: {fileID: 3255677996356333664}
   - component: {fileID: 5551491824537765346}
   - component: {fileID: 6688423891973947437}
@@ -129,27 +128,6 @@ MonoBehaviour:
     type: 3}
   firePoint: {fileID: 466337331178679867}
   bulletForce: 20
---- !u!114 &7059334521950520518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2916944212718552625}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1366776055
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &3255677996356333664
 MonoBehaviour:
   m_ObjectHideFlags: 0

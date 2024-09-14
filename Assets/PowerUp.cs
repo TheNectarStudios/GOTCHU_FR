@@ -27,7 +27,8 @@ public class PowerUp : MonoBehaviourPun
             PacMan3DMovement movement = ghost.GetComponent<PacMan3DMovement>();
             if (movement != null)
             {
-                movement.speed *= -1; // Example effect, reverse speed
+                Debug.Log("Power-Up Activated!");
+                // movement.speed *= -1; // Example effect, reverse speed
             }
         }
 
@@ -46,7 +47,8 @@ public class PowerUp : MonoBehaviourPun
             PacMan3DMovement movement = ghost.GetComponent<PacMan3DMovement>();
             if (movement != null)
             {
-                movement.speed *= -1; // Revert the effect
+                Debug.Log("Power-Up Deactivated!");
+                // movement.speed *= -1; // Revert the effect
             }
         }
 
