@@ -1,6 +1,5 @@
 using UnityEngine;
 using Photon.Pun;
-using System.Collections;
 
 public class PacMan3DMovement : MonoBehaviourPun
 {
@@ -14,6 +13,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     private bool isMoving = false;  // Flag to track if the player is moving
     private float checkDistance = 0.49f;  // Distance for obstacle check
     private float moveDistance = 2f;  // Size of each grid block, 2 units
+    private Vector3 lastMovementDirection = Vector3.forward; // Last movement direction
 
     void Start()
     {
@@ -77,6 +77,7 @@ public class PacMan3DMovement : MonoBehaviourPun
     {
         nextDirection = newDirection;
         hasQueuedDirection = true;
+        lastMovementDirection = newDirection; // Update last movement direction
     }
 
     // Move the player in the current direction continuously
@@ -92,7 +93,7 @@ public class PacMan3DMovement : MonoBehaviourPun
         RaycastHit hit;
 
         // Cast the box in the direction of movement
-        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, distance/2, obstacleLayer);
+        bool hitSomething = Physics.BoxCast(transform.position, halfExtents, dir, out hit, Quaternion.identity, distance / 2, obstacleLayer);
 
         return !hitSomething;  // Return true if no obstacles were hit
     }
@@ -106,5 +107,11 @@ public class PacMan3DMovement : MonoBehaviourPun
             nextDirection = Vector3.zero;
             hasQueuedDirection = false;
         }
+    }
+
+    // Method to get the last movement direction
+    public Vector3 GetLastMovementDirection()
+    {
+        return lastMovementDirection;
     }
 }

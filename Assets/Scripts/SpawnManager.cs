@@ -1,26 +1,36 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
     public Transform protagonistSpawnPoint;
     public Transform antagonistSpawnPoint;
+    public Button powerButton;
+    private string currentPowerUp = null;
 
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
+    public GameObject bulletPrefab; // Bullet prefab for shooting
 
     public Button buttonUp;
     public Button buttonDown;
     public Button buttonLeft;
     public Button buttonRight;
-    public Button powerButton;  // Single button for all powers
 
     public float bufferTime = 3.0f;
     private bool isCooldown = false;  // To handle cooldown across powers
+
+    // UI Image for power-up thumbnail
+    public Image powerUpThumbnail;
+
+    // Sprites for different power-ups
+    public Sprite freezeSprite;
+    public Sprite bulletSprite;
+    public Sprite speedBoostSprite;
 
     private void Start()
     {
@@ -87,11 +97,54 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 buttonDown.onClick.AddListener(() => movementScript.MoveDown());
                 buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
                 buttonRight.onClick.AddListener(() => movementScript.MoveRight());
+
+                // Ensure the power button is always interactable
+                powerButton.interactable = true;
+                powerButton.onClick.RemoveAllListeners();
+                powerButton.onClick.AddListener(ActivateStoredPowerUp);
             }
             else
             {
                 Debug.LogError("PacMan3DMovement script not found on the player.");
             }
+        }
+    }
+
+    private void ActivateStoredPowerUp()
+    {
+        if (currentPowerUp != null)
+        {
+            if (currentPowerUp == "Freeze")
+            {
+                ActivateFreezePowerUp();
+            }
+            else if (currentPowerUp == "Bullet")
+            {
+                ActivateBulletPowerUp();
+            }
+            else if (currentPowerUp == "SpeedBoost")
+            {
+                ActivateSpeedBoostPowerUp();
+            }
+            currentPowerUp = null;  // Clear inventory after use
+            HidePowerUpThumbnail(); // Hide the thumbnail after activation
+        }
+    }
+
+    private void ShowPowerUpThumbnail(Sprite powerUpSprite)
+    {
+        if (powerUpThumbnail != null)
+        {
+            powerUpThumbnail.sprite = powerUpSprite;
+            powerUpThumbnail.gameObject.SetActive(true);
+        }
+    }
+
+    private void HidePowerUpThumbnail()
+    {
+        if (powerUpThumbnail != null)
+        {
+            powerUpThumbnail.gameObject.SetActive(false);
         }
     }
 
@@ -158,5 +211,105 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(cooldown);
         powerButton.interactable = true;
         isCooldown = false;
+    }
+
+    public void UpdateInventory(string powerUpName)
+    {
+        currentPowerUp = powerUpName;
+        Debug.Log("Power-Up added to inventory: " + powerUpName);
+
+        // Show the power-up thumbnail when picked up
+        switch (powerUpName)
+        {
+            case "Freeze":
+                ShowPowerUpThumbnail(freezeSprite);
+                break;
+            case "Bullet":
+                ShowPowerUpThumbnail(bulletSprite);
+                break;
+            case "SpeedBoost":
+                ShowPowerUpThumbnail(speedBoostSprite);
+                break;
+        }
+    }
+
+    private void ActivateFreezePowerUp()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
+        foreach (GameObject enemy in enemies)
+        {
+            // Get the PacMan3DMovement script and disable it
+            PacMan3DMovement enemyMovement = enemy.GetComponent<PacMan3DMovement>();
+            if (enemyMovement != null)
+            {
+                enemyMovement.enabled = false;
+                StartCoroutine(ReEnableMovement(enemyMovement, 5f));
+            }
+        }
+    }
+
+    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (enemyMovement != null)
+        {
+            enemyMovement.enabled = true;
+        }
+    }
+
+    private void ActivateBulletPowerUp()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            FireBullet(player.transform);
+        }
+    }
+
+    private void FireBullet(Transform playerTransform)
+    {
+        if (bulletPrefab != null)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, playerTransform.rotation);
+            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+            if (bulletRb != null)
+            {
+                // Get the last movement direction from the player
+                PacMan3DMovement movementScript = playerTransform.GetComponent<PacMan3DMovement>();
+                if (movementScript != null)
+                {
+                    Vector3 movementDirection = movementScript.GetLastMovementDirection();
+                    bulletRb.AddForce(movementDirection * 10f, ForceMode.Impulse); // Adjust force as needed
+                }
+                else
+                {
+                    bulletRb.AddForce(playerTransform.forward * 10f, ForceMode.Impulse); // Default to forward if no movement direction
+                }
+            }
+        }
+    }
+
+    private void ActivateSpeedBoostPowerUp()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            PacMan3DMovement playerMovement = player.GetComponent<PacMan3DMovement>();
+            if (playerMovement != null)
+            {
+                float originalSpeed = playerMovement.speed;
+                playerMovement.speed *= 2;  // Double the speed
+                StartCoroutine(ResetSpeedAfterTime(playerMovement, originalSpeed, 5f));  // Speed boost lasts for 5 seconds
+            }
+        }
+    }
+
+    private IEnumerator ResetSpeedAfterTime(PacMan3DMovement playerMovement, float originalSpeed, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        if (playerMovement != null)
+        {
+            playerMovement.speed = originalSpeed;  // Reset to original speed
+        }
     }
 }
