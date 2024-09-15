@@ -11,6 +11,7 @@ TagManager:
   - button_left
   - button_right
   - Pearl
+  - GhostSpawn
   layers:
   - Default
   - TransparentFX
