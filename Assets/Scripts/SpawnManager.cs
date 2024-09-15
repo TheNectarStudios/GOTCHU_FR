@@ -267,10 +267,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
     private void FireBullet(Transform playerTransform)
+{
+    if (bulletPrefab != null)
     {
-        if (bulletPrefab != null)
+        // Instantiate the bullet over the network
+        GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
+
+        PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
+        if (bulletPhotonView != null && bulletPhotonView.IsMine)
         {
-            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, playerTransform.rotation);
             Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
             if (bulletRb != null)
             {
@@ -287,7 +292,13 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 }
             }
         }
+        else
+        {
+            Debug.LogError("Failed to assign ownership or bullet PhotonView is null.");
+        }
     }
+}
+
 
     private void ActivateSpeedBoostPowerUp()
     {
