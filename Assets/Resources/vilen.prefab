@@ -163,7 +163,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 2
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3057447524446487768}
@@ -215,8 +215,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
     type: 3}
-  respawnTime: 5
   spawnPointTag: GhostSpawn
+  respawnDelay: 3
 --- !u!54 &-6860914649217156247
 Rigidbody:
   m_ObjectHideFlags: 0
