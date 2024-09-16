@@ -12,17 +12,17 @@ public class BulletCollision : MonoBehaviour
         {
             Debug.Log("Bullet hit the ghost!");
 
-            // Get the PhotonView of the ghost to ensure network synchronization
-            PhotonView ghostPhotonView = other.GetComponent<PhotonView>();
+            // Access the GhostHitManager component from the ghost
+            GhostHitManager ghostHitManager = other.GetComponent<GhostHitManager>();
 
-            if (ghostPhotonView != null && PhotonNetwork.IsMasterClient)
+            if (ghostHitManager != null)
             {
-                // Handle the ghost's death or respawn logic here
-                HandleGhostHit(ghostPhotonView);
+                // Teleport the ghost when hit
+                ghostHitManager.TeleportToSpawnPoint();
             }
 
             // Destroy the bullet across the network
-            PhotonNetwork.Destroy(gameObject); // Destroy the bullet after collision
+            PhotonNetwork.Destroy(gameObject);
         }
         // Check if the bullet collided with the maze (by checking the layer)
         else if (other.gameObject.layer == LayerMask.NameToLayer("maze"))
@@ -32,13 +32,6 @@ public class BulletCollision : MonoBehaviour
             // Destroy the bullet immediately upon collision with the maze
             PhotonNetwork.Destroy(gameObject);
         }
-    }
-
-    private void HandleGhostHit(PhotonView ghostPhotonView)
-    {
-        // Add your logic here to handle what happens when the ghost is hit.
-        // Example: respawn the ghost or turn it into a spectator
-        Debug.Log("Handling ghost hit logic");
     }
 
     private void Start()
