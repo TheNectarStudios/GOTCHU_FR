@@ -1,5 +1,4 @@
 using System.Collections;  // Required for IEnumerator
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
@@ -58,7 +57,15 @@ public class PlayerPearlCollector : MonoBehaviourPun
         // Check if collected pearls reach the totalPearlsToCollect and then change the scene
         if (collectedPearls >= totalPearlsToCollect)
         {
-            Debug.Log("Collected all pearls! Switching to RoomCreated scene.");
+            Debug.Log("Collected all pearls! Protagonist won.");
+            
+            // Store a message indicating the Protagonist has won by collecting all pearls
+            PlayerPrefs.SetString("GameResult", "The Protagonist has won by collecting all the pearls!");
+
+            // Send the result to all players
+            photonView.RPC("SetGameResultForAll", RpcTarget.All, "The Protagonist has won by collecting all the pearls!");
+
+            // Transition to the next scene for all players
             photonView.RPC("ChangeSceneForAllPlayers", RpcTarget.All);
         }
     }
@@ -105,6 +112,13 @@ public class PlayerPearlCollector : MonoBehaviourPun
     {
         // Load the RoomCreated scene for all players in the room
         Debug.Log("Loading RoomCreated scene for all players...");
-        PhotonNetwork.LoadLevel("RoomCreated");
+        PhotonNetwork.LoadLevel("ResultScene");
+    }
+
+    [PunRPC]
+    void SetGameResultForAll(string resultMessage)
+    {
+        // Store the result message in PlayerPrefs for all players
+        PlayerPrefs.SetString("GameResult", resultMessage);
     }
 }

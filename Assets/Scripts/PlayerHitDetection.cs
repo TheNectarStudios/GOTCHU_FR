@@ -38,10 +38,13 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
             // Check if the player has reached the maximum allowed hits
             if (hitCounter >= maxHits)
             {
-                Debug.Log("Player reached max hits. Reverting to RoomCreated scene...");
-                
+                Debug.Log("Player reached max hits. Reverting to ResultScene...");
+
+                // Send a network-wide result message (Ghost wins)
+                photonView.RPC("BroadcastGameResult", RpcTarget.All, "Ghosts won by eliminating the protagonist!");
+
                 // Trigger a network-wide scene change using Photon
-                photonView.RPC("ReturnToRoomCreated", RpcTarget.All);
+                photonView.RPC("ReturnToResultScene", RpcTarget.All);
             }
         }
     }
@@ -70,9 +73,16 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void ReturnToRoomCreated()
+    private void BroadcastGameResult(string resultMessage)
     {
-        // Load the RoomCreated scene
-        SceneManager.LoadScene("RoomCreated");
+        // Store the result message in PlayerPrefs on all clients
+        PlayerPrefs.SetString("GameResult", resultMessage);
+    }
+
+    [PunRPC]
+    private void ReturnToResultScene()
+    {
+        // Load the ResultScene scene on all clients
+        SceneManager.LoadScene("ResultScene");
     }
 }
