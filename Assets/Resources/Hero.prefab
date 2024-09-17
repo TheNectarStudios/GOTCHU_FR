@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3255677996356333664}
   - component: {fileID: 5551491824537765346}
   - component: {fileID: 6688423891973947437}
+  - component: {fileID: 8124430747488892725}
   - component: {fileID: -6287650828009777040}
   - component: {fileID: 4522973827373353153}
   m_Layer: 0
@@ -181,6 +182,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collectedPearls: 0
+--- !u!114 &8124430747488892725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2916944212718552625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07525449bb4a1a94988fa44a4ed8b696, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMeshRenderer: {fileID: 0}
+  blinkDuration: 2
+  blinkCount: 3
 --- !u!114 &-6287650828009777040
 MonoBehaviour:
   m_ObjectHideFlags: 0
