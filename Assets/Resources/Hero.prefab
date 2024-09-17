@@ -197,6 +197,7 @@ MonoBehaviour:
   playerMeshRenderer: {fileID: 0}
   blinkDuration: 2
   blinkCount: 3
+  maxHits: 3
 --- !u!114 &-6287650828009777040
 MonoBehaviour:
   m_ObjectHideFlags: 0
