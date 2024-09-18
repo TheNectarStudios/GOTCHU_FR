@@ -14,7 +14,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
-    public GameObject bulletPrefab; // Bullet prefab for shooting
+    public GameObject bulletPrefab;
 
     public Button buttonUp;
     public Button buttonDown;
@@ -22,49 +22,47 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Button buttonRight;
 
     public float bufferTime = 3.0f;
-    private bool isCooldown = false;  // To handle cooldown across powers
+    private bool isCooldown = false;
 
-    // UI Image for power-up thumbnail
     public Image powerUpThumbnail;
-
-    // Sprites for different power-ups
     public Sprite freezeSprite;
     public Sprite bulletSprite;
     public Sprite speedBoostSprite;
 
-    // Panels for each role and ability
     public GameObject protagonistPanel;
     public GameObject antagonistInvisibilityPanel;
     public GameObject antagonistDashPanel;
     public GameObject antagonistTrapPanel;
 
-    // Control UI
     public GameObject controlUI;
-
-    // Loading screen
     public GameObject loadingScreen;
-
-    public GameObject TimerObject ; 
 
     private void Start()
     {
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
-            ShowLoadingScreen();
+            photonView.RPC("ShowLoadingScreenRPC", RpcTarget.All);
             StartCoroutine(WaitAndAssignRoles());
         }
     }
 
     private IEnumerator WaitAndAssignRoles()
     {
-        yield return new WaitUntil(() => !protagonistPanel.activeSelf && 
-                                         !antagonistInvisibilityPanel.activeSelf &&
-                                         !antagonistDashPanel.activeSelf &&
-                                         !antagonistTrapPanel.activeSelf);  // Wait until all role panels are hidden
+        yield return new WaitForSeconds(bufferTime);
+        photonView.RPC("HideLoadingScreenRPC", RpcTarget.All);
 
-        yield return new WaitForSeconds(bufferTime);  // Wait for the buffer time
-        HideLoadingScreen();
+        // Hide all role panels before showing new ones
+        photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
+
+        // Assign roles
         AssignRoles();
+
+        // Wait a short period to ensure all panels are hidden
+        yield return new WaitForSeconds(3f);
+        photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
+
+        // Enable the control UI after hiding role panels
+        photonView.RPC("ShowControlUI", RpcTarget.All);
     }
 
     private void AssignRoles()
@@ -88,13 +86,14 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetProtagonist()
     {
+        Debug.Log("Protagonist Role Assigned");
+
         GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
         AssignButtonControls(protagonist);
-        AssignCamera(protagonist);  // Attach camera to protagonist
+        AssignCamera(protagonist);
 
         if (protagonist.GetComponent<PhotonView>().IsMine)
         {
-            // Show the protagonist panel
             ShowPanel(protagonistPanel);
         }
     }
@@ -102,9 +101,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetAntagonist()
     {
+        Debug.Log("Antagonist Role Assigned");
+
         GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
         AssignButtonControls(antagonist);
-        AssignCamera(antagonist);  // Attach camera to antagonist
+        AssignCamera(antagonist);
 
         if (antagonist.GetComponent<PhotonView>().IsMine)
         {
@@ -129,7 +130,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
                 buttonRight.onClick.AddListener(() => movementScript.MoveRight());
 
-                // Ensure the power button is always interactable
                 powerButton.interactable = true;
                 powerButton.onClick.RemoveAllListeners();
                 powerButton.onClick.AddListener(ActivateStoredPowerUp);
@@ -157,8 +157,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             {
                 ActivateSpeedBoostPowerUp();
             }
-            currentPowerUp = null;  // Clear inventory after use
-            HidePowerUpThumbnail(); // Hide the thumbnail after activation
+            currentPowerUp = null;
+            photonView.RPC("HidePowerUpThumbnailRPC", RpcTarget.All);
         }
     }
 
@@ -169,6 +169,18 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             powerUpThumbnail.sprite = powerUpSprite;
             powerUpThumbnail.gameObject.SetActive(true);
         }
+    }
+
+    [PunRPC]
+    private void ShowPowerUpThumbnailRPC(Sprite powerUpSprite)
+    {
+        ShowPowerUpThumbnail(powerUpSprite);
+    }
+
+    [PunRPC]
+    private void HidePowerUpThumbnailRPC()
+    {
+        HidePowerUpThumbnail();
     }
 
     private void HidePowerUpThumbnail()
@@ -203,7 +215,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (player.GetComponent<PhotonView>().IsMine)
         {
-            // Make the power button available and assign abilities to the single button
             powerButton.interactable = true;
             powerButton.onClick.RemoveAllListeners();
 
@@ -214,21 +225,18 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             if (invisibility != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(invisibility.ActivateInvisibility, invisibility.cooldownTime));
-                ShowPanel(antagonistInvisibilityPanel);  // Show invisibility panel
+                ShowPanel(antagonistInvisibilityPanel);
             }
             if (dash != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(dash.ActivateDash, dash.cooldownTime));
-                ShowPanel(antagonistDashPanel);  // Show dash panel
+                ShowPanel(antagonistDashPanel);
             }
             if (trap != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(trap.PlaceTrap, trap.cooldownTime));
-                ShowPanel(antagonistTrapPanel);  // Show trap panel
+                ShowPanel(antagonistTrapPanel);
             }
-
-            // Enable control UI after role UI is hidden
-            StartCoroutine(EnableControlUIAfterDelay());
         }
     }
 
@@ -255,18 +263,23 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         currentPowerUp = powerUpName;
         Debug.Log("Power-Up added to inventory: " + powerUpName);
 
-        // Show the power-up thumbnail when picked up
+        Sprite powerUpSprite = null;
         switch (powerUpName)
         {
             case "Freeze":
-                ShowPowerUpThumbnail(freezeSprite);
+                powerUpSprite = freezeSprite;
                 break;
             case "Bullet":
-                ShowPowerUpThumbnail(bulletSprite);
+                powerUpSprite = bulletSprite;
                 break;
             case "SpeedBoost":
-                ShowPowerUpThumbnail(speedBoostSprite);
+                powerUpSprite = speedBoostSprite;
                 break;
+        }
+
+        if (powerUpSprite != null)
+        {
+            photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpSprite);
         }
     }
 
@@ -275,7 +288,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
         foreach (GameObject enemy in enemies)
         {
-            // Get the PacMan3DMovement script and disable it
             PacMan3DMovement enemyMovement = enemy.GetComponent<PacMan3DMovement>();
             if (enemyMovement != null)
             {
@@ -303,35 +315,17 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void FireBullet(Transform playerTransform)
+    void FireBullet(Transform playerTransform)
     {
         if (bulletPrefab != null)
         {
-            // Instantiate the bullet over the network
             GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
 
             PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
             if (bulletPhotonView != null && bulletPhotonView.IsMine)
             {
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
-                if (bulletRb != null)
-                {
-                    // Get the last movement direction from the player
-                    PacMan3DMovement movementScript = playerTransform.GetComponent<PacMan3DMovement>();
-                    if (movementScript != null)
-                    {
-                        Vector3 movementDirection = movementScript.GetLastMovementDirection();
-                        bulletRb.AddForce(movementDirection * 10f, ForceMode.Impulse); // Adjust force as needed
-                    }
-                    else
-                    {
-                        bulletRb.AddForce(playerTransform.forward * 10f, ForceMode.Impulse); // Default to forward if no movement direction
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to assign ownership or bullet PhotonView is null.");
+                Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                rb.velocity = playerTransform.forward * 10f;  // Set bullet speed
             }
         }
     }
@@ -341,72 +335,61 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            PacMan3DMovement playerMovement = player.GetComponent<PacMan3DMovement>();
-            if (playerMovement != null)
+            PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
+            if (movementScript != null)
             {
-                float originalSpeed = playerMovement.speed;
-                playerMovement.speed *= 2;  // Double the speed
-                StartCoroutine(ResetSpeedAfterTime(playerMovement, originalSpeed, 5f));  // Speed boost lasts for 5 seconds
+                movementScript.speed *= 2;  // Example of speed boost effect
+                StartCoroutine(ResetSpeedAfterDelay(movementScript, 5f));
             }
         }
     }
 
-    private IEnumerator ResetSpeedAfterTime(PacMan3DMovement playerMovement, float originalSpeed, float duration)
+    private IEnumerator ResetSpeedAfterDelay(PacMan3DMovement movementScript, float delay)
     {
-        yield return new WaitForSeconds(duration);
-        if (playerMovement != null)
-        {
-            playerMovement.speed = originalSpeed;  // Reset to original speed
-        }
+        yield return new WaitForSeconds(delay);
+        movementScript.speed /= 2;  // Reset speed to normal
     }
 
     private void ShowPanel(GameObject panel)
     {
-        // Hide all panels first
-        protagonistPanel.SetActive(false);
-        antagonistInvisibilityPanel.SetActive(false);
-        antagonistDashPanel.SetActive(false);
-        antagonistTrapPanel.SetActive(false);
-
-        // Show the specific panel
         if (panel != null)
         {
             panel.SetActive(true);
-            StartCoroutine(HidePanelAfterDelay(panel, 4f));  // Hide the panel after 4 seconds
         }
     }
 
-    private IEnumerator HidePanelAfterDelay(GameObject panel, float delay)
+    private void HidePanel(GameObject panel)
     {
-        yield return new WaitForSeconds(delay);
-        panel.SetActive(false);  // Hide the panel after the delay
-        controlUI.SetActive(true) ; 
-        TimerObject.SetActive(true) ; 
-    }
-
-    private void ShowLoadingScreen()
-    {
-        if (loadingScreen != null)
+        if (panel != null)
         {
-            loadingScreen.SetActive(true);
+            panel.SetActive(false);
         }
     }
 
-    private void HideLoadingScreen()
+    [PunRPC]
+    private void ShowLoadingScreenRPC()
     {
-        if (loadingScreen != null)
-        {
-            loadingScreen.SetActive(false);
-        }
+        ShowPanel(loadingScreen);
     }
 
-    private IEnumerator EnableControlUIAfterDelay()
+    [PunRPC]
+    private void HideLoadingScreenRPC()
     {
-        yield return new WaitUntil(() => !protagonistPanel.activeSelf && 
-                                         !antagonistInvisibilityPanel.activeSelf &&
-                                         !antagonistDashPanel.activeSelf &&
-                                         !antagonistTrapPanel.activeSelf);  // Wait until all role panels are hidden
+        HidePanel(loadingScreen);
+    }
 
-        controlUI.SetActive(true);  // Enable the control UI
+    [PunRPC]
+    private void HideAllRolePanelsRPC()
+    {
+        HidePanel(protagonistPanel);
+        HidePanel(antagonistInvisibilityPanel);
+        HidePanel(antagonistDashPanel);
+        HidePanel(antagonistTrapPanel);
+    }
+
+    [PunRPC]
+    private void ShowControlUI()
+    {
+        ShowPanel(controlUI);
     }
 }

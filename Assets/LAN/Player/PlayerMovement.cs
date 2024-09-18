@@ -13,13 +13,15 @@ public class PacMan3DMovement : MonoBehaviourPun
     private bool isMoving = false;  // Flag to track if the player is moving
     private float checkDistance = 0.49f;  // Distance for obstacle check
     private float moveDistance = 2f;  // Size of each grid block, 2 units
-    private Vector3 lastMovementDirection = Vector3.forward; // Last movement direction
+    private Vector3 lastMovementDirection = Vector3.forward;  // Last movement direction
+    private float normalSpeed;  // To store the default speed for resetting
 
     void Start()
     {
         if (photonView.IsMine)
         {
             initialPosition = transform.position;
+            normalSpeed = speed;  // Store the initial speed value for resetting later
         }
     }
 
@@ -113,5 +115,17 @@ public class PacMan3DMovement : MonoBehaviourPun
     public Vector3 GetLastMovementDirection()
     {
         return lastMovementDirection;
+    }
+
+    // Method to increase the player's speed (for power-ups)
+    public void IncreaseSpeed(float multiplier)
+    {
+        speed = normalSpeed * multiplier;  // Increase speed by a multiplier
+    }
+
+    // Method to reset the player's speed to normal
+    public void ResetSpeed()
+    {
+        speed = normalSpeed;  // Reset speed to the initial value
     }
 }
