@@ -32,17 +32,38 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Sprite bulletSprite;
     public Sprite speedBoostSprite;
 
+    // Panels for each role and ability
+    public GameObject protagonistPanel;
+    public GameObject antagonistInvisibilityPanel;
+    public GameObject antagonistDashPanel;
+    public GameObject antagonistTrapPanel;
+
+    // Control UI
+    public GameObject controlUI;
+
+    // Loading screen
+    public GameObject loadingScreen;
+
+    public GameObject TimerObject ; 
+
     private void Start()
     {
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
+            ShowLoadingScreen();
             StartCoroutine(WaitAndAssignRoles());
         }
     }
 
     private IEnumerator WaitAndAssignRoles()
     {
-        yield return new WaitForSeconds(bufferTime);
+        yield return new WaitUntil(() => !protagonistPanel.activeSelf && 
+                                         !antagonistInvisibilityPanel.activeSelf &&
+                                         !antagonistDashPanel.activeSelf &&
+                                         !antagonistTrapPanel.activeSelf);  // Wait until all role panels are hidden
+
+        yield return new WaitForSeconds(bufferTime);  // Wait for the buffer time
+        HideLoadingScreen();
         AssignRoles();
     }
 
@@ -70,6 +91,12 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
         AssignButtonControls(protagonist);
         AssignCamera(protagonist);  // Attach camera to protagonist
+
+        if (protagonist.GetComponent<PhotonView>().IsMine)
+        {
+            // Show the protagonist panel
+            ShowPanel(protagonistPanel);
+        }
     }
 
     [PunRPC]
@@ -78,7 +105,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
         AssignButtonControls(antagonist);
         AssignCamera(antagonist);  // Attach camera to antagonist
-        AssignAbilities(antagonist);
+
+        if (antagonist.GetComponent<PhotonView>().IsMine)
+        {
+            AssignAbilities(antagonist);
+        }
     }
 
     private void AssignButtonControls(GameObject player)
@@ -183,15 +214,21 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             if (invisibility != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(invisibility.ActivateInvisibility, invisibility.cooldownTime));
+                ShowPanel(antagonistInvisibilityPanel);  // Show invisibility panel
             }
             if (dash != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(dash.ActivateDash, dash.cooldownTime));
+                ShowPanel(antagonistDashPanel);  // Show dash panel
             }
             if (trap != null)
             {
                 powerButton.onClick.AddListener(() => ActivatePower(trap.PlaceTrap, trap.cooldownTime));
+                ShowPanel(antagonistTrapPanel);  // Show trap panel
             }
+
+            // Enable control UI after role UI is hidden
+            StartCoroutine(EnableControlUIAfterDelay());
         }
     }
 
@@ -267,38 +304,37 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
     private void FireBullet(Transform playerTransform)
-{
-    if (bulletPrefab != null)
     {
-        // Instantiate the bullet over the network
-        GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
-
-        PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
-        if (bulletPhotonView != null && bulletPhotonView.IsMine)
+        if (bulletPrefab != null)
         {
-            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
-            if (bulletRb != null)
+            // Instantiate the bullet over the network
+            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
+
+            PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
+            if (bulletPhotonView != null && bulletPhotonView.IsMine)
             {
-                // Get the last movement direction from the player
-                PacMan3DMovement movementScript = playerTransform.GetComponent<PacMan3DMovement>();
-                if (movementScript != null)
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                if (bulletRb != null)
                 {
-                    Vector3 movementDirection = movementScript.GetLastMovementDirection();
-                    bulletRb.AddForce(movementDirection * 10f, ForceMode.Impulse); // Adjust force as needed
-                }
-                else
-                {
-                    bulletRb.AddForce(playerTransform.forward * 10f, ForceMode.Impulse); // Default to forward if no movement direction
+                    // Get the last movement direction from the player
+                    PacMan3DMovement movementScript = playerTransform.GetComponent<PacMan3DMovement>();
+                    if (movementScript != null)
+                    {
+                        Vector3 movementDirection = movementScript.GetLastMovementDirection();
+                        bulletRb.AddForce(movementDirection * 10f, ForceMode.Impulse); // Adjust force as needed
+                    }
+                    else
+                    {
+                        bulletRb.AddForce(playerTransform.forward * 10f, ForceMode.Impulse); // Default to forward if no movement direction
+                    }
                 }
             }
-        }
-        else
-        {
-            Debug.LogError("Failed to assign ownership or bullet PhotonView is null.");
+            else
+            {
+                Debug.LogError("Failed to assign ownership or bullet PhotonView is null.");
+            }
         }
     }
-}
-
 
     private void ActivateSpeedBoostPowerUp()
     {
@@ -322,5 +358,55 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             playerMovement.speed = originalSpeed;  // Reset to original speed
         }
+    }
+
+    private void ShowPanel(GameObject panel)
+    {
+        // Hide all panels first
+        protagonistPanel.SetActive(false);
+        antagonistInvisibilityPanel.SetActive(false);
+        antagonistDashPanel.SetActive(false);
+        antagonistTrapPanel.SetActive(false);
+
+        // Show the specific panel
+        if (panel != null)
+        {
+            panel.SetActive(true);
+            StartCoroutine(HidePanelAfterDelay(panel, 4f));  // Hide the panel after 4 seconds
+        }
+    }
+
+    private IEnumerator HidePanelAfterDelay(GameObject panel, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        panel.SetActive(false);  // Hide the panel after the delay
+        controlUI.SetActive(true) ; 
+        TimerObject.SetActive(true) ; 
+    }
+
+    private void ShowLoadingScreen()
+    {
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(true);
+        }
+    }
+
+    private void HideLoadingScreen()
+    {
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(false);
+        }
+    }
+
+    private IEnumerator EnableControlUIAfterDelay()
+    {
+        yield return new WaitUntil(() => !protagonistPanel.activeSelf && 
+                                         !antagonistInvisibilityPanel.activeSelf &&
+                                         !antagonistDashPanel.activeSelf &&
+                                         !antagonistTrapPanel.activeSelf);  // Wait until all role panels are hidden
+
+        controlUI.SetActive(true);  // Enable the control UI
     }
 }
