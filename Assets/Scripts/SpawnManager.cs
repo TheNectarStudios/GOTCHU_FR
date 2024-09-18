@@ -37,9 +37,9 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject controlUI;
     public GameObject loadingScreen;
 
-    public Text timerText; // UI Text to display the timer
-    private float timer = 0f;
-    private bool timerActive = false;
+    public GameObject timerObject; 
+    // private float timer = 0f;
+    // private bool timerActive = false;
 
     private void Start()
     {
@@ -64,36 +64,37 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         // Wait a short period to ensure all panels are hidden
         yield return new WaitForSeconds(3f);
         photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
+        
+        // Start the timer (renamed to match the method name)
+        photonView.RPC("StartTimer", RpcTarget.All);
 
         // Enable the control UI after hiding role panels
         photonView.RPC("ShowControlUI", RpcTarget.All);
-
-        // Start the timer
-        photonView.RPC("StartTimerRPC", RpcTarget.All);
     }
 
-    private void Update()
-    {
-        if (timerActive)
-        {
-            timer += Time.deltaTime;
-            UpdateTimerUI();
-        }
-    }
 
-    private void UpdateTimerUI()
-    {
-        if (timerText != null)
-        {
-            timerText.text = "Time: " + Mathf.Round(timer).ToString();
-        }
-    }
+    // private void Update()
+    // {
+    //     if (timerActive)
+    //     {
+    //         timer += Time.deltaTime;
+    //         UpdateTimerUI();
+    //     }
+    // }
 
-    [PunRPC]
-    private void StartTimerRPC()
-    {
-        timerActive = true;
-    }
+    // private void UpdateTimerUI()
+    // {
+    //     if (timerText != null)
+    //     {
+    //         timerText.text = "Time: " + Mathf.Round(timer).ToString();
+    //     }
+    // }
+
+    // [PunRPC]
+    // private void StartTimerRPC()
+    // {
+    //     timerActive = true;
+    // }
 
     private void AssignRoles()
     {
@@ -425,6 +426,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             antagonistTrapPanel.SetActive(false);
         }
+
     }
 
     [PunRPC]
@@ -435,4 +437,13 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             controlUI.SetActive(true);
         }
     }
+    [PunRPC]
+    private void StartTimer()
+    {
+        if (timerObject != null)
+        {
+            timerObject.SetActive(true);
+        }
+    }
+
 }
