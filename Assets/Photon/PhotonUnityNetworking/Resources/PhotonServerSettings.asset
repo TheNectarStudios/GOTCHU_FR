@@ -68,6 +68,16 @@ MonoBehaviour:
   - ReturnToResultScene
   - BroadcastGameResult
   - SetGameResultForAll
+  - HideControlUIRPC
+  - HidePanelRPC
+  - HidePowerUpThumbnailRPC
+  - ShowControlUIRPC
+  - ShowPanelRPC
+  - ShowPowerUpThumbnailRPC
+  - HideLoadingScreenRPC
+  - ShowLoadingScreenRPC
+  - HideAllRolePanelsRPC
+  - ShowControlUI
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
