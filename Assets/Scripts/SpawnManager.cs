@@ -38,9 +38,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject loadingScreen;
 
     public GameObject timerObject; 
-    // private float timer = 0f;
-    // private bool timerActive = false;
-
+   
     private void Start()
     {
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
@@ -72,29 +70,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         photonView.RPC("ShowControlUI", RpcTarget.All);
     }
 
-
-    // private void Update()
-    // {
-    //     if (timerActive)
-    //     {
-    //         timer += Time.deltaTime;
-    //         UpdateTimerUI();
-    //     }
-    // }
-
-    // private void UpdateTimerUI()
-    // {
-    //     if (timerText != null)
-    //     {
-    //         timerText.text = "Time: " + Mathf.Round(timer).ToString();
-    //     }
-    // }
-
-    // [PunRPC]
-    // private void StartTimerRPC()
-    // {
-    //     timerActive = true;
-    // }
 
     private void AssignRoles()
     {
