@@ -322,16 +322,40 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (bulletPrefab != null)
         {
+            // Instantiate the bullet at the player's position
             GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
 
-            PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
-            if (bulletPhotonView != null && bulletPhotonView.IsMine)
+            // Get the player's movement script to determine the direction
+            PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
+
+            // Check if the movement script exists
+            if (playerMovement != null)
             {
-                Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                rb.velocity = playerTransform.forward * 10f;  // Set bullet speed
+                // Use the method to get the last movement direction
+                Vector3 movementDirection = playerMovement.GetLastMovementDirection();
+
+                // If the movement direction is valid, apply it to the bullet's velocity
+                if (movementDirection != Vector3.zero)
+                {
+                    Debug.Log("Bullet fired in direction: " + movementDirection);
+                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                    rb.velocity = movementDirection * 10f;  // Set bullet speed
+                }
+                else
+                {
+                    Debug.LogError("Player is not moving, bullet fired in default forward direction");
+                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                    rb.velocity = playerTransform.forward * 10f;  // Set bullet speed
+                }
+            }
+            else
+            {
+                Debug.LogError("PacMan3DMovement script not found on player");
             }
         }
     }
+
+
 
     private void ActivateSpeedBoostPowerUp()
     {
