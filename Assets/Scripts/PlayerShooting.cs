@@ -8,9 +8,13 @@ public class PlayerShooting : MonoBehaviour
     public float bulletForce = 20f; // The speed of the bullet
 
     private bool canShoot = false;  // Controls if the player can shoot
-    private Vector3 lastPosition;   // To track player movement
-    private bool isMoving = false;  // To determine if the player is moving
-    private Vector3 moveDirection;  // Stores the direction in which the player is moving
+    private PacMan3DMovement pacManMovement; // Reference to the movement script
+
+    void Start()
+    {
+        // Find the PacMan3DMovement script attached to the player
+        pacManMovement = GetComponent<PacMan3DMovement>();
+    }
 
     // Call this method when the player picks up the shooting power-up
     public void EnableShooting(GameObject bullet)
@@ -21,44 +25,40 @@ public class PlayerShooting : MonoBehaviour
 
     void Update()
     {
-        // Calculate the player's movement direction
-        moveDirection = transform.position - lastPosition;
-
-        // Check if the player is moving
-        if (moveDirection.magnitude > 0.01f)
-        {
-            isMoving = true;
-        }
-        else
-        {
-            isMoving = false;
-        }
-
-        lastPosition = transform.position;
-
         // Check if the player is allowed to shoot, is moving, and presses the spacebar
-        if (canShoot && isMoving && Input.GetKeyDown(KeyCode.Space))
+        if (canShoot && Input.GetKeyDown(KeyCode.Space))
         {
-            Shoot(moveDirection.normalized); // Pass the direction of movement to Shoot()
+            // Get the last movement direction from the PacMan3DMovement script
+            Vector3 shootingDirection = pacManMovement.GetLastMovementDirection().normalized;
+
+            // Shoot in the direction the player is moving
+            Shoot(shootingDirection);
         }
     }
 
+    // Method to handle shooting
     void Shoot(Vector3 direction)
     {
         // Ensure the bullet is instantiated across the network
         if (PhotonNetwork.IsConnected && canShoot)
         {
+            // Log the direction for debugging
+            Debug.Log("Shooting in direction: " + direction);
+
             // Use PhotonNetwork.Instantiate to instantiate the bullet across the network
-            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, firePoint.position, firePoint.rotation);
-            
-            // Apply velocity to the bullet in the direction the player was moving
+            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, firePoint.position, Quaternion.identity);
+
+            // Apply velocity to the bullet in the direction the player is moving
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.velocity = direction * bulletForce; // Use direction of player movement
+                rb.velocity = direction * bulletForce; // Apply the correct movement direction and force to the bullet
+
+                // Log the velocity applied to the bullet for debugging
+                Debug.Log("Bullet velocity: " + rb.velocity);
             }
 
-            // Disable shooting after the bullet is fired
+            // Disable shooting after the bullet is fired (for single-use shooting mechanic)
             canShoot = false;
         }
         else
@@ -66,4 +66,5 @@ public class PlayerShooting : MonoBehaviour
             Debug.LogError("Not connected to Photon or shooting is disabled!");
         }
     }
+
 }
