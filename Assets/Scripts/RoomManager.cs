@@ -3,8 +3,8 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
+using System.Linq;  // <-- Add this to fix the Enumerable error
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -13,6 +13,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private string mapType;
     public static string RoomKey; // Store the room key
+    private bool isDisconnecting = false; // Flag to track if we are disconnecting
+    public GameObject loadingBufferUI; // Optional: Loading buffer UI object
 
     private void Start()
     {
@@ -54,6 +56,29 @@ public class RoomManager : MonoBehaviourPunCallbacks
         // Connect to Photon and join the room
         TryJoinRoom();
     }
+
+    public void OnBackToJoinRoom()
+    {
+        // If we are already disconnecting, don't start again
+        if (!isDisconnecting)
+        {
+            Debug.Log("Disconnecting and returning to JoinRoom scene...");
+            isDisconnecting = true;
+            
+            // Show loading buffer UI (if available)
+            if (loadingBufferUI != null)
+            {
+                loadingBufferUI.SetActive(true);  // Show loading indicator
+            }
+
+            // Start the disconnection and scene change with buffer
+            StartCoroutine(DisconnectAndReturnWithBuffer());
+        }
+        else
+        {
+            Debug.LogWarning("Already in the process of disconnecting.");
+        }
+    }
     #endregion
 
     #region Photon Callback Methods
@@ -66,14 +91,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         Debug.Log("Room created with key: " + RoomKey);
-        // Optionally update UI with room details or load a new scene
         SceneManager.LoadScene("RoomCreated");
     }
 
     public override void OnJoinedRoom()
     {
         Debug.Log("Successfully joined the room with key: " + RoomKey);
-        // Load the game scene or any other scene based on room properties
         if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("MapType", out object mapTypeObj))
         {
             mapType = (string)mapTypeObj;
@@ -93,24 +116,23 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.LogError($"Failed to join room: {message}");
     }
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        foreach (RoomInfo room in roomList)
-        {
-            if (room.Name.Contains("Outdoor"))
-            {
-                occupancyRateText.text = $"{room.PlayerCount} / 20";
-            }
-            else if (room.Name.Contains("School"))
-            {
-                occupancyRateText.text = $"{room.PlayerCount} / 20";
-            }
-        }
-    }
-
     public override void OnDisconnected(DisconnectCause cause)
     {
-        Debug.LogError($"Disconnected from Photon: {cause}");
+        Debug.Log($"Disconnected from Photon: {cause}");
+        // Proceed with scene change after disconnect
+        if (isDisconnecting)
+        {
+            Debug.Log("Successfully disconnected from Photon. Loading 'JoinRoom' scene.");
+            isDisconnecting = false; // Reset flag
+
+            // Hide loading buffer UI (if available)
+            if (loadingBufferUI != null)
+            {
+                loadingBufferUI.SetActive(false);
+            }
+
+            SceneManager.LoadScene("JoinRoom");
+        }
     }
     #endregion
 
@@ -148,5 +170,28 @@ public class RoomManager : MonoBehaviourPunCallbacks
         return key;
     }
 
+    // Coroutine to handle disconnection and delay (buffer) before changing the scene
+    private IEnumerator DisconnectAndReturnWithBuffer()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.Disconnect();
+
+            // Optional: Add a small buffer time (e.g., 2 seconds)
+            yield return new WaitForSeconds(2f);
+        }
+        else
+        {
+            Debug.LogWarning("Not connected to Photon, proceeding to scene change...");
+        }
+
+        // Ensure that Photon is fully disconnected before proceeding
+        while (PhotonNetwork.IsConnected)
+        {
+            yield return null;  // Wait for disconnection
+        }
+
+        SceneManager.LoadScene("JoinRoom");  // Finally change the scene
+    }
     #endregion
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class RoomInfoDisplay : MonoBehaviourPunCallbacks
 {
@@ -80,5 +82,50 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
         {
             startGameButton.SetActive(false);
         }
+    }
+
+    // New function to exit the room, disconnect from Photon, and load "CreateRoom" scene
+    public void ExitRoom()
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();  // Leave the room first
+        }
+        else
+        {
+            DisconnectAndLoadScene();  // If not in room, directly disconnect and load the scene
+        }
+    }
+
+    // Called when successfully left the room
+    public override void OnLeftRoom()
+    {
+        DisconnectAndLoadScene();  // Once the room is left, disconnect and load scene
+    }
+
+    // Disconnect from Photon and load the "CreateRoom" scene
+    private void DisconnectAndLoadScene()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.Disconnect();  // Disconnect from Photon
+            StartCoroutine(WaitForDisconnect());
+        }
+        else
+        {
+            SceneManager.LoadScene("CreateRoom");  // Load the "CreateRoom" scene immediately if already disconnected
+        }
+    }
+
+    // Coroutine to ensure we only switch scenes after the disconnection is complete
+    private IEnumerator WaitForDisconnect()
+    {
+        while (PhotonNetwork.IsConnected)
+        {
+            yield return null;  // Wait until we're disconnected from Photon
+        }
+
+        // Now that we're disconnected, load the "CreateRoom" scene
+        SceneManager.LoadScene("CreateRoom");
     }
 }
