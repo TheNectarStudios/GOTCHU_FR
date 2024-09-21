@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: fc3d151d4cb67724aa8a773c66d3d100, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -118,6 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25df2acf758d8dd4098919285489db25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowDownFactor: 0.5
-  trapDuration: 10
-  slowDownDuration: 5
+  trapPrefab: {fileID: 0}
+  trapLifetime: 15
+  cooldownTime: 15
+  trapButton: {fileID: 0}
