@@ -23,7 +23,21 @@ public class PowerupSpawner : MonoBehaviourPun
 
     private void HandlePowerUpPickedUp(PowerUp powerUp)
     {
-        activePowerUps.Remove(powerUp.gameObject); // Remove the picked-up power-up from the list
+        // Transfer ownership before destroying the power-up
+        PhotonView powerUpPhotonView = powerUp.GetComponent<PhotonView>();
+        if (powerUpPhotonView != null && !powerUpPhotonView.IsMine)
+        {
+            powerUpPhotonView.RequestOwnership(); // Request ownership to safely destroy it
+        }
+
+        // Remove the power-up from the active list and destroy it
+        activePowerUps.Remove(powerUp.gameObject);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(powerUp.gameObject); // MasterClient ensures it's destroyed across the network
+        }
+
         StartCoroutine(RespawnPowerUp()); // Optionally respawn a new power-up after a delay
     }
 
@@ -41,6 +55,8 @@ public class PowerupSpawner : MonoBehaviourPun
 
     private void SpawnRandomPowerUp()
     {
+        if (!PhotonNetwork.IsMasterClient) return; // Ensure only the MasterClient spawns power-ups
+
         int spawnIndex = Random.Range(0, spawnPoints.Count);
         int powerUpIndex = Random.Range(0, powerUpPrefabs.Count);
 

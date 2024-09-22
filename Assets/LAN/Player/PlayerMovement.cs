@@ -30,10 +30,10 @@ public class PacMan3DMovement : MonoBehaviourPun
         if (!photonView.IsMine) return;
 
         // Debug the current movement direction
-        Debug.Log("Current movement direction: " + direction);
+        // Debug.Log("Current movement direction: " + direction);
 
-        // Debug the next queued direction
-        Debug.Log("Next queued direction: " + nextDirection);
+        // // Debug the next queued direction
+        // Debug.Log("Next queued direction: " + nextDirection);
 
         // Check for a queued movement direction and apply if possible
         if (hasQueuedDirection && CanMoveInDirection(nextDirection, checkDistance))
@@ -88,7 +88,7 @@ public class PacMan3DMovement : MonoBehaviourPun
         lastMovementDirection = newDirection; // Update last movement direction
         
         // Debug the queued direction when set
-        Debug.Log("Queued new direction: " + newDirection);
+        // Debug.Log("Queued new direction: " + newDirection);
     }
 
     // Move the player in the current direction continuously

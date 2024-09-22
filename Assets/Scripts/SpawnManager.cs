@@ -325,6 +325,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             // Instantiate the bullet at the player's position
             GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
 
+            // Get the PhotonView of the bullet
+            PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
+
+            // Transfer ownership of the bullet to the player who fired it
+            if (bulletPhotonView != null && bulletPhotonView.Owner != PhotonNetwork.LocalPlayer)
+            {
+                bulletPhotonView.TransferOwnership(PhotonNetwork.LocalPlayer);
+            }
+
             // Get the player's movement script to determine the direction
             PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
 
@@ -354,6 +363,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
 
 
 
@@ -387,7 +397,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             panel.SetActive(true);
         }
     }
-
+    
     [PunRPC]
     private void ShowLoadingScreenRPC()
     {
