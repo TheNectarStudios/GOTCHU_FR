@@ -27,25 +27,46 @@ public class PowerupSpawner : MonoBehaviourPun
         PhotonView powerUpPhotonView = powerUp.GetComponent<PhotonView>();
         if (powerUpPhotonView != null && !powerUpPhotonView.IsMine)
         {
-            powerUpPhotonView.RequestOwnership(); // Request ownership to safely destroy it
+            // Request ownership and wait until it is granted before destroying
+            StartCoroutine(TransferOwnershipAndDestroy(powerUpPhotonView, powerUp.gameObject));
+        }
+        else
+        {
+            DestroyPowerUp(powerUp.gameObject);
+        }
+    }
+
+    private IEnumerator TransferOwnershipAndDestroy(PhotonView photonView, GameObject powerUp)
+    {
+        photonView.RequestOwnership(); // Request ownership
+
+        // Wait until the ownership is successfully transferred
+        while (!photonView.IsMine)
+        {
+            yield return null; // Wait for the next frame
         }
 
-        // Remove the power-up from the active list and destroy it
-        activePowerUps.Remove(powerUp.gameObject);
+        // Once ownership is ours, destroy the power-up
+        DestroyPowerUp(powerUp);
+    }
 
+    private void DestroyPowerUp(GameObject powerUp)
+    {
+        // Remove the power-up from the active list
+        activePowerUps.Remove(powerUp);
+
+        // Destroy across the network only if the player is the MasterClient
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.Destroy(powerUp.gameObject); // MasterClient ensures it's destroyed across the network
+            PhotonNetwork.Destroy(powerUp); // Ensures it's destroyed across the network
         }
-
-        StartCoroutine(RespawnPowerUp()); // Optionally respawn a new power-up after a delay
     }
 
     private IEnumerator SpawnPowerUpsRoutine()
     {
         while (true)
         {
-            if (activePowerUps.Count < maxPowerUps)
+            if (PhotonNetwork.IsMasterClient && activePowerUps.Count < maxPowerUps)
             {
                 SpawnRandomPowerUp();
             }
@@ -55,8 +76,6 @@ public class PowerupSpawner : MonoBehaviourPun
 
     private void SpawnRandomPowerUp()
     {
-        if (!PhotonNetwork.IsMasterClient) return; // Ensure only the MasterClient spawns power-ups
-
         int spawnIndex = Random.Range(0, spawnPoints.Count);
         int powerUpIndex = Random.Range(0, powerUpPrefabs.Count);
 
@@ -64,14 +83,5 @@ public class PowerupSpawner : MonoBehaviourPun
         GameObject powerUp = PhotonNetwork.Instantiate(powerUpPrefabs[powerUpIndex].name, spawnPoint.position, Quaternion.identity);
 
         activePowerUps.Add(powerUp); // Add the new power-up to the list of active ones
-    }
-
-    private IEnumerator RespawnPowerUp()
-    {
-        yield return new WaitForSeconds(3f); // Respawn delay
-        if (activePowerUps.Count < maxPowerUps)
-        {
-            SpawnRandomPowerUp();
-        }
     }
 }
