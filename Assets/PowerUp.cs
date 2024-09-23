@@ -54,7 +54,8 @@ public class PowerUp : MonoBehaviourPun
 
         if (photonView.IsMine || PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.Destroy(gameObject);
+            // PhotonNetwork.Destroy(gameObject);
+            Debug.Log("Galti ho gai mere se");
         }
     }
 }
