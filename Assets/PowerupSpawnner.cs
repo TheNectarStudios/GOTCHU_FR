@@ -60,7 +60,7 @@ public class PowerupSpawner : MonoBehaviourPun
         activePowerUps.Remove(powerUp);
 
         // Destroy across the network only if the player is the owner or MasterClient
-        if (PhotonNetwork.IsMasterClient && powerUp.GetComponent<PhotonView>().IsMine)
+        if (powerUp.GetComponent<PhotonView>().IsMine)
         {
             Debug.Log("Destroying power-up across the network.");
             PhotonNetwork.Destroy(powerUp); // Ensures it's destroyed across the network
