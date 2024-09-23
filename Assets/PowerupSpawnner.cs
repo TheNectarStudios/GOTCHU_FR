@@ -38,14 +38,18 @@ public class PowerupSpawner : MonoBehaviourPun
 
     private IEnumerator TransferOwnershipAndDestroy(PhotonView photonView, GameObject powerUp)
     {
-        photonView.RequestOwnership(); // Request ownership
+        Debug.Log("Requesting ownership transfer for power-up.");
 
-        // Wait until the ownership is successfully transferred
+        // Request ownership transfer
+        photonView.RequestOwnership();
+
+        // Wait for the ownership to transfer
         while (!photonView.IsMine)
         {
             yield return null; // Wait for the next frame
         }
 
+        Debug.Log("Ownership successfully transferred. Now destroying the power-up.");
         // Once ownership is ours, destroy the power-up
         DestroyPowerUp(powerUp);
     }
@@ -55,10 +59,15 @@ public class PowerupSpawner : MonoBehaviourPun
         // Remove the power-up from the active list
         activePowerUps.Remove(powerUp);
 
-        // Destroy across the network only if the player is the MasterClient
-        if (PhotonNetwork.IsMasterClient)
+        // Destroy across the network only if the player is the owner or MasterClient
+        if (PhotonNetwork.IsMasterClient && powerUp.GetComponent<PhotonView>().IsMine)
         {
+            Debug.Log("Destroying power-up across the network.");
             PhotonNetwork.Destroy(powerUp); // Ensures it's destroyed across the network
+        }
+        else
+        {
+            Debug.LogError("Cannot destroy power-up. Not the owner or not the MasterClient.");
         }
     }
 
