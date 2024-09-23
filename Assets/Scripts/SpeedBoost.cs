@@ -12,7 +12,7 @@ public class SpeedBoost : MonoBehaviour
             if (spawnManager != null)
             {
                 spawnManager.UpdateInventory("SpeedBoost");
-                Destroy(gameObject);
+                // Destroy(gameObject);
             }
         }
     }

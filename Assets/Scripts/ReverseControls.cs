@@ -11,7 +11,7 @@ public class BulletPowerUp : MonoBehaviour
             if (spawnManager != null)
             {
                 spawnManager.UpdateInventory("Bullet");
-                Destroy(gameObject);
+                // Destroy(gameObject);
             }
         }
     }
