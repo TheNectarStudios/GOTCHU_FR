@@ -12,7 +12,7 @@ public class Freeze : MonoBehaviour
             if (spawnManager != null)
             {
                 spawnManager.UpdateInventory("Freeze");
-                Destroy(gameObject);  // Destroy the power-up object after collection
+                 // Destroy the power-up object after collection
             }
         }
     }
