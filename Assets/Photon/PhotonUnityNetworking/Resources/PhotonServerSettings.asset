@@ -81,6 +81,8 @@ MonoBehaviour:
   - StartTimerRPC
   - StartTimer
   - FreezeAntagonistsRPC
+  - PlayAudioAcrossNetwork
+  - FreezeGhostsAcrossNetwork
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
