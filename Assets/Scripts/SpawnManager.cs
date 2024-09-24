@@ -331,32 +331,64 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void ActivateBulletPowerUp()
+   private void ActivateBulletPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
-            FireBullet();
+            // Pass the player's transform to FireBullet
+            FireBullet(player.transform);
         }
     }
 
-    private void FireBullet()
+
+    void FireBullet(Transform playerTransform)
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null)
+        if (bulletPrefab != null)
         {
-            Vector3 bulletSpawnPos = player.transform.position + new Vector3(0, 0.5f, 0);
-            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, bulletSpawnPos, Quaternion.identity);
-            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+            // Instantiate the bullet at the player's position
+            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
 
-            if (bulletRb != null)
+            // Get the PhotonView of the bullet
+            PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
+
+            // Transfer ownership of the bullet to the player who fired it
+            if (bulletPhotonView != null && bulletPhotonView.Owner != PhotonNetwork.LocalPlayer)
             {
-                bulletRb.velocity = player.transform.forward * 10f;
+                bulletPhotonView.TransferOwnership(PhotonNetwork.LocalPlayer);
+            }
+
+            // Get the player's movement script to determine the direction
+            PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
+
+            // Ensure the movement script exists
+            if (playerMovement != null)
+            {
+                // Use the method to get the last movement direction
+                Vector3 movementDirection = playerMovement.GetLastMovementDirection();
+
+                // Apply direction to the bullet's velocity
+                if (movementDirection != Vector3.zero)
+                {
+                    Debug.Log("Bullet fired in direction: " + movementDirection);
+                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                    rb.velocity = movementDirection * 10f;  // Set bullet speed
+                }
+                else
+                {
+                    Debug.LogError("Player is not moving, bullet fired in default forward direction");
+                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                    rb.velocity = playerTransform.forward * 10f;  // Default bullet speed
+                }
+            }
+            else
+            {
+                Debug.LogError("PacMan3DMovement script not found on player");
             }
         }
     }
+
 
     private void ActivateSpeedBoostPowerUp()
     {
