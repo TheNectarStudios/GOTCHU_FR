@@ -41,11 +41,25 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     public GameObject timerObject; 
    
+   private ShaderManager shaderManager; 
     private void Start()
     {
+        // Find ShaderManager in the scene and assign it
+        shaderManager = FindObjectOfType<ShaderManager>();
+
+        // Check if ShaderManager was found
+        if (shaderManager == null)
+        {
+            Debug.LogError("ShaderManager not found in the scene!");
+        }
+
+        // If connected to Photon, in a room, and the current client is the Master
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
+            // Call the RPC to show the loading screen across all clients
             photonView.RPC("ShowLoadingScreenRPC", RpcTarget.All);
+
+            // Start the coroutine to assign roles
             StartCoroutine(WaitAndAssignRoles());
         }
     }
@@ -281,15 +295,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
 
-  private void ActivateFreezePowerUp()
+     private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
-        photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
+        // photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
     }
-
-
-
-
 
     [PunRPC]
     private void FreezeGhostsAcrossNetwork()
@@ -316,11 +326,17 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                     ghostAnimator.enabled = false; 
                 }
 
+                // Ensure ShaderManager is assigned before using it
+                if (shaderManager != null)
+                {
+                    // Set freeze effect to visible
+                    shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.visibleValue);
+                }
+
                 StartCoroutine(ReEnableMovement(enemyMovement, 5f, enemy.name));
             }
         }
     }
-
 
     private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
     {
@@ -337,7 +353,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             ghostAnimator.enabled = true; 
         }
+
+        // Ensure ShaderManager is assigned before using it
+        if (shaderManager != null)
+        {
+            // Reset freeze effect to invisible
+            shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.invisibleValue);
+        }
     }
+
 
    private void ActivateBulletPowerUp()
     {
@@ -456,72 +480,72 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
 
 
-[PunRPC]private void ApplyFreezeEffectForAntagonists()
-{
-    // Check if the local player is an antagonist
-    bool isLocalPlayerAntagonist = PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("IsAntagonist", out object isAntagonist) && (bool)isAntagonist;
-    Debug.Log("Is Local Player Antagonist: " + isLocalPlayerAntagonist);
+// [PunRPC]private void ApplyFreezeEffectForAntagonists()
+// {
+//     // Check if the local player is an antagonist
+//     bool isLocalPlayerAntagonist = PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("IsAntagonist", out object isAntagonist) && (bool)isAntagonist;
+//     Debug.Log("Is Local Player Antagonist: " + isLocalPlayerAntagonist);
 
-    // Only apply freeze effect for non-antagonists (i.e., for the ghosts)
-    if (!isLocalPlayerAntagonist)
-    {
-        Debug.Log("Applying freeze effect for ghosts");
+//     // Only apply freeze effect for non-antagonists (i.e., for the ghosts)
+//     if (!isLocalPlayerAntagonist)
+//     {
+//         Debug.Log("Applying freeze effect for ghosts");
 
-        // Find all objects tagged as "Ghost"
-        GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+//         // Find all objects tagged as "Ghost"
+//         GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
 
-        // Loop through all ghosts and apply freeze effect
-        foreach (GameObject ghost in ghosts)
-        {
-            Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in ghostRenderers)
-            {
-                Material material = renderer.material;
-                if (material != null)
-                {
-                    Debug.Log("Applying freeze effect to Ghost: " + ghost.name);
+//         // Loop through all ghosts and apply freeze effect
+//         foreach (GameObject ghost in ghosts)
+//         {
+//             Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
+//             foreach (Renderer renderer in ghostRenderers)
+//             {
+//                 Material material = renderer.material;
+//                 if (material != null)
+//                 {
+//                     Debug.Log("Applying freeze effect to Ghost: " + ghost.name);
 
-                    // Use ShaderManager to apply the freeze effect
-                    ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-                    if (shaderManager != null)
-                    {
-                        // Set tiling multiplier to visible value
-                        shaderManager.SetTilingMultiplier(material, shaderManager.visibleValue);
-                    }
-                }
-            }
-        }
+//                     // Use ShaderManager to apply the freeze effect
+//                     ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+//                     if (shaderManager != null)
+//                     {
+//                         // Set tiling multiplier to visible value
+//                         shaderManager.SetTilingMultiplier(material, shaderManager.visibleValue);
+//                     }
+//                 }
+//             }
+//         }
 
-        // Reset the effect back to invisible after 5 seconds
-        StartCoroutine(ResetFreezeEffectAfterDelay(ghosts, 5.0f));
-    }
-}
+//         // Reset the effect back to invisible after 5 seconds
+//         StartCoroutine(ResetFreezeEffectAfterDelay(ghosts, 5.0f));
+//     }
+// }
 
-// Coroutine to reset the freeze effect after a delay
-private IEnumerator ResetFreezeEffectAfterDelay(GameObject[] ghosts, float delay)
-{
-    yield return new WaitForSeconds(delay);
+// // Coroutine to reset the freeze effect after a delay
+// private IEnumerator ResetFreezeEffectAfterDelay(GameObject[] ghosts, float delay)
+// {
+//     yield return new WaitForSeconds(delay);
 
-    ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-    if (shaderManager != null)
-    {
-        // Loop through all ghosts and reset the freeze effect
-        foreach (GameObject ghost in ghosts)
-        {
-            Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in ghostRenderers)
-            {
-                Material material = renderer.material;
-                if (material != null)
-                {
-                    // Reset tiling multiplier to invisible after the delay
-                    shaderManager.SetTilingMultiplier(material, shaderManager.invisibleValue);
-                    Debug.Log("Resetting freeze effect for Ghost: " + ghost.name);
-                }
-            }
-        }
-    }
-}
+//     ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+//     if (shaderManager != null)
+//     {
+//         // Loop through all ghosts and reset the freeze effect
+//         foreach (GameObject ghost in ghosts)
+//         {
+//             Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
+//             foreach (Renderer renderer in ghostRenderers)
+//             {
+//                 Material material = renderer.material;
+//                 if (material != null)
+//                 {
+//                     // Reset tiling multiplier to invisible after the delay
+//                     shaderManager.SetTilingMultiplier(material, shaderManager.invisibleValue);
+//                     Debug.Log("Resetting freeze effect for Ghost: " + ghost.name);
+//                 }
+//             }
+//         }
+//     }
+// }
     private void ShowPanel(GameObject panel)
     {
         panel.SetActive(true);
