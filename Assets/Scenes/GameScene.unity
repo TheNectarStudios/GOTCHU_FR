@@ -6734,8 +6734,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   freezeEffectMaterial: {fileID: 2100000, guid: abf05f3b1ac19a645bf81d62be07f541,
     type: 2}
-  visibleOpacity: 1
-  invisibleOpacity: 0
+  invisibleValue: 0
+  visibleValue: 1.57
 --- !u!1 &968435467 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5148817236446094103, guid: 1447d62ebdf21d14aa18557de0e4056f,
@@ -8230,7 +8230,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1090886774
 Transform:
   m_ObjectHideFlags: 0

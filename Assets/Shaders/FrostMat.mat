@@ -38,10 +38,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _cellDensity: 16.24
-    - _tillingMultiplier: 1.57
+    - _cellDensity: 50
+    - _tillingMultiplier: 0
     - _tillingPower: 5
-    - _timer: 0.3
+    - _timer: 4
     m_Colors:
-    - _FrontColor: {r: 0.08920611, g: 0.5891984, b: 0.7056604, a: 1}
+    - _BaseColor: {r: 0.08920611, g: 0.5891984, b: 0.7056604, a: 1}
   m_BuildTextureStacks: []

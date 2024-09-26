@@ -1,90 +1,86 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class ShaderManager : MonoBehaviour
 {
     public Material freezeEffectMaterial;  // Reference to the freeze material used in URP
-    public float visibleOpacity = 1.0f;     // Fully visible
-    public float invisibleOpacity = 0.0f;   // Fully invisible
+    public float invisibleValue = 0.0f;     // Represents invisible
+    public float visibleValue = 1.57f;       // Represents visible
 
     private void Start()
     {
-        // Set the initial opacity of the freeze effect material to 0 (invisible)
-        SetMaterialOpacity(freezeEffectMaterial, invisibleOpacity);
+        SetTilingMultiplier(freezeEffectMaterial, invisibleValue);
     }
 
-    // Apply the freeze effect by adjusting the opacity of the material for all antagonists (Ghosts)
-    public void SetFreezeEffectForAntagonists(bool isVisible)
+    private void Update()
     {
-        GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
-        foreach (GameObject ghost in ghosts)
+        // Test with keyboard input
+        if (Input.GetKeyDown(KeyCode.F)) // Press F to apply freeze effect for ghosts
         {
-            Renderer renderer = ghost.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                AdjustMaterialOpacity(renderer, isVisible);
-            }
+            ApplyFreezeEffectForAntagonists();
+        }
+
+        if (Input.GetKeyDown(KeyCode.P)) // Press P to reset effect
+        {
+            ResetFreezeEffect();
         }
     }
 
-    // Apply the freeze effect by adjusting the opacity of the material for the protagonist (Player)
-    public void SetFreezeEffectForProtagonist(bool isVisible)
+    // Applies the freeze effect for non-antagonist players tagged as "Ghost"
+    [PunRPC]
+    public void ApplyFreezeEffectForAntagonists()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        bool isLocalPlayerAntagonist = PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("IsAntagonist", out object isAntagonist) && (bool)isAntagonist;
+
+        if (!isLocalPlayerAntagonist) // Only apply freeze effect for non-antagonists (ghosts)
         {
-            Renderer renderer = player.GetComponent<Renderer>();
-            if (renderer != null)
+            Debug.Log("Applying freeze effect for ghosts");
+
+            // Find all objects tagged as "Ghost"
+            GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+
+            foreach (GameObject ghost in ghosts)
             {
-                AdjustMaterialOpacity(renderer, isVisible);
+                // Use ShaderManager to apply the freeze effect
+                SetTilingMultiplier(freezeEffectMaterial, visibleValue); // Apply visible value to the full-screen shader
+                Debug.Log("Freeze effect applied to Ghost: " + ghost.name);
             }
+
+            // Optionally, reset the effect back to invisible after 5 seconds
+            StartCoroutine(ResetFreezeEffectAfterDelay(5.0f));
         }
     }
 
-    // Sets the opacity of the specified material
-    private void SetMaterialOpacity(Material material, float opacity)
+    // Resets the freeze effect for all ghosts
+    public void ResetFreezeEffect()
+    {
+        SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Reset to invisible
+        Debug.Log("Resetting freeze effect to invisible");
+    }
+
+    // Coroutine to reset the freeze effect after a delay
+    private IEnumerator ResetFreezeEffectAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Reset to invisible
+        Debug.Log("Resetting freeze effect to invisible after delay");
+    }
+
+    // Sets the value of the _tillingMultiplier property
+    public void SetTilingMultiplier(Material material, float value)
     {
         if (material != null)
         {
-            if (material.HasProperty("_BaseColor"))  // URP uses _BaseColor for HDRP and URP shaders
+            if (material.HasProperty("_tillingMultiplier"))
             {
-                Color color = material.GetColor("_BaseColor");
-                color.a = opacity;  // Set the alpha value
-                material.SetColor("_BaseColor", color);
-            }
-            else if (material.HasProperty("_Color"))  // Standard shader might use _Color
-            {
-                Color color = material.GetColor("_Color");
-                color.a = opacity;  // Set the alpha value
-                material.SetColor("_Color", color);
+                material.SetFloat("_tillingMultiplier", value); // Set the value of _tillingMultiplier
             }
             else
             {
-                Debug.LogError("Material does not have _BaseColor or _Color property for opacity control.");
+                Debug.LogError("Material does not have _tillingMultiplier property.");
             }
-        }
-    }
-
-    // Adjusts the opacity of the material
-    private void AdjustMaterialOpacity(Renderer renderer, bool isVisible)
-    {
-        Material material = renderer.material;
-        if (material.HasProperty("_BaseColor"))  // URP uses _BaseColor for HDRP and URP shaders
-        {
-            Color color = material.GetColor("_BaseColor");
-            color.a = isVisible ? visibleOpacity : invisibleOpacity;  // Adjust the alpha value
-            material.SetColor("_BaseColor", color);
-        }
-        else if (material.HasProperty("_Color"))  // Standard shader might use _Color
-        {
-            Color color = material.GetColor("_Color");
-            color.a = isVisible ? visibleOpacity : invisibleOpacity;  // Adjust the alpha value
-            material.SetColor("_Color", color);
-        }
-        else
-        {
-            Debug.LogError("Material does not have _BaseColor or _Color property for opacity control.");
         }
     }
 }
