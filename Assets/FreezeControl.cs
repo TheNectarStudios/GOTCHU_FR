@@ -7,8 +7,7 @@ public class FreezeControl : MonoBehaviourPun
     public Material freezeMaterial;
     public float freezeDuration = 5f;
     public float tillingMultiplier = 1.56f;
-
-    private bool isFrozen = false;
+        private bool isFrozen = false;
     private Material originalMaterial;
     private float initialtilling;
 

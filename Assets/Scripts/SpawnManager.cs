@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
     public Transform protagonistSpawnPoint;
+    public Material freezeEffectMaterial;
+
     public Transform antagonistSpawnPoint;
     public Button powerButton;
     private string currentPowerUp = null;
@@ -279,12 +281,14 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
 
-    private void ActivateFreezePowerUp()
+  private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
+        photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
     }
 
-    [PunRPC]
+
+      [PunRPC]
     private void FreezeGhostsAcrossNetwork()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
@@ -314,7 +318,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
+    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay)
     {
         yield return new WaitForSeconds(delay);
 
@@ -442,11 +446,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void StartTimer()
     {
-        timerObject.SetActive(true);
+        if (timerObject != null)
+        {
+            timerObject.SetActive(true);
+        }
     }
 
-    private void ShowPanel(GameObject panel)
-    {
-        panel.SetActive(true);
-    }
 }
