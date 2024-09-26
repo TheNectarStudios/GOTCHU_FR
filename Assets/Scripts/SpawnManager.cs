@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
     public Transform protagonistSpawnPoint;
+    public Material freezeEffectMaterial;
+
     public Transform antagonistSpawnPoint;
     public Button powerButton;
     private string currentPowerUp = null;
@@ -286,7 +288,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
 
-    private void ActivateFreezePowerUp()
+  private void ActivateFreezePowerUp()
+    {
+        photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
+        photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
+    }
+
+
+      [PunRPC]
+    private void FreezeGhostsAcrossNetwork()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
         foreach (GameObject enemy in enemies)
@@ -294,18 +304,41 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             PacMan3DMovement enemyMovement = enemy.GetComponent<PacMan3DMovement>();
             if (enemyMovement != null)
             {
+                Debug.Log("Disabling movement for ghost: " + enemy.name);
                 enemyMovement.enabled = false;
-                StartCoroutine(ReEnableMovement(enemyMovement, 5f));
+
+                Rigidbody ghostRigidbody = enemy.GetComponent<Rigidbody>();
+                if (ghostRigidbody != null)
+                {
+                    ghostRigidbody.velocity = Vector3.zero;
+                    ghostRigidbody.angularVelocity = Vector3.zero;
+                }
+
+                Animator ghostAnimator = enemy.GetComponent<Animator>();
+                if (ghostAnimator != null)
+                {
+                    ghostAnimator.enabled = false; 
+                }
+
+                StartCoroutine(ReEnableMovement(enemyMovement, 5f, enemy.name));
             }
         }
     }
 
-    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay)
+  private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
     {
         yield return new WaitForSeconds(delay);
+
         if (enemyMovement != null)
         {
+            Debug.Log("Re-enabling movement for ghost: " + enemyName);
             enemyMovement.enabled = true;
+        }
+
+        Animator ghostAnimator = enemyMovement.GetComponent<Animator>();
+        if (ghostAnimator != null)
+        {
+            ghostAnimator.enabled = true; 
         }
     }
 
@@ -454,5 +487,34 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             timerObject.SetActive(true);
         }
     }
+
+
+
+[PunRPC]
+
+private void ApplyFreezeEffectForAntagonists()
+{
+    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
+    {
+        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+        if (shaderManager != null)
+        {
+            shaderManager.SetFreezeEffectForAntagonists(true);  // Make Ghosts visible with freeze effect
+        }
+    }
+}
+
+[PunRPC]
+private void RemoveFreezeEffectForAntagonists()
+{
+    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
+    {
+        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+        if (shaderManager != null)
+        {
+            shaderManager.SetFreezeEffectForAntagonists(false);  // Make Ghosts invisible
+        }
+    }
+}
 
 }
