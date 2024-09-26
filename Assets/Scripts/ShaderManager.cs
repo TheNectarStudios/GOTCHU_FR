@@ -1,34 +1,64 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
 public class ShaderManager : MonoBehaviour
 {
     public Material freezeEffectMaterial;  // Reference to the freeze material used in URP
-    public float invisibleValue = 0.0f;     // Represents invisible
-    public float visibleValue = 1.57f;       // Represents visible
+    public float invisibleValue = 0.0f;    // Represents invisible
+    public float visibleValue = 1.57f;     // Represents visible
+    public float transitionDuration = 5.0f; // Duration for the effect to transition back to invisible
+
+    private PhotonView photonView;         // PhotonView reference
 
     private void Start()
     {
-        SetTilingMultiplier(freezeEffectMaterial, invisibleValue);
+        if (freezeEffectMaterial == null)
+        {
+            Debug.LogError("FreezeEffectMaterial is null in ShaderManager! Make sure the material is assigned in the inspector.");
+        }
+        else
+        {
+            Debug.Log("FreezeEffectMaterial assigned successfully.");
+            SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Initial state: invisible
+        }
+
+        photonView = GetComponent<PhotonView>();
+        if (photonView == null)
+        {
+            Debug.LogError("PhotonView component is missing from the GameObject. Add a PhotonView component to the GameObject.");
+        }
     }
 
     private void Update()
     {
-        // Test with keyboard input
-        if (Input.GetKeyDown(KeyCode.F)) // Press F to apply freeze effect for ghosts
+        if (freezeEffectMaterial == null)
         {
-            ApplyFreezeEffectForAntagonists();
+            Debug.LogError("FreezeEffectMaterial is still null in Update method!");
+            return;
         }
 
-        if (Input.GetKeyDown(KeyCode.P)) // Press P to reset effect
+        if (photonView == null)
         {
-            ResetFreezeEffect();
+            Debug.LogError("PhotonView is null in ShaderManager Update. Cannot call RPC.");
+            return;
+        }
+
+        // Press F to apply freeze effect for ghosts
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("F key pressed: Applying freeze effect...");
+            photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.AllBuffered);
+        }
+
+        // Press P to reset freeze effect
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("P key pressed: Resetting freeze effect...");
+            photonView.RPC("ResetFreezeEffect", RpcTarget.AllBuffered);
         }
     }
 
-    // Applies the freeze effect for non-antagonist players tagged as "Ghost"
     [PunRPC]
     public void ApplyFreezeEffectForAntagonists()
     {
@@ -38,37 +68,40 @@ public class ShaderManager : MonoBehaviour
         {
             Debug.Log("Applying freeze effect for ghosts");
 
-            // Find all objects tagged as "Ghost"
-            GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
-
-            foreach (GameObject ghost in ghosts)
-            {
-                // Use ShaderManager to apply the freeze effect
-                SetTilingMultiplier(freezeEffectMaterial, visibleValue); // Apply visible value to the full-screen shader
-                Debug.Log("Freeze effect applied to Ghost: " + ghost.name);
-            }
-
-            // Optionally, reset the effect back to invisible after 5 seconds
-            StartCoroutine(ResetFreezeEffectAfterDelay(5.0f));
+            // Start the transition to make the effect visible and then revert
+            StartCoroutine(TransitionTilingMultiplier(visibleValue, invisibleValue, transitionDuration));
         }
     }
 
-    // Resets the freeze effect for all ghosts
+    [PunRPC]
     public void ResetFreezeEffect()
     {
-        SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Reset to invisible
+        // Reset the effect immediately
+        StopAllCoroutines();  // Stop any ongoing transition
+        SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Set directly to invisible
         Debug.Log("Resetting freeze effect to invisible");
     }
 
-    // Coroutine to reset the freeze effect after a delay
-    private IEnumerator ResetFreezeEffectAfterDelay(float delay)
+    // Coroutine to smoothly transition the tillingMultiplier value
+    private IEnumerator TransitionTilingMultiplier(float fromValue, float toValue, float duration)
     {
-        yield return new WaitForSeconds(delay);
-        SetTilingMultiplier(freezeEffectMaterial, invisibleValue); // Reset to invisible
-        Debug.Log("Resetting freeze effect to invisible after delay");
+        float timeElapsed = 0f;
+        while (timeElapsed < duration)
+        {
+            // Gradually change the value over time
+            float currentValue = Mathf.Lerp(fromValue, toValue, timeElapsed / duration);
+            SetTilingMultiplier(freezeEffectMaterial, currentValue);
+
+            timeElapsed += Time.deltaTime;  // Increment elapsed time
+            yield return null;              // Wait for the next frame
+        }
+
+        // Ensure the final value is set to 'toValue' after the loop finishes
+        SetTilingMultiplier(freezeEffectMaterial, toValue);
+        Debug.Log("Transition complete. Final tiling multiplier set to: " + toValue);
     }
 
-    // Sets the value of the _tillingMultiplier property
+    // Method to set the tillingMultiplier on the material
     public void SetTilingMultiplier(Material material, float value)
     {
         if (material != null)
@@ -76,11 +109,16 @@ public class ShaderManager : MonoBehaviour
             if (material.HasProperty("_tillingMultiplier"))
             {
                 material.SetFloat("_tillingMultiplier", value); // Set the value of _tillingMultiplier
+                Debug.Log($"_tillingMultiplier set to {value}");
             }
             else
             {
                 Debug.LogError("Material does not have _tillingMultiplier property.");
             }
+        }
+        else
+        {
+            Debug.LogError("Material is null when trying to set _tillingMultiplier.");
         }
     }
 }
