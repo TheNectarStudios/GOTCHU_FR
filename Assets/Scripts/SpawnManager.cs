@@ -55,23 +55,16 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(bufferTime);
         photonView.RPC("HideLoadingScreenRPC", RpcTarget.All);
 
-        // Hide all role panels before showing new ones
         photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
 
-        // Assign roles
         AssignRoles();
 
-        // Wait a short period to ensure all panels are hidden
         yield return new WaitForSeconds(3f);
         photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
-        
-        // Start the timer (renamed to match the method name)
         photonView.RPC("StartTimer", RpcTarget.All);
 
-        // Enable the control UI after hiding role panels
         photonView.RPC("ShowControlUI", RpcTarget.All);
     }
-
 
     private void AssignRoles()
     {
@@ -325,7 +318,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-  private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
+    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay)
     {
         yield return new WaitForSeconds(delay);
 
@@ -342,14 +335,17 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void ActivateBulletPowerUp()
+   private void ActivateBulletPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+
+        if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
+            // Pass the player's transform to FireBullet
             FireBullet(player.transform);
         }
     }
+
 
     void FireBullet(Transform playerTransform)
     {
@@ -370,13 +366,13 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             // Get the player's movement script to determine the direction
             PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
 
-            // Check if the movement script exists
+            // Ensure the movement script exists
             if (playerMovement != null)
             {
                 // Use the method to get the last movement direction
                 Vector3 movementDirection = playerMovement.GetLastMovementDirection();
 
-                // If the movement direction is valid, apply it to the bullet's velocity
+                // Apply direction to the bullet's velocity
                 if (movementDirection != Vector3.zero)
                 {
                     Debug.Log("Bullet fired in direction: " + movementDirection);
@@ -387,7 +383,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 {
                     Debug.LogError("Player is not moving, bullet fired in default forward direction");
                     Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = playerTransform.forward * 10f;  // Set bullet speed
+                    rb.velocity = playerTransform.forward * 10f;  // Default bullet speed
                 }
             }
             else
@@ -398,87 +394,55 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
 
-
-
     private void ActivateSpeedBoostPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+
+        if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
-            PacMan3DMovement playerMovement = player.GetComponent<PacMan3DMovement>();
-            if (playerMovement != null)
+            PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
+
+            if (movementScript != null)
             {
-                playerMovement.speed *= 2;  // Example of speed boost
-                StartCoroutine(ResetSpeedBoost(playerMovement, 5f));
+                movementScript.speed += 2.0f;
+                StartCoroutine(ResetSpeedAfterDelay(movementScript, 5f));
             }
         }
     }
 
-    private IEnumerator ResetSpeedBoost(PacMan3DMovement playerMovement, float delay)
+    private IEnumerator ResetSpeedAfterDelay(PacMan3DMovement movementScript, float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (playerMovement != null)
-        {
-            playerMovement.speed /= 2;  // Reset speed
-        }
+        movementScript.speed -= 2.0f;
     }
 
-    private void ShowPanel(GameObject panel)
-    {
-        if (panel != null)
-        {
-            panel.SetActive(true);
-        }
-    }
-    
     [PunRPC]
     private void ShowLoadingScreenRPC()
     {
-        if (loadingScreen != null)
-        {
-            loadingScreen.SetActive(true);
-        }
+        loadingScreen.SetActive(true);
     }
 
     [PunRPC]
     private void HideLoadingScreenRPC()
     {
-        if (loadingScreen != null)
-        {
-            loadingScreen.SetActive(false);
-        }
-    }
-
-    [PunRPC]
-    private void HideAllRolePanelsRPC()
-    {
-        if (protagonistPanel != null)
-        {
-            protagonistPanel.SetActive(false);
-        }
-        if (antagonistInvisibilityPanel != null)
-        {
-            antagonistInvisibilityPanel.SetActive(false);
-        }
-        if (antagonistDashPanel != null)
-        {
-            antagonistDashPanel.SetActive(false);
-        }
-        if (antagonistTrapPanel != null)
-        {
-            antagonistTrapPanel.SetActive(false);
-        }
-
+        loadingScreen.SetActive(false);
     }
 
     [PunRPC]
     private void ShowControlUI()
     {
-        if (controlUI != null)
-        {
-            controlUI.SetActive(true);
-        }
+        controlUI.SetActive(true);
     }
+
+    [PunRPC]
+    private void HideAllRolePanelsRPC()
+    {
+        protagonistPanel.SetActive(false);
+        antagonistInvisibilityPanel.SetActive(false);
+        antagonistDashPanel.SetActive(false);
+        antagonistTrapPanel.SetActive(false);
+    }
+
     [PunRPC]
     private void StartTimer()
     {
@@ -487,34 +451,5 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             timerObject.SetActive(true);
         }
     }
-
-
-
-[PunRPC]
-
-private void ApplyFreezeEffectForAntagonists()
-{
-    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
-    {
-        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-        if (shaderManager != null)
-        {
-            shaderManager.SetFreezeEffectForAntagonists(true);  // Make Ghosts visible with freeze effect
-        }
-    }
-}
-
-[PunRPC]
-private void RemoveFreezeEffectForAntagonists()
-{
-    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
-    {
-        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-        if (shaderManager != null)
-        {
-            shaderManager.SetFreezeEffectForAntagonists(false);  // Make Ghosts invisible
-        }
-    }
-}
 
 }
