@@ -288,7 +288,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
 
-      [PunRPC]
+
+
+
+    [PunRPC]
     private void FreezeGhostsAcrossNetwork()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
@@ -318,7 +321,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay)
+
+    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
     {
         yield return new WaitForSeconds(delay);
 
@@ -446,10 +450,43 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void StartTimer()
     {
-        if (timerObject != null)
+        timerObject.SetActive(true);
+    }
+
+
+
+
+[PunRPC]
+
+private void ApplyFreezeEffectForAntagonists()
+{
+    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
+    {
+        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+        if (shaderManager != null)
         {
-            timerObject.SetActive(true);
+            shaderManager.SetFreezeEffectForAntagonists(true);  // Make Ghosts visible with freeze effect
         }
+    }
+}
+
+[PunRPC]
+private void RemoveFreezeEffectForAntagonists()
+{
+    if (!PhotonNetwork.LocalPlayer.IsMasterClient) // Assuming master is protagonist
+    {
+        ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
+        if (shaderManager != null)
+        {
+            shaderManager.SetFreezeEffectForAntagonists(false);  // Make Ghosts invisible
+        }
+    }
+}
+
+
+    private void ShowPanel(GameObject panel)
+    {
+        panel.SetActive(true);
     }
 
 }
