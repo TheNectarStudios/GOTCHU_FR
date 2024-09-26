@@ -7,10 +7,15 @@ using UnityEngine.SceneManagement;  // Import SceneManagement for scene transiti
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     public TMP_InputField playerNameInput;
+    public PanelShake panelShake;  // Reference to the PanelShake script
 
     private void Start()
     {
         // Ensure any UI setup if needed
+        if (panelShake == null)
+        {
+            panelShake = FindObjectOfType<PanelShake>(); // Find the PanelShake script in the scene if not assigned
+        }
     }
 
     public void JoinLobby()
@@ -18,6 +23,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // Log the name entered in the TMP input field
         string playerName = playerNameInput.text;
         Debug.Log("Player Name: " + playerName);
+
+        // Trigger panel shake
+        panelShake.TriggerShake();
 
         // Set the Photon Network player nickname
         PhotonNetwork.NickName = playerName;
