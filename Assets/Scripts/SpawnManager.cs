@@ -75,9 +75,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(3f);
         photonView.RPC("HideAllRolePanelsRPC", RpcTarget.All);
-        photonView.RPC("StartTimer", RpcTarget.All);
 
         photonView.RPC("ShowControlUI", RpcTarget.All);
+        yield return new WaitForSeconds(2f);
+        photonView.RPC("StartTimer", RpcTarget.All);
     }
 
     private void AssignRoles()
