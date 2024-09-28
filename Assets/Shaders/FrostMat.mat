@@ -39,7 +39,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _cellDensity: 50
-    - _tillingMultiplier: 0
+    - _tillingMultiplier: 0.14318886
     - _tillingPower: 5
     - _timer: 4
     m_Colors:
