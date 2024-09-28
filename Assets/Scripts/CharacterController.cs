@@ -19,7 +19,7 @@ public class CharacterControllerWithCheer : MonoBehaviour
         animator.enabled = false;
 
         // Start the coroutine to wait for 7 seconds before enabling movement and animation
-        StartCoroutine(StartAfterBuffer(6.3f));  // 7-second buffer
+        StartCoroutine(StartAfterBuffer(6f));  // 7-second buffer
     }
 
     IEnumerator StartAfterBuffer(float waitTime)
