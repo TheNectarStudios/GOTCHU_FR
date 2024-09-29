@@ -1,62 +1,42 @@
 using UnityEngine;
-using System.Collections;
 
-public class CharacterControllerWithCheer : MonoBehaviour
+public class CheeringAnimation : MonoBehaviour
 {
-    public Transform targetPoint;  // The point to reach
-    public float speed = 5f;       // Speed of the character
-    public Animator animator;      // Reference to the Animator component
-    private bool hasReachedTarget = false;
-    
-    public bool IsRunning = true;  // Bool to control running animation
-    public bool IsCheering = false; // Bool to control cheering animation
+    public Animator animator;
 
-    private bool bufferCompleted = false; // Track if the buffer period is completed
+    [SerializeField] private float cheeringDuration = 7f; // Duration of cheering (in seconds)
+    [SerializeField] private float idleDuration = 3f;     // Duration of idle (in seconds)
 
-    void Start()
+    private bool IsCheering = false;
+
+    private void Start()
     {
-        // Ensure no animations are running by default during buffer
-        animator.enabled = false;
+        // Initially set the character to Idle
+        animator.SetBool("IsCheering", false);
 
-        // Start the coroutine to wait for 7 seconds before enabling movement and animation
-        StartCoroutine(StartAfterBuffer(6f));  // 7-second buffer
+        // Start the cycle of cheering and idling
+        StartCoroutine(CheeringCycle());
     }
 
-    IEnumerator StartAfterBuffer(float waitTime)
+    private System.Collections.IEnumerator CheeringCycle()
     {
-        yield return new WaitForSeconds(waitTime); // Wait for the buffer time
-        bufferCompleted = true;                   // After 7 seconds, logic can start
-        animator.enabled = true;                  // Enable animations after buffer
-    }
-
-    void Update()
-    {
-        // Only run the movement and animation logic if the buffer is completed
-        if (bufferCompleted)
+        while (true) // Infinite loop to keep the cycle running
         {
-            if (!hasReachedTarget)
-            {
-                // Move towards the target
-                float step = speed * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, targetPoint.position, step);
+            // Set IsCheering to true, start the cheering animation
+            IsCheering = true;
+            animator.SetBool("IsCheering", true);
+            Debug.Log("Cheering for " + cheeringDuration + " seconds...");
 
-                // Check if the character has reached the target
-                if (Vector3.Distance(transform.position, targetPoint.position) < 0.1f)
-                {
-                    hasReachedTarget = true;  // Stop moving
-                    IsRunning = false;        // Stop running animation
-                    IsCheering = true;        // Start cheering animation
-                }
-            }
+            // Wait for the specified cheering duration
+            yield return new WaitForSeconds(cheeringDuration);
 
-            // Update animator parameters
-            animator.SetBool("IsRunning", IsRunning);
+            // Set IsCheering to false, go back to idle
+            IsCheering = false;
+            animator.SetBool("IsCheering", false);
+            Debug.Log("Idling for " + idleDuration + " seconds...");
 
-            // Only set IsCheering true if hasReachedTarget is true
-            if (hasReachedTarget)
-            {
-                animator.SetBool("IsCheering", IsCheering);
-            }
+            // Wait for the specified idle duration
+            yield return new WaitForSeconds(idleDuration);
         }
     }
 }
