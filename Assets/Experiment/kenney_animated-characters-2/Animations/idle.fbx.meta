@@ -33,7 +33,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Root|Idle
+      name: Idle
       takeName: Root|Idle
       internalID: 2910742486769232160
       firstFrame: 0
