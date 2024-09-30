@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07525449bb4a1a94988fa44a4ed8b696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMeshRenderer: {fileID: 0}
+  targetPrefab: {fileID: 8802387135186228559}
   blinkDuration: 2
   blinkCount: 3
   maxHits: 3

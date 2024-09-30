@@ -5,19 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class PlayerHitDetection : MonoBehaviourPunCallbacks
 {
-    public MeshRenderer playerMeshRenderer;  // Reference to the player's MeshRenderer
+    public GameObject targetPrefab;          // Assignable prefab that will be disabled/enabled
     public float blinkDuration = 2f;         // Total time for blinking
-    public int blinkCount = 3;               // Number of times the player blinks
+    public int blinkCount = 3;               // Number of times the object blinks
     private bool isBlinking = false;         // Boolean to prevent multiple hit registrations during blinking
     private int hitCounter = 0;              // Player's hit counter
     public int maxHits = 3;                  // Maximum hits allowed before returning to the RoomCreated scene
 
     private void Start()
     {
-        // Ensure that the player's MeshRenderer is assigned
-        if (playerMeshRenderer == null)
+        // Ensure that the target prefab is assigned
+        if (targetPrefab == null)
         {
-            playerMeshRenderer = GetComponent<MeshRenderer>();
+            Debug.LogError("Target prefab is not assigned! Please assign a prefab to disable/enable.");
         }
     }
 
@@ -33,7 +33,7 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
             Debug.Log("Hit counter: " + hitCounter);
 
             // Start the blink effect and set isBlinking to true to prevent multiple hits
-            StartCoroutine(BlinkPlayerMesh());
+            StartCoroutine(BlinkTargetPrefab());
 
             // Check if the player has reached the maximum allowed hits
             if (hitCounter >= maxHits)
@@ -49,24 +49,26 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator BlinkPlayerMesh()
+    private IEnumerator BlinkTargetPrefab()
     {
+        if (targetPrefab == null) yield break; // Exit if no target is assigned
+
         isBlinking = true; // Prevent additional hit counts during blinking
         float blinkInterval = blinkDuration / (blinkCount * 2); // Time between on and off states
 
         for (int i = 0; i < blinkCount; i++)
         {
-            // Disable the mesh renderer (make the player invisible)
-            playerMeshRenderer.enabled = false;
+            // Disable the assigned prefab (make it invisible)
+            targetPrefab.SetActive(false);
             yield return new WaitForSeconds(blinkInterval);
 
-            // Enable the mesh renderer (make the player visible again)
-            playerMeshRenderer.enabled = true;
+            // Enable the assigned prefab (make it visible again)
+            targetPrefab.SetActive(true);
             yield return new WaitForSeconds(blinkInterval);
         }
 
-        // Ensure the player is visible after blinking
-        playerMeshRenderer.enabled = true;
+        // Ensure the prefab is enabled after blinking
+        targetPrefab.SetActive(true);
 
         // Reset the blinking flag after the blinking period is over
         isBlinking = false;
