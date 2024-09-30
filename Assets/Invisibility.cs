@@ -1,10 +1,12 @@
 using UnityEngine;
 using Photon.Pun;
 using System.Collections;
+using TMPro;  // Import TextMeshPro namespace
 
 public class Invisibility : MonoBehaviourPun
 {
-    public Renderer playerRenderer;  // Assign the player's renderer
+    public GameObject objectToDisable;  // Assign the object to disable in the editor
+    public TextMeshProUGUI textToDisable;  // Assign the TextMeshPro to disable in the editor
     public float invisibilityDuration = 5f;  // Duration of invisibility
     public float cooldownTime = 15f;  // Cooldown time between uses
 
@@ -13,21 +15,22 @@ public class Invisibility : MonoBehaviourPun
 
     private void Start()
     {
-        // Ensure the playerRenderer is assigned, otherwise try to get it from the object
-        if (playerRenderer == null)
+        // Ensure the object to disable is assigned
+        if (objectToDisable == null)
         {
-            playerRenderer = GetComponentInChildren<Renderer>();
+            Debug.LogError("Object to disable is not assigned. Please attach a GameObject to the Invisibility script.");
         }
 
-        if (playerRenderer == null)
+        // Ensure the TextMeshPro field is assigned
+        if (textToDisable == null)
         {
-            Debug.LogError("Renderer not found. Please assign a Renderer to the Invisibility script.");
+            Debug.LogError("TextMeshPro is not assigned. Please attach a TextMeshPro object to the Invisibility script.");
         }
     }
 
     public void ActivateInvisibility()
     {
-        if (isCooldown || playerRenderer == null) return;  // Prevent usage during cooldown
+        if (isCooldown || objectToDisable == null || textToDisable == null) return;  // Prevent usage during cooldown or if objects not assigned
 
         StartCoroutine(InvisibilityRoutine());
     }
@@ -41,7 +44,7 @@ public class Invisibility : MonoBehaviourPun
             photonView.RPC("SetInvisibleForOthers", RpcTarget.Others, true);
         }
 
-        // Disable renderer for others but keep it visible for the player themselves
+        // Disable the assigned object and TextMeshPro for others but keep them visible for the player themselves
         SetInvisibility(true);
 
         // Invisibility lasts for a defined duration
@@ -63,20 +66,24 @@ public class Invisibility : MonoBehaviourPun
     [PunRPC]
     private void SetInvisibleForOthers(bool invisible)
     {
-        playerRenderer.enabled = !invisible;
+        // Disable or enable the object and the TextMeshPro based on the invisibility state
+        objectToDisable.SetActive(!invisible);
+        textToDisable.gameObject.SetActive(!invisible);  // Disable or enable the TextMeshPro
     }
 
     private void SetInvisibility(bool invisible)
     {
         if (photonView.IsMine)
         {
-            // Keep the renderer active for the player themselves
-            playerRenderer.enabled = true;
+            // Keep the object and TextMeshPro active for the player themselves
+            objectToDisable.SetActive(true);
+            textToDisable.gameObject.SetActive(true);
         }
         else
         {
             // Set visibility for other players
-            playerRenderer.enabled = !invisible;
+            objectToDisable.SetActive(!invisible);
+            textToDisable.gameObject.SetActive(!invisible);
         }
     }
 
