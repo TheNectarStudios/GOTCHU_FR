@@ -4,15 +4,15 @@ using System.Collections;
 
 public class GhostHitManager : MonoBehaviourPun
 {
-    public GameObject pearlPrefab;       // Reference to the pearl prefab
-    private GameObject placedPearl;      // Reference to the pearl placed by the ghost
-    private GameObject naturalSpawnPoint; // Reference to the natural spawn point in the scene
+    public GameObject pearlPrefab;          // Reference to the pearl prefab
+    private GameObject placedPearl;         // Reference to the pearl placed by the ghost
+    private GameObject naturalSpawnPoint;   // Reference to the natural spawn point in the scene
     public string spawnPointTag = "GhostSpawn"; // Tag to identify spawn points
-    public float respawnDelay = 3f; // Delay in seconds before the ghost is visible and movable again
+    public float respawnDelay = 3f;         // Delay in seconds before the ghost is visible and movable again
 
-    private Vector3 lastPosition; // Position to teleport the ghost to
-    private MeshRenderer ghostMeshRenderer; // Reference to the MeshRenderer of the ghost
-    private Rigidbody ghostRigidbody; // Reference to the Rigidbody to control movement
+    private Vector3 lastPosition;           // Position to teleport the ghost to
+    public GameObject objectToDisable;      // Object to disable (assigned in the editor)
+    private Rigidbody ghostRigidbody;       // Reference to the Rigidbody to control movement
     private MonoBehaviour ghostMovementScript; // Reference to any movement script (if applicable)
 
     private void Start()
@@ -23,14 +23,6 @@ public class GhostHitManager : MonoBehaviourPun
         if (naturalSpawnPoint == null)
         {
             Debug.LogError("Natural spawn point not found! Make sure it's tagged correctly.");
-        }
-
-        // Get the MeshRenderer component of the ghost to enable/disable visibility
-        ghostMeshRenderer = GetComponent<MeshRenderer>();
-
-        if (ghostMeshRenderer == null)
-        {
-            Debug.LogError("No MeshRenderer found on the ghost!");
         }
 
         // Get the Rigidbody component to freeze/unfreeze the ghost
@@ -71,26 +63,24 @@ public class GhostHitManager : MonoBehaviourPun
         photonView.RPC("TeleportGhostRPC", RpcTarget.All, lastPosition);
     }
 
-
-
     [PunRPC]
     public void TeleportGhostRPC(Vector3 teleportPosition)
     {
         Debug.Log("Teleporting ghost to position: " + teleportPosition);
         transform.position = teleportPosition; // Move the ghost to the teleport position
 
-        // Disable the MeshRenderer and movement, then re-enable them after the delay
-        StartCoroutine(DisableMeshAndMovement(respawnDelay));
+        // Disable the object and movement, then re-enable them after the delay
+        StartCoroutine(DisableObjectAndMovement(respawnDelay));
     }
 
-    // Coroutine to disable the MeshRenderer and movement, then re-enable them after a delay
-    private IEnumerator DisableMeshAndMovement(float delay)
+    // Coroutine to disable the object and movement, then re-enable them after a delay
+    private IEnumerator DisableObjectAndMovement(float delay)
     {
-        // Disable the ghost's MeshRenderer to make it invisible
-        if (ghostMeshRenderer != null)
+        // Disable the assigned object in the editor (e.g., ghost model)
+        if (objectToDisable != null)
         {
-            ghostMeshRenderer.enabled = false;
-            Debug.Log("Ghost is invisible for " + delay + " seconds.");
+            objectToDisable.SetActive(false);
+            Debug.Log("Object is invisible for " + delay + " seconds.");
         }
 
         // Disable the ghost's Rigidbody and/or movement script to prevent movement
@@ -109,11 +99,11 @@ public class GhostHitManager : MonoBehaviourPun
         // Wait for the specified delay
         yield return new WaitForSeconds(delay);
 
-        // Re-enable the ghost's MeshRenderer to make it visible again
-        if (ghostMeshRenderer != null)
+        // Re-enable the assigned object to make it visible again
+        if (objectToDisable != null)
         {
-            ghostMeshRenderer.enabled = true;
-            Debug.Log("Ghost is visible again.");
+            objectToDisable.SetActive(true);
+            Debug.Log("Object is visible again.");
         }
 
         // Re-enable movement by unfreezing the Rigidbody and movement script

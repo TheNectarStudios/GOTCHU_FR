@@ -355,6 +355,7 @@ MonoBehaviour:
     type: 3}
   spawnPointTag: GhostSpawn
   respawnDelay: 3
+  objectToDisable: {fileID: 7692552349509555231}
 --- !u!54 &-6860914649217156247
 Rigidbody:
   m_ObjectHideFlags: 0
