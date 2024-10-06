@@ -12,6 +12,8 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
     private int hitCounter = 0;              // Player's hit counter
     public int maxHits = 3;                  // Maximum hits allowed before returning to the RoomCreated scene
 
+    private TopDownCameraFollow cameraFollow; // Reference to the camera follow script
+
     private void Start()
     {
         // Ensure that the target prefab is assigned
@@ -19,6 +21,9 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
         {
             Debug.LogError("Target prefab is not assigned! Please assign a prefab to disable/enable.");
         }
+
+        // Find the TopDownCameraFollow script
+        cameraFollow = FindObjectOfType<TopDownCameraFollow>();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -27,6 +32,12 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
         if (collision.gameObject.CompareTag("Ghost") && !isBlinking)
         {
             Debug.Log("Player hit by the ghost!");
+
+            // Trigger the camera shake
+            if (cameraFollow != null)
+            {
+                cameraFollow.ShakeCamera(0.5f, 0.2f);  // Shake for 0.5 seconds with a magnitude of 0.2
+            }
 
             // Increment the hit counter and start the blink effect
             hitCounter++;
