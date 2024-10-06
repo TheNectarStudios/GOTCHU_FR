@@ -26,6 +26,18 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
         cameraFollow = FindObjectOfType<TopDownCameraFollow>();
     }
 
+    private void Update()
+    {
+        // Trigger camera shake when the G key is pressed using camera's own shake settings
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            if (cameraFollow != null)
+            {
+                cameraFollow.ShakeCamera(cameraFollow.shakeDuration, cameraFollow.shakeMagnitude); // Use camera's variables
+            }
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         // Check if the object that collided with the player is tagged as "Ghost"
@@ -33,10 +45,10 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
         {
             Debug.Log("Player hit by the ghost!");
 
-            // Trigger the camera shake
+            // Trigger the camera shake using the camera script's variables
             if (cameraFollow != null)
             {
-                cameraFollow.ShakeCamera(0.5f, 0.2f);  // Shake for 0.5 seconds with a magnitude of 0.2
+                cameraFollow.ShakeCamera(cameraFollow.shakeDuration, cameraFollow.shakeMagnitude);  // Use camera's variables
             }
 
             // Increment the hit counter and start the blink effect
