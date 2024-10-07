@@ -8072,6 +8072,8 @@ MonoBehaviour:
   target: {fileID: 0}
   offset: {x: 0, y: 45, z: 0}
   smoothSpeed: 2
+  shakeDuration: 0.5
+  shakeMagnitude: 0.8
 --- !u!114 &777803894
 MonoBehaviour:
   m_ObjectHideFlags: 0
