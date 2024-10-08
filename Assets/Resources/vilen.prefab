@@ -354,7 +354,9 @@ MonoBehaviour:
   pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
     type: 3}
   spawnPointTag: GhostSpawn
-  respawnDelay: 3
+  respawnDelay: 1.5
+  scaleTransitionDuration: 0.5
+  preTeleportBuffer: 0.5
   objectToDisable: {fileID: 7692552349509555231}
 --- !u!54 &-6860914649217156247
 Rigidbody:
@@ -395,7 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3484651199
+  GlobalObjectIdHash: 3967685051
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
