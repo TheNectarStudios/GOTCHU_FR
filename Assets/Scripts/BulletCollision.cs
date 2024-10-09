@@ -19,6 +19,14 @@ public class BulletCollision : MonoBehaviour
             {
                 // Teleport the ghost when hit
                 ghostHitManager.TeleportToSpawnPoint();
+
+                // Trigger camera shake via GhostHitManager
+                TopDownCameraFollow cameraFollow = FindObjectOfType<TopDownCameraFollow>();
+                if (cameraFollow != null)
+                {
+                    cameraFollow.ShakeCamera(); // Trigger the camera shake
+                    Debug.Log("Camera shake triggered on bullet hit!");
+                }
             }
 
             // Destroy the bullet across the network
