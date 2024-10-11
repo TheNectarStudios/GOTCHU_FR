@@ -407,6 +407,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 46739880}
+  - component: {fileID: 46739881}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: GhostSpawn
@@ -429,6 +430,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 603813615}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &46739881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46739879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabToSpawn: {fileID: 5642766282230003982, guid: b5c8ca7ed10b61e499cce8ec3b6e2e4c,
+    type: 3}
+  spawnPoint: {fileID: 46739880}
+  spawnDelay: 13
 --- !u!1 &68885969
 GameObject:
   m_ObjectHideFlags: 0
@@ -21896,6 +21913,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1751649893}
+  - component: {fileID: 1751649894}
   m_Layer: 0
   m_Name: Spawner (2)
   m_TagString: GhostSpawn
@@ -21912,12 +21930,28 @@ Transform:
   m_GameObject: {fileID: 1751649892}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: 0.97, y: 2, z: -1.42}
+  m_LocalPosition: {x: 2.96, y: 2, z: -1.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603813615}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1751649894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751649892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabToSpawn: {fileID: 5642766282230003982, guid: b5c8ca7ed10b61e499cce8ec3b6e2e4c,
+    type: 3}
+  spawnPoint: {fileID: 1751649893}
+  spawnDelay: 13
 --- !u!1 &1753297617
 GameObject:
   m_ObjectHideFlags: 0
@@ -22032,6 +22066,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1775479156}
+  - component: {fileID: 1775479157}
   m_Layer: 0
   m_Name: Spawner (1)
   m_TagString: GhostSpawn
@@ -22048,12 +22083,28 @@ Transform:
   m_GameObject: {fileID: 1775479155}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: 0.97, y: 2, z: -1.42}
+  m_LocalPosition: {x: -0.67, y: 2, z: -1.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 603813615}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1775479157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1775479155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabToSpawn: {fileID: 5642766282230003982, guid: b5c8ca7ed10b61e499cce8ec3b6e2e4c,
+    type: 3}
+  spawnPoint: {fileID: 1775479156}
+  spawnDelay: 13
 --- !u!1 &1778800700
 GameObject:
   m_ObjectHideFlags: 0

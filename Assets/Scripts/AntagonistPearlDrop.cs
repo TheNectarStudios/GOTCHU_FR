@@ -5,6 +5,7 @@ using System.Collections;
 public class AntagonistPearlDrop : MonoBehaviourPun
 {
     public GameObject pearlPrefab;  // Reference to the pearl prefab
+    public GameObject dropAnimationPrefab;  // Reference to the animation prefab
     public Transform pearlHolder;   // Where the pearl will be attached on the antagonist
     public float autoDropTime = 20f;  // Time after which the pearl will drop automatically
     private bool hasDroppedPearl = false;  // To track if the pearl has been dropped
@@ -55,6 +56,12 @@ public class AntagonistPearlDrop : MonoBehaviourPun
             }
 
             hasDroppedPearl = true;  // Mark the pearl as dropped
+
+            // Play the drop animation at the pearl's position
+            if (dropAnimationPrefab != null)
+            {
+                Instantiate(dropAnimationPrefab, attachedPearl.transform.position, Quaternion.identity);
+            }
         }
     }
 
