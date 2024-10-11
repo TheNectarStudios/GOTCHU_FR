@@ -168,6 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyDelay: 2
+  impactPrefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7,
+    type: 3}
 --- !u!135 &4343507972405733262
 SphereCollider:
   m_ObjectHideFlags: 0

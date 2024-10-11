@@ -10,7 +10,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Transform protagonistSpawnPoint;
     public Material freezeEffectMaterial;
 
-    public Transform antagonistSpawnPoint;
+    // Add multiple spawner points for antagonists
+    public Transform[] antagonistSpawnPoints; // Array of antagonist spawners
     public Button powerButton;
     private string currentPowerUp = null;
 
@@ -18,7 +19,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
     
-
     public Button buttonUp;
     public Button buttonDown;
     public Button buttonLeft;
@@ -42,7 +42,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     public GameObject timerObject; 
    
-   private ShaderManager shaderManager; 
+    private ShaderManager shaderManager;
+
+    private int spawnedGhostsCount = 0;  // Keep track of ghosts spawned
+
     private void Start()
     {
         // Find ShaderManager in the scene and assign it
@@ -120,13 +123,24 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Antagonist Role Assigned");
 
-        GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
-        AssignButtonControls(antagonist);
-        AssignCamera(antagonist);
-
-        if (antagonist.GetComponent<PhotonView>().IsMine)
+        // Check the number of ghosts spawned so far
+        if (spawnedGhostsCount < antagonistSpawnPoints.Length)
         {
-            AssignAbilities(antagonist);
+            Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount]; // Use a different spawn point
+            GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
+            AssignButtonControls(antagonist);
+            AssignCamera(antagonist);
+
+            if (antagonist.GetComponent<PhotonView>().IsMine)
+            {
+                AssignAbilities(antagonist);
+            }
+
+            // Only increase the count for the first 2 spawners
+            if (spawnedGhostsCount < 2)
+            {
+                spawnedGhostsCount++; // Increase spawned ghosts count
+            }
         }
     }
 
