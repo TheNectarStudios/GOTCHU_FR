@@ -35,10 +35,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
 
     #region UI Callback Methods
+    // For creating a private room (play with friends)
     public void OnCreateRoomButtonClicked()
     {
         RoomKey = GenerateRoomKey();
-        TryCreateAndJoinRoom();
+        Debug.Log($"Creating a private room with key: {RoomKey}");
+        TryCreateAndJoinRoom(isPrivateRoom: true);  // Create a private room
     }
 
     public void OnJoinRoomButtonClicked()
@@ -64,10 +66,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
     }
 
-    // New Play Button Callback for joining a random room
+    // Play button to join a random public room
     public void OnPlayButtonClicked()
     {
-        TryJoinRoomWithQueue();
+        TryJoinRoomWithQueue();  // Join a public room
     }
     #endregion
 
@@ -101,15 +103,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("No random room available or all rooms are full. Creating a new room.");
+        Debug.Log("No random room available or all rooms are full. Creating a new public room.");
         RoomKey = GenerateRoomKey();
-        TryCreateAndJoinRoom();
+        TryCreateAndJoinRoom(isPrivateRoom: false);  // Create a public room
     }
 
-    // This method is called when the room list updates
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        availableRooms = roomList;  // Update the available rooms list
+        availableRooms = roomList;
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -124,7 +125,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #endregion
 
     #region Private Methods
-    // Core function to handle the queuing system
+    // Try to join a public room with the queuing system
     private void TryJoinRoomWithQueue()
     {
         StartCoroutine(CheckForAvailableRoom());
@@ -132,29 +133,31 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private IEnumerator CheckForAvailableRoom()
     {
-        // Check available rooms and try to join one that is not full
         foreach (RoomInfo room in availableRooms)
         {
-            if (room.PlayerCount < MaxPlayersInRoom && !room.RemovedFromList)
+            if (room.PlayerCount < MaxPlayersInRoom && !room.RemovedFromList && room.IsVisible)
             {
-                Debug.Log($"Found a room that is not full: {room.Name}. Joining...");
+                Debug.Log($"Found a public room: {room.Name}. Joining...");
                 RoomKey = room.Name;
                 PhotonNetwork.JoinRoom(room.Name);
-                yield break;  // Exit the coroutine as we have found a room
+                yield break;
             }
         }
 
-        // If no suitable room is found, create a new one
-        Debug.Log("No suitable room found. Creating a new room...");
+        // No suitable public room found, create a new public room
+        Debug.Log("No public room available. Creating a new public room...");
         RoomKey = GenerateRoomKey();
-        TryCreateAndJoinRoom();
+        TryCreateAndJoinRoom(isPrivateRoom: false);  // Create a public room
     }
 
-    private void TryCreateAndJoinRoom()
+    // Create a room, can be public or private
+    private void TryCreateAndJoinRoom(bool isPrivateRoom)
     {
         RoomOptions roomOptions = new RoomOptions
         {
             MaxPlayers = MaxPlayersInRoom,
+            IsVisible = !isPrivateRoom,  // Set visibility based on whether the room is private or public
+            IsOpen = true,  // Allow players to join
             CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
             {
                 { "RoomKey", RoomKey },
