@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyDelay: 2
-  impactPrefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7,
+  impactPrefab: {fileID: 4021103657954561961, guid: 6136262f7ebed154b860be4c0c4f81d1,
     type: 3}
 --- !u!135 &4343507972405733262
 SphereCollider:

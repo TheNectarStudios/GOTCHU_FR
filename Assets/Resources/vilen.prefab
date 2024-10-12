@@ -282,7 +282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
     type: 3}
-  dropAnimationPrefab: {fileID: 5112403345868107898, guid: 6f34ef0d986e9db4199cf75805f79753,
+  dropAnimationPrefab: {fileID: 5112403345868107898, guid: 8b85151945364814dacc0d16ab69e566,
     type: 3}
   pearlHolder: {fileID: 4766628923474102866}
   autoDropTime: 20
@@ -400,7 +400,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3967685051
+  GlobalObjectIdHash: 3484651199
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
