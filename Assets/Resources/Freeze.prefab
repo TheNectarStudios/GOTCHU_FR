@@ -286,5 +286,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  moveHeight: 1
+  moveHeight: 0.7
   rotateSpeed: 50

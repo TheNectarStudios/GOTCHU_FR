@@ -1,19 +1,27 @@
 using UnityEngine;
 using Photon.Pun;
 using System.Collections;
+using TMPro;  // Required for TextMeshProUGUI
 
 public class GhostHitManager : MonoBehaviourPun
 {
-    public GameObject pearlPrefab;          // Reference to the pearl prefab
-    private GameObject placedPearl;         // Reference to the pearl placed by the ghost
-    private GameObject naturalSpawnPoint;   // Reference to the natural spawn point in the scene
+    public GameObject pearlPrefab;           // Reference to the pearl prefab
+    private GameObject placedPearl;          // Reference to the pearl placed by the ghost
+    private GameObject naturalSpawnPoint;    // Reference to the natural spawn point in the scene
     public string spawnPointTag = "GhostSpawn"; // Tag to identify spawn points
-    public float respawnDelay = 3f;         // Delay in seconds before the ghost is visible and movable again
+    public float respawnDelay = 3f;          // Delay in seconds before the ghost is visible and movable again
+    public float scaleTransitionDuration = 1f; // Time it takes to scale down/up the object
+    public float preTeleportBuffer = 0.5f;   // Buffer time before the ghost teleports after shrinking
 
-    private Vector3 lastPosition;           // Position to teleport the ghost to
-    public GameObject objectToDisable;      // Object to disable (assigned in the editor)
-    private Rigidbody ghostRigidbody;       // Reference to the Rigidbody to control movement
+    private Vector3 lastPosition;            // Position to teleport the ghost to
+    public GameObject objectToDisable;       // Object to disable (assigned in the editor)
+    public TextMeshProUGUI textToDisable;    // TextMeshProUGUI to disable when hit
+    private Rigidbody ghostRigidbody;        // Reference to the Rigidbody to control movement
     private MonoBehaviour ghostMovementScript; // Reference to any movement script (if applicable)
+
+    private Vector3 originalScale;           // Store the original scale of the object
+
+    private TopDownCameraFollow cameraFollow; // Reference to the camera follow script
 
     private void Start()
     {
@@ -35,6 +43,34 @@ public class GhostHitManager : MonoBehaviourPun
 
         // Get the movement script (optional, depends on your setup)
         ghostMovementScript = GetComponent<MonoBehaviour>(); // Replace with your actual movement script
+
+        // Store the original scale of the object
+        if (objectToDisable != null)
+        {
+            originalScale = objectToDisable.transform.localScale;
+        }
+
+        // Find the TopDownCameraFollow script on the camera
+        cameraFollow = FindObjectOfType<TopDownCameraFollow>();
+        if (cameraFollow == null)
+        {
+            Debug.LogError("No TopDownCameraFollow script found on the camera!");
+        }
+    }
+
+    private void Update()
+    {
+        // Check if the player presses the 'H' key
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Debug.Log("H key pressed! Triggering camera shake.");
+
+            // Trigger the camera shake effect
+            if (cameraFollow != null)
+            {
+                cameraFollow.ShakeCamera();
+            }
+        }
     }
 
     public void TeleportToSpawnPoint()
@@ -59,7 +95,19 @@ public class GhostHitManager : MonoBehaviourPun
             lastPosition = transform.position; // Fallback to current position
         }
 
-        // Call the RPC to teleport the ghost across the network
+        // Start the shrinking, teleporting, and scaling process
+        StartCoroutine(ShrinkThenTeleport());
+    }
+
+    private IEnumerator ShrinkThenTeleport()
+    {
+        // Step 1: Shrink the object to zero
+        yield return StartCoroutine(ScaleObject(Vector3.zero, scaleTransitionDuration));
+
+        // Step 2: Wait for the pre-teleport buffer time before teleporting
+        yield return new WaitForSeconds(preTeleportBuffer);
+
+        // Step 3: Call the RPC to teleport the ghost across the network
         photonView.RPC("TeleportGhostRPC", RpcTarget.All, lastPosition);
     }
 
@@ -69,18 +117,25 @@ public class GhostHitManager : MonoBehaviourPun
         Debug.Log("Teleporting ghost to position: " + teleportPosition);
         transform.position = teleportPosition; // Move the ghost to the teleport position
 
-        // Disable the object and movement, then re-enable them after the delay
-        StartCoroutine(DisableObjectAndMovement(respawnDelay));
+        // Step 4: Begin the process of scaling back up and re-enabling after the delay
+        StartCoroutine(ScaleAndDisable(respawnDelay));
     }
 
-    // Coroutine to disable the object and movement, then re-enable them after a delay
-    private IEnumerator DisableObjectAndMovement(float delay)
+    // Coroutine to scale down, disable the object, then scale up and re-enable it
+    private IEnumerator ScaleAndDisable(float delay)
     {
         // Disable the assigned object in the editor (e.g., ghost model)
         if (objectToDisable != null)
         {
             objectToDisable.SetActive(false);
             Debug.Log("Object is invisible for " + delay + " seconds.");
+        }
+
+        // Disable the TextMeshProUGUI text
+        if (textToDisable != null)
+        {
+            textToDisable.gameObject.SetActive(false);
+            Debug.Log("TextMeshProUGUI is disabled.");
         }
 
         // Disable the ghost's Rigidbody and/or movement script to prevent movement
@@ -96,15 +151,25 @@ public class GhostHitManager : MonoBehaviourPun
             Debug.Log("Ghost movement script is disabled.");
         }
 
-        // Wait for the specified delay
+        // Wait for the specified delay before reappearing
         yield return new WaitForSeconds(delay);
 
-        // Re-enable the assigned object to make it visible again
+        // Re-enable the object and scale it back to its original size
         if (objectToDisable != null)
         {
             objectToDisable.SetActive(true);
             Debug.Log("Object is visible again.");
         }
+
+        // Re-enable the TextMeshProUGUI text
+        if (textToDisable != null)
+        {
+            textToDisable.gameObject.SetActive(true);
+            Debug.Log("TextMeshProUGUI is re-enabled.");
+        }
+
+        // Scale up the object back to its original size
+        yield return StartCoroutine(ScaleObject(originalScale, scaleTransitionDuration));
 
         // Re-enable movement by unfreezing the Rigidbody and movement script
         if (ghostRigidbody != null)
@@ -119,6 +184,52 @@ public class GhostHitManager : MonoBehaviourPun
             Debug.Log("Ghost movement script is re-enabled.");
         }
     }
+
+    // Coroutine to smoothly scale the object
+    private IEnumerator ScaleObject(Vector3 targetScale, float duration)
+    {
+        Vector3 initialScale = objectToDisable.transform.localScale;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            // Lerp between the initial and target scale
+            objectToDisable.transform.localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure the final scale is set exactly
+        objectToDisable.transform.localScale = targetScale;
+    }
+
+    // Bullet collision handler to trigger the camera shake
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet")) // Ensure the bullet has the correct tag
+        {
+            Debug.Log("Ghost hit by bullet!");
+
+            // Trigger camera shake when hit by a bullet
+            if (cameraFollow != null)
+            {
+                cameraFollow.ShakeCamera(); // Trigger camera shake
+                Debug.Log("Camera shake triggered!");
+            }
+            else
+            {
+                Debug.LogError("Camera follow script is missing!");
+            }
+
+            // Trigger teleportation after being hit
+            TeleportToSpawnPoint();
+        }
+        else
+        {
+            Debug.Log("Collision with non-bullet object: " + collision.gameObject.name);
+        }
+    }
+
 
     // Optional: Call this method when placing a pearl
     public void PlacePearl(Vector3 position)

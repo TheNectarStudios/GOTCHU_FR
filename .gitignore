@@ -3,7 +3,14 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 /DBuild
+
+
+
 Powerup FX/
+
+JMO Assets/
+
+
 
 /[Ll]ibrary/
 /[Tt]emp/
@@ -12,6 +19,7 @@ Powerup FX/
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+
 
 
 # MemoryCaptures can get excessive in size.

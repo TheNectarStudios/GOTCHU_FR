@@ -10,14 +10,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Transform protagonistSpawnPoint;
     public Material freezeEffectMaterial;
 
-    public Transform antagonistSpawnPoint;
+    // Add multiple spawner points for antagonists
+    public Transform[] antagonistSpawnPoints; // Array of antagonist spawners
     public Button powerButton;
     private string currentPowerUp = null;
 
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
-
+    
     public Button buttonUp;
     public Button buttonDown;
     public Button buttonLeft;
@@ -41,7 +42,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     public GameObject timerObject; 
    
-   private ShaderManager shaderManager; 
+    private ShaderManager shaderManager;
+
+    private int spawnedGhostsCount = 0;  // Keep track of ghosts spawned
+
     private void Start()
     {
         // Find ShaderManager in the scene and assign it
@@ -119,13 +123,24 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Antagonist Role Assigned");
 
-        GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, antagonistSpawnPoint.position, antagonistSpawnPoint.rotation);
-        AssignButtonControls(antagonist);
-        AssignCamera(antagonist);
-
-        if (antagonist.GetComponent<PhotonView>().IsMine)
+        // Check the number of ghosts spawned so far
+        if (spawnedGhostsCount < antagonistSpawnPoints.Length)
         {
-            AssignAbilities(antagonist);
+            Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount]; // Use a different spawn point
+            GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
+            AssignButtonControls(antagonist);
+            AssignCamera(antagonist);
+
+            if (antagonist.GetComponent<PhotonView>().IsMine)
+            {
+                AssignAbilities(antagonist);
+            }
+
+            // Only increase the count for the first 2 spawners
+            if (spawnedGhostsCount < 2)
+            {
+                spawnedGhostsCount++; // Increase spawned ghosts count
+            }
         }
     }
 
@@ -479,74 +494,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
 
-
-
-// [PunRPC]private void ApplyFreezeEffectForAntagonists()
-// {
-//     // Check if the local player is an antagonist
-//     bool isLocalPlayerAntagonist = PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("IsAntagonist", out object isAntagonist) && (bool)isAntagonist;
-//     Debug.Log("Is Local Player Antagonist: " + isLocalPlayerAntagonist);
-
-//     // Only apply freeze effect for non-antagonists (i.e., for the ghosts)
-//     if (!isLocalPlayerAntagonist)
-//     {
-//         Debug.Log("Applying freeze effect for ghosts");
-
-//         // Find all objects tagged as "Ghost"
-//         GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
-
-//         // Loop through all ghosts and apply freeze effect
-//         foreach (GameObject ghost in ghosts)
-//         {
-//             Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
-//             foreach (Renderer renderer in ghostRenderers)
-//             {
-//                 Material material = renderer.material;
-//                 if (material != null)
-//                 {
-//                     Debug.Log("Applying freeze effect to Ghost: " + ghost.name);
-
-//                     // Use ShaderManager to apply the freeze effect
-//                     ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-//                     if (shaderManager != null)
-//                     {
-//                         // Set tiling multiplier to visible value
-//                         shaderManager.SetTilingMultiplier(material, shaderManager.visibleValue);
-//                     }
-//                 }
-//             }
-//         }
-
-//         // Reset the effect back to invisible after 5 seconds
-//         StartCoroutine(ResetFreezeEffectAfterDelay(ghosts, 5.0f));
-//     }
-// }
-
-// // Coroutine to reset the freeze effect after a delay
-// private IEnumerator ResetFreezeEffectAfterDelay(GameObject[] ghosts, float delay)
-// {
-//     yield return new WaitForSeconds(delay);
-
-//     ShaderManager shaderManager = FindObjectOfType<ShaderManager>();
-//     if (shaderManager != null)
-//     {
-//         // Loop through all ghosts and reset the freeze effect
-//         foreach (GameObject ghost in ghosts)
-//         {
-//             Renderer[] ghostRenderers = ghost.GetComponentsInChildren<Renderer>();
-//             foreach (Renderer renderer in ghostRenderers)
-//             {
-//                 Material material = renderer.material;
-//                 if (material != null)
-//                 {
-//                     // Reset tiling multiplier to invisible after the delay
-//                     shaderManager.SetTilingMultiplier(material, shaderManager.invisibleValue);
-//                     Debug.Log("Resetting freeze effect for Ghost: " + ghost.name);
-//                 }
-//             }
-//         }
-//     }
-// }
     private void ShowPanel(GameObject panel)
     {
         panel.SetActive(true);
