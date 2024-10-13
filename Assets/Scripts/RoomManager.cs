@@ -11,11 +11,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 {
     public TMP_InputField roomKeyInput;
     public TextMeshProUGUI occupancyRateText;
+    public TextMeshProUGUI playerNameDisplay;  // TextMeshProUGUI for displaying the player's name
+    public GameObject nameEditPanel;           // Panel for editing the name
+    public TMP_InputField nameInputField;      // Input field for new player name
+    public GameObject loadingBufferUI;
 
     private string mapType;
     public static string RoomKey;
     private bool isDisconnecting = false;
-    public GameObject loadingBufferUI;
 
     private const int MaxPlayersInRoom = 4; // Max players per room
     private List<RoomInfo> availableRooms = new List<RoomInfo>();  // Store available rooms
@@ -32,6 +35,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.JoinLobby();  // Join the lobby to get the room list updates
         }
+
+        // Retrieve the player's name from PlayerPrefs and display it
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player"); // Default to "Player" if not found
+        playerNameDisplay.text = playerName; // Display the player name in the UI
     }
 
     #region UI Callback Methods
@@ -54,6 +61,33 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("Room key is empty. Cannot join the room.");
         }
+    }
+
+    public void OnEditNameButtonClicked()
+    {
+        nameEditPanel.SetActive(true); // Show the name edit panel
+        nameInputField.text = playerNameDisplay.text; // Populate the input field with the current name
+    }
+
+    public void OnSaveNameButtonClicked()
+    {
+        string newName = nameInputField.text.Trim();
+        if (!string.IsNullOrEmpty(newName))
+        {
+            playerNameDisplay.text = newName; // Update the displayed name
+            PlayerPrefs.SetString("PlayerName", newName); // Save the new name in PlayerPrefs
+            PlayerPrefs.Save(); // Ensure PlayerPrefs data is saved
+            nameEditPanel.SetActive(false); // Hide the name edit panel
+        }
+        else
+        {
+            Debug.LogWarning("Player name cannot be empty."); // Warning for empty name
+        }
+    }
+
+    public void OnCancelEditButtonClicked()
+    {
+        nameEditPanel.SetActive(false); // Hide the name edit panel without saving
     }
 
     public void OnBackToJoinRoom()
@@ -190,3 +224,4 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
     #endregion
 }
+    
