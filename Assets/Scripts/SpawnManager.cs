@@ -18,7 +18,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
-    
+
     public Button buttonUp;
     public Button buttonDown;
     public Button buttonLeft;
@@ -41,10 +41,16 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject loadingScreen;
 
     public GameObject timerObject; 
-   
+
     private ShaderManager shaderManager;
 
     private int spawnedGhostsCount = 0;  // Keep track of ghosts spawned
+
+    // Audio components
+    public AudioSource audioSource; // Assign this in the Inspector
+    public AudioClip freezeAudioClip;
+    public AudioClip bulletAudioClip;
+    public AudioClip speedBoostAudioClip;
 
     private void Start()
     {
@@ -178,14 +184,17 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             if (currentPowerUp == "Freeze")
             {
+                PlayAudio(freezeAudioClip);
                 ActivateFreezePowerUp();
             }
             else if (currentPowerUp == "Bullet")
             {
+                PlayAudio(bulletAudioClip);
                 ActivateBulletPowerUp();
             }
             else if (currentPowerUp == "SpeedBoost")
             {
+                PlayAudio(speedBoostAudioClip);
                 ActivateSpeedBoostPowerUp();
             }
             currentPowerUp = null;
@@ -311,132 +320,20 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
 
-     private void ActivateFreezePowerUp()
+    private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
-        // photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
     }
 
-    [PunRPC]
-    private void FreezeGhostsAcrossNetwork()
-    {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
-        foreach (GameObject enemy in enemies)
-        {
-            PacMan3DMovement enemyMovement = enemy.GetComponent<PacMan3DMovement>();
-            if (enemyMovement != null)
-            {
-                Debug.Log("Disabling movement for ghost: " + enemy.name);
-                enemyMovement.enabled = false;
-
-                Rigidbody ghostRigidbody = enemy.GetComponent<Rigidbody>();
-                if (ghostRigidbody != null)
-                {
-                    ghostRigidbody.velocity = Vector3.zero;
-                    ghostRigidbody.angularVelocity = Vector3.zero;
-                }
-
-                Animator ghostAnimator = enemy.GetComponent<Animator>();
-                if (ghostAnimator != null)
-                {
-                    ghostAnimator.enabled = false; 
-                }
-
-                // Ensure ShaderManager is assigned before using it
-                if (shaderManager != null)
-                {
-                    // Set freeze effect to visible
-                    shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.visibleValue);
-                }
-
-                StartCoroutine(ReEnableMovement(enemyMovement, 5f, enemy.name));
-            }
-        }
-    }
-
-    private IEnumerator ReEnableMovement(PacMan3DMovement enemyMovement, float delay, string enemyName)
-    {
-        yield return new WaitForSeconds(delay);
-
-        if (enemyMovement != null)
-        {
-            Debug.Log("Re-enabling movement for ghost: " + enemyName);
-            enemyMovement.enabled = true;
-        }
-
-        Animator ghostAnimator = enemyMovement.GetComponent<Animator>();
-        if (ghostAnimator != null)
-        {
-            ghostAnimator.enabled = true; 
-        }
-
-        // Ensure ShaderManager is assigned before using it
-        if (shaderManager != null)
-        {
-            // Reset freeze effect to invisible
-            shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.invisibleValue);
-        }
-    }
-
-
-   private void ActivateBulletPowerUp()
+    private void ActivateBulletPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
-            // Pass the player's transform to FireBullet
             FireBullet(player.transform);
         }
     }
-
-
-    void FireBullet(Transform playerTransform)
-    {
-        if (bulletPrefab != null)
-        {
-            // Instantiate the bullet at the player's position
-            GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
-
-            // Get the PhotonView of the bullet
-            PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
-
-            // Transfer ownership of the bullet to the player who fired it
-            if (bulletPhotonView != null && bulletPhotonView.Owner != PhotonNetwork.LocalPlayer)
-            {
-                bulletPhotonView.TransferOwnership(PhotonNetwork.LocalPlayer);
-            }
-
-            // Get the player's movement script to determine the direction
-            PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
-
-            // Ensure the movement script exists
-            if (playerMovement != null)
-            {
-                // Use the method to get the last movement direction
-                Vector3 movementDirection = playerMovement.GetLastMovementDirection();
-
-                // Apply direction to the bullet's velocity
-                if (movementDirection != Vector3.zero)
-                {
-                    Debug.Log("Bullet fired in direction: " + movementDirection);
-                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = movementDirection * 10f;  // Set bullet speed
-                }
-                else
-                {
-                    Debug.LogError("Player is not moving, bullet fired in default forward direction");
-                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = playerTransform.forward * 10f;  // Default bullet speed
-                }
-            }
-            else
-            {
-                Debug.LogError("PacMan3DMovement script not found on player");
-            }
-        }
-    }
-
 
     private void ActivateSpeedBoostPowerUp()
     {
@@ -460,43 +357,106 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         movementScript.speed -= 2.0f;
     }
 
+    private void PlayAudio(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
+
+    [PunRPC]
+    private void FreezeGhostsAcrossNetwork()
+    {
+        GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        foreach (GameObject ghost in ghosts)
+        {
+            if (ghost.TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                meshRenderer.material = freezeEffectMaterial;
+                StartCoroutine(ResetGhostMaterialAfterDelay(ghost, 3f));
+            }
+        }
+    }
+
+    private IEnumerator ResetGhostMaterialAfterDelay(GameObject ghost, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (ghost.TryGetComponent(out MeshRenderer meshRenderer))
+        {
+            // Reset to the original material (assuming you store it)
+            // meshRenderer.material = originalMaterial; // Uncomment and set original material
+        }
+    }
+
+    private void FireBullet(Transform playerTransform)
+    {
+        Vector3 bulletDirection = playerTransform.forward; // Assuming forward direction is the desired bullet direction
+        GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, Quaternion.identity);
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        bulletRb.AddForce(bulletDirection * 10f, ForceMode.Impulse); // Change 10f to your desired bullet speed
+    }
+
     [PunRPC]
     private void ShowLoadingScreenRPC()
     {
-        loadingScreen.SetActive(true);
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(true);
+        }
     }
 
     [PunRPC]
     private void HideLoadingScreenRPC()
     {
-        loadingScreen.SetActive(false);
+        if (loadingScreen != null)
+        {
+            loadingScreen.SetActive(false);
+        }
     }
 
     [PunRPC]
     private void ShowControlUI()
     {
-        controlUI.SetActive(true);
+        if (controlUI != null)
+        {
+            controlUI.SetActive(true);
+        }
     }
 
     [PunRPC]
     private void HideAllRolePanelsRPC()
     {
-        protagonistPanel.SetActive(false);
-        antagonistInvisibilityPanel.SetActive(false);
-        antagonistDashPanel.SetActive(false);
-        antagonistTrapPanel.SetActive(false);
+        if (protagonistPanel != null)
+        {
+            protagonistPanel.SetActive(false);
+        }
+        if (antagonistInvisibilityPanel != null)
+        {
+            antagonistInvisibilityPanel.SetActive(false);
+        }
+        if (antagonistDashPanel != null)
+        {
+            antagonistDashPanel.SetActive(false);
+        }
+        if (antagonistTrapPanel != null)
+        {
+            antagonistTrapPanel.SetActive(false);
+        }
     }
 
     [PunRPC]
     private void StartTimer()
     {
-        timerObject.SetActive(true);
+        // Your timer logic here
+        Debug.Log("Timer started.");
     }
-
 
     private void ShowPanel(GameObject panel)
     {
-        panel.SetActive(true);
+        if (panel != null)
+        {
+            panel.SetActive(true);
+        }
     }
-
 }
