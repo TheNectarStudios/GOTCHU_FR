@@ -170,6 +170,7 @@ MonoBehaviour:
   destroyDelay: 2
   impactPrefab: {fileID: 4021103657954561961, guid: 6136262f7ebed154b860be4c0c4f81d1,
     type: 3}
+  impactSound: {fileID: 8300000, guid: 9a80169b4f50c984b8783d415a4fd17c, type: 3}
 --- !u!135 &4343507972405733262
 SphereCollider:
   m_ObjectHideFlags: 0

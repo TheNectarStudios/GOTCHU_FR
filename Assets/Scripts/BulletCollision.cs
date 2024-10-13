@@ -5,6 +5,18 @@ public class BulletCollision : MonoBehaviour
 {
     public float destroyDelay = 2f; // Time after which the bullet will be destroyed if no collision happens
     public GameObject impactPrefab; // The impact effect prefab to be instantiated upon collision
+    public AudioClip impactSound; // Sound to be played upon impact
+    private AudioSource audioSource; // Reference to the AudioSource component
+
+    private void Start()
+    {
+        // Create an AudioSource component if not already attached
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = impactSound; // Set the audio clip
+
+        // Destroy the bullet after a certain amount of time (fallback) to prevent it from lingering
+        Destroy(gameObject, destroyDelay);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -15,6 +27,12 @@ public class BulletCollision : MonoBehaviour
             if (impactPrefab != null)
             {
                 Instantiate(impactPrefab, transform.position, transform.rotation);
+            }
+
+            // Play the impact sound
+            if (impactSound != null)
+            {
+                audioSource.Play(); // Play the impact sound
             }
 
             // If it's a ghost, handle ghost-specific logic
@@ -43,11 +61,5 @@ public class BulletCollision : MonoBehaviour
             // Destroy the bullet across the network after the impact
             PhotonNetwork.Destroy(gameObject);
         }
-    }
-
-    private void Start()
-    {
-        // Destroy the bullet after a certain amount of time (fallback) to prevent it from lingering
-        Destroy(gameObject, destroyDelay);
     }
 }
