@@ -1,8 +1,7 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Pun; // Photon support
 
-public class DelayedAudioPlay : MonoBehaviourPun
+public class DelayedAudioPlay : MonoBehaviour
 {
     public AudioSource audioSource;
 
@@ -11,11 +10,8 @@ public class DelayedAudioPlay : MonoBehaviourPun
         audioSource = GetComponent<AudioSource>(); // Get the AudioSource component attached to the same GameObject
         if (audioSource != null)
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                // Only the MasterClient should start the coroutine, then synchronize via RPC
-                StartCoroutine(PlayAudioAfterDelay(6.5f)); // Start the coroutine to play after a delay
-            }
+            // Each player will individually start the coroutine to play the audio after a delay
+            StartCoroutine(PlayAudioAfterDelay(6.5f)); // Start the coroutine to play after a delay
         }
         else
         {
@@ -23,23 +19,22 @@ public class DelayedAudioPlay : MonoBehaviourPun
         }
     }
 
-    // Coroutine to wait and then synchronize the audio playback across the network
+    // Coroutine to wait and then play the audio locally for each player
     private IEnumerator PlayAudioAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay); // Wait for the delay time
 
-        // Call the RPC to play the audio on all clients
-        photonView.RPC("PlayAudioAcrossNetwork", RpcTarget.All);
+        // Play the audio locally for each player
+        PlayAudio();
     }
 
-    // RPC method that will be called across the network to play the audio
-    [PunRPC]
-    private void PlayAudioAcrossNetwork()
+    // Method to play audio locally
+    private void PlayAudio()
     {
         if (audioSource != null && !audioSource.isPlaying)
         {
             audioSource.Play(); // Play the audio
-            Debug.Log("Audio played across the network.");
+            Debug.Log("Audio played locally for this player.");
         }
     }
 }
