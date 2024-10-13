@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;  // Import SceneManagement for scene transiti
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
-    public TMP_InputField playerNameInput;
     public PanelShake panelShake;  // Reference to the PanelShake script
 
     private void Start()
@@ -16,27 +15,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             panelShake = FindObjectOfType<PanelShake>(); // Find the PanelShake script in the scene if not assigned
         }
-    }
 
-    public void JoinLobby()
-    {
-        // Log the name entered in the TMP input field
-        string playerName = playerNameInput.text.Trim();
-
-        if (string.IsNullOrEmpty(playerName))
-        {
-            Debug.LogWarning("Player name is empty. Please enter a valid name.");
-            if (panelShake != null)
-            {
-                panelShake.TriggerShake();  // Trigger shake when there's an error
-            }
-            return;  // Stop if player name is empty
-        }
-
-        Debug.Log("Player Name: " + playerName);
+        // Generate a random player name
+        string randomPlayerName = "Player" + Random.Range(100, 1000).ToString();
+        Debug.Log("Assigned Player Name: " + randomPlayerName);
 
         // Set the Photon Network player nickname
-        PhotonNetwork.NickName = playerName;
+        PhotonNetwork.NickName = randomPlayerName;
+
+        // Save the player name for later use
+        PlayerPrefs.SetString("PlayerName", randomPlayerName);
+        PlayerPrefs.Save();  // Ensure the data is saved
 
         // Connect to the Photon Master Server
         PhotonNetwork.ConnectUsingSettings();
