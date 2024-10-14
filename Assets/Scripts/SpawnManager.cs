@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
+using UnityEngine.InputSystem; 
 
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
@@ -67,6 +68,14 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             StartCoroutine(WaitAndAssignRoles());
         }
     }
+    void Update()
+{
+    if (Keyboard.current.gKey.wasPressedThisFrame) // Check if "G" was pressed
+    {
+        Debug.Log("G key pressed - Triggering freeze power-up");
+        ActivateFreezePowerUp(); // Trigger the freeze power-up
+    }
+}
 
     private IEnumerator WaitAndAssignRoles()
     {
@@ -310,16 +319,19 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
+    
 
-     private void ActivateFreezePowerUp()
+      private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
-        // photonView.RPC("ApplyFreezeEffectForAntagonists", RpcTarget.All);
+        Debug.Log("Yesssss");
     }
 
     [PunRPC]
     private void FreezeGhostsAcrossNetwork()
     {
+        
+        
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
         foreach (GameObject enemy in enemies)
         {
@@ -339,7 +351,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 Animator ghostAnimator = enemy.GetComponent<Animator>();
                 if (ghostAnimator != null)
                 {
-                    ghostAnimator.enabled = false; 
+                    ghostAnimator.enabled = false;
                 }
 
                 // Ensure ShaderManager is assigned before using it
