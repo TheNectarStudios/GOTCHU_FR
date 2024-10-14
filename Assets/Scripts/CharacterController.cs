@@ -25,7 +25,7 @@ public class CheeringAnimation : MonoBehaviour
             // Set IsCheering to true, start the cheering animation
             IsCheering = true;
             animator.SetBool("IsCheering", true);
-            Debug.Log("Cheering for " + cheeringDuration + " seconds...");
+            // Debug.Log("Cheering for " + cheeringDuration + " seconds...");
 
             // Wait for the specified cheering duration
             yield return new WaitForSeconds(cheeringDuration);
@@ -33,7 +33,7 @@ public class CheeringAnimation : MonoBehaviour
             // Set IsCheering to false, go back to idle
             IsCheering = false;
             animator.SetBool("IsCheering", false);
-            Debug.Log("Idling for " + idleDuration + " seconds...");
+            // Debug.Log("Idling for " + idleDuration + " seconds...");
 
             // Wait for the specified idle duration
             yield return new WaitForSeconds(idleDuration);
