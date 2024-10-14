@@ -19,7 +19,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
-        
+
 
     public float bufferTime = 3.0f;
     private bool isCooldown = false;
@@ -45,22 +45,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // Find ShaderManager in the scene and assign it
         shaderManager = FindObjectOfType<ShaderManager>();
-
-        // Check if ShaderManager was found
-        if (shaderManager == null)
-        {
-            Debug.LogError("ShaderManager not found in the scene!");
-        }
-
-        // If connected to Photon, in a room, and the current client is the Master
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
         {
-            // Call the RPC to show the loading screen across all clients
             photonView.RPC("ShowLoadingScreenRPC", RpcTarget.All);
-
-            // Start the coroutine to assign roles
             StartCoroutine(WaitAndAssignRoles());
         }
     }
@@ -105,12 +93,9 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetProtagonist()
     {
-        Debug.Log("Protagonist Role Assigned");
-
         GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
         AssignButtonControls(protagonist);
         AssignCamera(protagonist);
-
         if (protagonist.GetComponent<PhotonView>().IsMine)
         {
             ShowPanel(protagonistPanel);
@@ -120,9 +105,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetAntagonist()
     {
-        Debug.Log("Antagonist Role Assigned");
-
-        // Check the number of ghosts spawned so far
         if (spawnedGhostsCount < antagonistSpawnPoints.Length)
         {
             Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount]; // Use a different spawn point
@@ -134,16 +116,13 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             {
                 AssignAbilities(antagonist);
             }
-
-            // Only increase the count for the first 2 spawners
             if (spawnedGhostsCount < 2)
             {
-                spawnedGhostsCount++; // Increase spawned ghosts count
+                spawnedGhostsCount++; 
             }
         }
     }
-
-    private void AssignButtonControls(GameObject player)
+   private void AssignButtonControls(GameObject player)
     {
         if (player.GetComponent<PhotonView>().IsMine)
         {
@@ -154,10 +133,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 powerButton.interactable = true;
                 powerButton.onClick.RemoveAllListeners();
                 powerButton.onClick.AddListener(ActivateStoredPowerUp);
-            }
-            else
-            {
-                Debug.LogError("PacMan3DMovement script not found on the player.");
             }
         }
     }
@@ -296,8 +271,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public void UpdateInventory(string powerUpName)
     {
         currentPowerUp = powerUpName;
-        Debug.Log("Power-Up added to inventory: " + powerUpName);
-
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
     
@@ -305,7 +278,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
       private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
-        Debug.Log("Yesssss");
     }
 
     [PunRPC]
@@ -319,9 +291,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             PacMan3DMovement enemyMovement = enemy.GetComponent<PacMan3DMovement>();
             if (enemyMovement != null)
             {
-                Debug.Log("Disabling movement for ghost: " + enemy.name);
                 enemyMovement.enabled = false;
-
                 Rigidbody ghostRigidbody = enemy.GetComponent<Rigidbody>();
                 if (ghostRigidbody != null)
                 {
@@ -334,11 +304,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 {
                     ghostAnimator.enabled = false;
                 }
-
-                // Ensure ShaderManager is assigned before using it
                 if (shaderManager != null)
                 {
-                    // Set freeze effect to visible
                     shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.visibleValue);
                 }
 
@@ -353,7 +320,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         if (enemyMovement != null)
         {
-            Debug.Log("Re-enabling movement for ghost: " + enemyName);
             enemyMovement.enabled = true;
         }
 
@@ -362,11 +328,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             ghostAnimator.enabled = true; 
         }
-
-        // Ensure ShaderManager is assigned before using it
         if (shaderManager != null)
         {
-            // Reset freeze effect to invisible
             shaderManager.SetTilingMultiplier(shaderManager.freezeEffectMaterial, shaderManager.invisibleValue);
         }
     }
@@ -378,7 +341,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
-            // Pass the player's transform to FireBullet
             FireBullet(player.transform);
         }
     }
@@ -388,49 +350,29 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (bulletPrefab != null)
         {
-            // Instantiate the bullet at the player's position
             GameObject bullet = PhotonNetwork.Instantiate(bulletPrefab.name, playerTransform.position, playerTransform.rotation, 0);
-
-            // Get the PhotonView of the bullet
             PhotonView bulletPhotonView = bullet.GetComponent<PhotonView>();
-
-            // Transfer ownership of the bullet to the player who fired it
             if (bulletPhotonView != null && bulletPhotonView.Owner != PhotonNetwork.LocalPlayer)
             {
                 bulletPhotonView.TransferOwnership(PhotonNetwork.LocalPlayer);
             }
-
-            // Get the player's movement script to determine the direction
             PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
-
-            // Ensure the movement script exists
             if (playerMovement != null)
             {
-                // Use the method to get the last movement direction
                 Vector3 movementDirection = playerMovement.GetLastMovementDirection();
-
-                // Apply direction to the bullet's velocity
                 if (movementDirection != Vector3.zero)
                 {
-                    Debug.Log("Bullet fired in direction: " + movementDirection);
                     Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = movementDirection * 10f;  // Set bullet speed
+                    rb.velocity = movementDirection * 10f;  
                 }
                 else
                 {
-                    Debug.LogError("Player is not moving, bullet fired in default forward direction");
                     Rigidbody rb = bullet.GetComponent<Rigidbody>();
                     rb.velocity = playerTransform.forward * 10f;  // Default bullet speed
                 }
             }
-            else
-            {
-                Debug.LogError("PacMan3DMovement script not found on player");
-            }
         }
     }
-
-
     private void ActivateSpeedBoostPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -446,31 +388,26 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             }
         }
     }
-
     private IEnumerator ResetSpeedAfterDelay(PacMan3DMovement movementScript, float delay)
     {
         yield return new WaitForSeconds(delay);
         movementScript.speed -= 2.0f;
     }
-
     [PunRPC]
     private void ShowLoadingScreenRPC()
     {
         loadingScreen.SetActive(true);
     }
-
     [PunRPC]
     private void HideLoadingScreenRPC()
     {
         loadingScreen.SetActive(false);
     }
-
     [PunRPC]
     private void ShowControlUI()
     {
         controlUI.SetActive(true);
     }
-
     [PunRPC]
     private void HideAllRolePanelsRPC()
     {
@@ -479,15 +416,11 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         antagonistDashPanel.SetActive(false);
         antagonistTrapPanel.SetActive(false);
     }
-
     [PunRPC]
-    private void StartTimer()
+     private void StartTimer()
     {
         timerObject.SetActive(true);
-    }
-
-
-    private void ShowPanel(GameObject panel)
+    } private void ShowPanel(GameObject panel)
     {
         panel.SetActive(true);
     }
