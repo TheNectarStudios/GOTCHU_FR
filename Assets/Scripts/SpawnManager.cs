@@ -68,15 +68,9 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             StartCoroutine(WaitAndAssignRoles());
         }
     }
-    void Update()
-{
-    if (Keyboard.current.gKey.wasPressedThisFrame) // Check if "G" was pressed
-    {
-        Debug.Log("G key pressed - Triggering freeze power-up");
-        ActivateFreezePowerUp(); // Trigger the freeze power-up
-    }
-}
 
+
+  
     private IEnumerator WaitAndAssignRoles()
     {
         yield return new WaitForSeconds(bufferTime);
@@ -165,10 +159,10 @@ public class SpawnManager : MonoBehaviourPunCallbacks
                 buttonLeft.onClick.RemoveAllListeners();
                 buttonRight.onClick.RemoveAllListeners();
 
-                buttonUp.onClick.AddListener(() => movementScript.MoveUp());
-                buttonDown.onClick.AddListener(() => movementScript.MoveDown());
-                buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
-                buttonRight.onClick.AddListener(() => movementScript.MoveRight());
+                // buttonUp.onClick.AddListener(() => movementScript.MoveUp());
+                // buttonDown.onClick.AddListener(() => movementScript.MoveDown());
+                // buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
+                // buttonRight.onClick.AddListener(() => movementScript.MoveRight());
 
                 powerButton.interactable = true;
                 powerButton.onClick.RemoveAllListeners();

@@ -66,5 +66,4 @@ public class PlayerShooting : MonoBehaviour
             Debug.LogError("Not connected to Photon or shooting is disabled!");
         }
     }
-
 }
