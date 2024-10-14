@@ -4,7 +4,6 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
-using UnityEngine.InputSystem; 
 
 public class SpawnManager : MonoBehaviourPunCallbacks
 {
@@ -19,11 +18,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
-    
-    public Button buttonUp;
-    public Button buttonDown;
-    public Button buttonLeft;
-    public Button buttonRight;
 
     public float bufferTime = 3.0f;
     private bool isCooldown = false;
@@ -41,8 +35,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public GameObject controlUI;
     public GameObject loadingScreen;
 
-    public GameObject timerObject; 
-   
+    public GameObject timerObject;
+
     private ShaderManager shaderManager;
 
     private int spawnedGhostsCount = 0;  // Keep track of ghosts spawned
@@ -68,14 +62,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             StartCoroutine(WaitAndAssignRoles());
         }
     }
-    void Update()
-{
-    if (Keyboard.current.gKey.wasPressedThisFrame) // Check if "G" was pressed
-    {
-        Debug.Log("G key pressed - Triggering freeze power-up");
-        ActivateFreezePowerUp(); // Trigger the freeze power-up
-    }
-}
 
     private IEnumerator WaitAndAssignRoles()
     {
@@ -118,7 +104,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         Debug.Log("Protagonist Role Assigned");
 
         GameObject protagonist = PhotonNetwork.Instantiate(protagonistPrefab.name, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
-        AssignButtonControls(protagonist);
         AssignCamera(protagonist);
 
         if (protagonist.GetComponent<PhotonView>().IsMine)
@@ -137,7 +122,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         {
             Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount]; // Use a different spawn point
             GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
-            AssignButtonControls(antagonist);
             AssignCamera(antagonist);
 
             if (antagonist.GetComponent<PhotonView>().IsMine)
@@ -150,98 +134,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             {
                 spawnedGhostsCount++; // Increase spawned ghosts count
             }
-        }
-    }
-
-    private void AssignButtonControls(GameObject player)
-    {
-        if (player.GetComponent<PhotonView>().IsMine)
-        {
-            PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
-            if (movementScript != null)
-            {
-                buttonUp.onClick.RemoveAllListeners();
-                buttonDown.onClick.RemoveAllListeners();
-                buttonLeft.onClick.RemoveAllListeners();
-                buttonRight.onClick.RemoveAllListeners();
-
-                buttonUp.onClick.AddListener(() => movementScript.MoveUp());
-                buttonDown.onClick.AddListener(() => movementScript.MoveDown());
-                buttonLeft.onClick.AddListener(() => movementScript.MoveLeft());
-                buttonRight.onClick.AddListener(() => movementScript.MoveRight());
-
-                powerButton.interactable = true;
-                powerButton.onClick.RemoveAllListeners();
-                powerButton.onClick.AddListener(ActivateStoredPowerUp);
-            }
-            else
-            {
-                Debug.LogError("PacMan3DMovement script not found on the player.");
-            }
-        }
-    }
-
-    private void ActivateStoredPowerUp()
-    {
-        if (currentPowerUp != null)
-        {
-            if (currentPowerUp == "Freeze")
-            {
-                ActivateFreezePowerUp();
-            }
-            else if (currentPowerUp == "Bullet")
-            {
-                ActivateBulletPowerUp();
-            }
-            else if (currentPowerUp == "SpeedBoost")
-            {
-                ActivateSpeedBoostPowerUp();
-            }
-            currentPowerUp = null;
-            photonView.RPC("HidePowerUpThumbnailRPC", RpcTarget.All);
-        }
-    }
-
-    private void ShowPowerUpThumbnail(Sprite powerUpSprite)
-    {
-        if (powerUpThumbnail != null)
-        {
-            powerUpThumbnail.sprite = powerUpSprite;
-            powerUpThumbnail.gameObject.SetActive(true);
-        }
-    }
-
-    [PunRPC]
-    private void ShowPowerUpThumbnailRPC(string powerUpType)
-    {
-        Sprite powerUpSprite = null;
-        switch (powerUpType)
-        {
-            case "Freeze":
-                powerUpSprite = freezeSprite;
-                break;
-            case "Bullet":
-                powerUpSprite = bulletSprite;
-                break;
-            case "SpeedBoost":
-                powerUpSprite = speedBoostSprite;
-                break;
-        }
-
-        ShowPowerUpThumbnail(powerUpSprite);
-    }
-
-    [PunRPC]
-    private void HidePowerUpThumbnailRPC()
-    {
-        HidePowerUpThumbnail();
-    }
-
-    private void HidePowerUpThumbnail()
-    {
-        if (powerUpThumbnail != null)
-        {
-            powerUpThumbnail.gameObject.SetActive(false);
         }
     }
 
@@ -319,9 +211,8 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
         photonView.RPC("ShowPowerUpThumbnailRPC", RpcTarget.All, powerUpName);
     }
-    
 
-      private void ActivateFreezePowerUp()
+    private void ActivateFreezePowerUp()
     {
         photonView.RPC("FreezeGhostsAcrossNetwork", RpcTarget.AllBuffered);
         Debug.Log("Yesssss");
@@ -330,8 +221,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void FreezeGhostsAcrossNetwork()
     {
-        
-        
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
         foreach (GameObject enemy in enemies)
         {
@@ -379,7 +268,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         Animator ghostAnimator = enemyMovement.GetComponent<Animator>();
         if (ghostAnimator != null)
         {
-            ghostAnimator.enabled = true; 
+            ghostAnimator.enabled = true;
         }
 
         // Ensure ShaderManager is assigned before using it
@@ -390,8 +279,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         }
     }
 
-
-   private void ActivateBulletPowerUp()
+    private void ActivateBulletPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
@@ -401,7 +289,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             FireBullet(player.transform);
         }
     }
-
 
     void FireBullet(Transform playerTransform)
     {
@@ -421,65 +308,42 @@ public class SpawnManager : MonoBehaviourPunCallbacks
 
             // Get the player's movement script to determine the direction
             PacMan3DMovement playerMovement = playerTransform.GetComponent<PacMan3DMovement>();
-
-            // Ensure the movement script exists
             if (playerMovement != null)
             {
-                // Use the method to get the last movement direction
-                Vector3 movementDirection = playerMovement.GetLastMovementDirection();
-
-                // Apply direction to the bullet's velocity
-                if (movementDirection != Vector3.zero)
-                {
-                    Debug.Log("Bullet fired in direction: " + movementDirection);
-                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = movementDirection * 10f;  // Set bullet speed
-                }
-                else
-                {
-                    Debug.LogError("Player is not moving, bullet fired in default forward direction");
-                    Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                    rb.velocity = playerTransform.forward * 10f;  // Default bullet speed
-                }
-            }
-            else
-            {
-                Debug.LogError("PacMan3DMovement script not found on player");
+                // Set bullet direction based on player's facing direction
+                bullet.GetComponent<Rigidbody>().velocity = playerMovement.transform.forward * 10f; // Adjust speed as needed
             }
         }
-    }
-
-
-    private void ActivateSpeedBoostPowerUp()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null && player.GetComponent<PhotonView>().IsMine)
-        {
-            PacMan3DMovement movementScript = player.GetComponent<PacMan3DMovement>();
-
-            if (movementScript != null)
-            {
-                movementScript.speed += 2.0f;
-                StartCoroutine(ResetSpeedAfterDelay(movementScript, 5f));
-            }
-        }
-    }
-
-    private IEnumerator ResetSpeedAfterDelay(PacMan3DMovement movementScript, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        movementScript.speed -= 2.0f;
     }
 
     [PunRPC]
-    private void ShowLoadingScreenRPC()
+    public void ShowPowerUpThumbnailRPC(string powerUpName)
+    {
+        switch (powerUpName)
+        {
+            case "Freeze":
+                powerUpThumbnail.sprite = freezeSprite;
+                break;
+            case "Bullet":
+                powerUpThumbnail.sprite = bulletSprite;
+                break;
+            case "SpeedBoost":
+                powerUpThumbnail.sprite = speedBoostSprite;
+                break;
+            default:
+                powerUpThumbnail.sprite = null;
+                break;
+        }
+    }
+
+    [PunRPC]
+    public void ShowLoadingScreenRPC()
     {
         loadingScreen.SetActive(true);
     }
 
     [PunRPC]
-    private void HideLoadingScreenRPC()
+    public void HideLoadingScreenRPC()
     {
         loadingScreen.SetActive(false);
     }
@@ -500,15 +364,15 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void StartTimer()
+    public void StartTimer()
     {
+        // Implement timer functionality
         timerObject.SetActive(true);
+        // Start your timer logic here
     }
-
 
     private void ShowPanel(GameObject panel)
     {
         panel.SetActive(true);
     }
-
 }
