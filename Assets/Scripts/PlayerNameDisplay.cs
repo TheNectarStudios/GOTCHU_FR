@@ -11,7 +11,7 @@ public class PlayerNameDisplay : MonoBehaviourPun
         // Check if this is the local player or another player's object
         if (photonView.IsMine)
         {
-            // Set the player name text to the current player's Photon nickname
+            // Set the player name text to the current player's Photon nickname (which is set from PlayerPrefs)
             playerNameText.text = PhotonNetwork.NickName;
         }
         else
