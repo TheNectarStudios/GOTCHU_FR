@@ -13,28 +13,30 @@ public class DynamicJoystick : Joystick
     {
         MoveThreshold = moveThreshold;
         base.Start();
-        background.gameObject.SetActive(false);
+        background.gameObject.SetActive(false); // Hide the background at the start
     }
 
     public override void OnPointerDown(PointerEventData eventData)
     {
+        // Position the background where the user initially touches
         background.anchoredPosition = ScreenPointToAnchoredPosition(eventData.position);
-        background.gameObject.SetActive(true);
+        background.gameObject.SetActive(true); // Show the joystick background
         base.OnPointerDown(eventData);
     }
 
     public override void OnPointerUp(PointerEventData eventData)
     {
-        background.gameObject.SetActive(false);
+        background.gameObject.SetActive(false); // Hide the joystick background when released
         base.OnPointerUp(eventData);
     }
 
+    // Handle input without moving the background
     protected override void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
     {
         if (magnitude > moveThreshold)
         {
             Vector2 difference = normalised * (magnitude - moveThreshold) * radius;
-            background.anchoredPosition += difference;
+            // No need to move the background, so we don't update the background's position here
         }
         base.HandleInput(magnitude, normalised, radius, cam);
     }
