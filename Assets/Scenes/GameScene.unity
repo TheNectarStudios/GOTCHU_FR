@@ -527,8 +527,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabToSpawn: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
+    type: 3}
+  spawnPoint: {fileID: 46739880}
   spawnDelay: 5
 --- !u!64 &73768602
 MeshCollider:
@@ -2646,8 +2647,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabToSpawn: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  prefabToSpawn: {fileID: 9157105887711914197, guid: 9e69c72046b9c544691570866634ed80,
+    type: 3}
+  spawnPoint: {fileID: 371680272}
   spawnDelay: 5
 --- !u!1001 &381370039
 PrefabInstance:
@@ -8755,10 +8757,6 @@ MonoBehaviour:
     type: 3}
   bulletPrefab: {fileID: 3820103123359011567, guid: d2ba9348fa1b06f4283c9df1d7fac1e6,
     type: 3}
-  buttonUp: {fileID: 0}
-  buttonDown: {fileID: 0}
-  buttonLeft: {fileID: 0}
-  buttonRight: {fileID: 0}
   bufferTime: 3
   powerUpThumbnail: {fileID: 805926946}
   freezeSprite: {fileID: 1401011104, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
@@ -18913,8 +18911,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabToSpawn: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
+    type: 3}
+  spawnPoint: {fileID: 1751649893}
   spawnDelay: 5
 --- !u!1 &1775479155
 GameObject:
@@ -18960,8 +18959,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da31913798877fc47ac1be3aa568a07e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabToSpawn: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
+    type: 3}
+  spawnPoint: {fileID: 1775479156}
   spawnDelay: 5
 --- !u!1 &1778800700
 GameObject:
