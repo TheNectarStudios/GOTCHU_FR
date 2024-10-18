@@ -249,7 +249,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2.5, y: 1, z: 2.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3255677996356333664
 MonoBehaviour:
@@ -264,7 +264,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  joystick: {fileID: 5064617223692465037}
 --- !u!114 &239865805036464957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -928,15 +927,3 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3936527648102420938}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5064617223692465037 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8135886326569738823, guid: 56fae09712773584fb63896d473a98ee,
-    type: 3}
-  m_PrefabInstance: {fileID: 3936527648102420938}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba0d0e7a039f526499c356a3c5cd6d3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
