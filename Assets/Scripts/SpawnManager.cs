@@ -11,15 +11,13 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Transform protagonistSpawnPoint;
     public Material freezeEffectMaterial;
 
-    // Add multiple spawner points for antagonists
-    public Transform[] antagonistSpawnPoints; // Array of antagonist spawners
+    public Transform[] antagonistSpawnPoints;
     public Button powerButton;
     private string currentPowerUp = null;
 
     public GameObject protagonistPrefab;
     public GameObject antagonistPrefab;
     public GameObject bulletPrefab;
-
 
     public float bufferTime = 3.0f;
     private bool isCooldown = false;
@@ -30,15 +28,21 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     public Sprite speedBoostSprite;
 
     public GameObject protagonistPanel;
-    public GameObject antagonistInvisibilityPanel;
-    public GameObject antagonistDashPanel;
-    public GameObject antagonistTrapPanel;
+    public GameObject antagonistPanel;  // Single antagonist panel
 
     public GameObject controlUI;
     public GameObject loadingScreen;
 
-    public GameObject timerObject; 
-   
+    public GameObject timerObject;
+
+    // Reference for the joystick UI
+    public GameObject joystickPrefab;
+
+    public GameObject antagonistInvisibilityPanel;
+    public GameObject antagonistDashPanel;
+    public GameObject antagonistTrapPanel;
+
+
     private ShaderManager shaderManager;
 
     private int spawnedGhostsCount = 0;  // Keep track of ghosts spawned
@@ -52,7 +56,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             StartCoroutine(WaitAndAssignRoles());
         }
     }
-
 
   
     private IEnumerator WaitAndAssignRoles()
@@ -89,7 +92,6 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             }
         }
     }
-
     [PunRPC]
     private void SetProtagonist()
     {
@@ -99,6 +101,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
         if (protagonist.GetComponent<PhotonView>().IsMine)
         {
             ShowPanel(protagonistPanel);
+            EnableJoystick(); // Enable the joystick for the protagonist
         }
     }
 
@@ -107,7 +110,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     {
         if (spawnedGhostsCount < antagonistSpawnPoints.Length)
         {
-            Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount]; // Use a different spawn point
+            Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount];
             GameObject antagonist = PhotonNetwork.Instantiate(antagonistPrefab.name, spawnPoint.position, spawnPoint.rotation);
             AssignButtonControls(antagonist);
             AssignCamera(antagonist);
@@ -115,6 +118,7 @@ public class SpawnManager : MonoBehaviourPunCallbacks
             if (antagonist.GetComponent<PhotonView>().IsMine)
             {
                 AssignAbilities(antagonist);
+                EnableJoystick(); // Enable the joystick for the antagonist
             }
             if (spawnedGhostsCount < 2)
             {
@@ -423,6 +427,21 @@ public class SpawnManager : MonoBehaviourPunCallbacks
     } private void ShowPanel(GameObject panel)
     {
         panel.SetActive(true);
+    }
+
+     private void EnableJoystick()
+    {
+        if (joystickPrefab != null && PhotonNetwork.IsMasterClient)
+        {
+            GameObject joystickInstance = PhotonNetwork.Instantiate(joystickPrefab.name, Vector3.zero, Quaternion.identity);
+            joystickInstance.transform.SetParent(GameObject.Find("Canvas").transform, false); // Attach to canvas
+            joystickInstance.SetActive(true);
+            Debug.Log("Joystick enabled for player.");
+        }
+        else
+        {
+            Debug.LogWarning("Joystick prefab not assigned or not the master client!");
+        }
     }
 
 }
