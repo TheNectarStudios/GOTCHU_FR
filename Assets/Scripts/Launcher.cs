@@ -20,12 +20,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         string randomPlayerName = "Player" + Random.Range(100, 1000).ToString();
         Debug.Log("Assigned Player Name: " + randomPlayerName);
 
-        // Set the Photon Network player nickname
+        // Set the Photon Network player nickname directly
         PhotonNetwork.NickName = randomPlayerName;
-
-        // Save the player name for later use
-        PlayerPrefs.SetString("PlayerName", randomPlayerName);
-        PlayerPrefs.Save();  // Ensure the data is saved
 
         // Connect to the Photon Master Server
         PhotonNetwork.ConnectUsingSettings();
