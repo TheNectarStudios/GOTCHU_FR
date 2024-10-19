@@ -36,8 +36,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
             PhotonNetwork.JoinLobby();  // Join the lobby to get the room list updates
         }
 
-        // Retrieve the player's name from PlayerPrefs and display it
-        string playerName = PlayerPrefs.GetString("PlayerName", "Player"); // Default to "Player" if not found
+        // Retrieve and display the player's Photon nickname
+        string playerName = PhotonNetwork.NickName != null ? PhotonNetwork.NickName : "Player";
         playerNameDisplay.text = playerName; // Display the player name in the UI
     }
 
@@ -75,8 +75,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         if (!string.IsNullOrEmpty(newName))
         {
             playerNameDisplay.text = newName; // Update the displayed name
-            PlayerPrefs.SetString("PlayerName", newName); // Save the new name in PlayerPrefs
-            PlayerPrefs.Save(); // Ensure PlayerPrefs data is saved
+            PhotonNetwork.NickName = newName; // Save the new name in PhotonNetwork's NickName
             nameEditPanel.SetActive(false); // Hide the name edit panel
         }
         else
@@ -224,4 +223,3 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
     #endregion
 }
-    

@@ -35,10 +35,10 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
 
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            // Try to get the player name from PlayerPrefs. If not found, use player.NickName.
-            string savedPlayerName = PlayerPrefs.GetString("PlayerName", player.NickName); 
+            // Use the player's Photon NickName instead of PlayerPrefs
+            string playerName = !string.IsNullOrEmpty(player.NickName) ? player.NickName : "Unknown Player"; 
             
-            playerNames += savedPlayerName + "\n";
+            playerNames += playerName + "\n";
         }
 
         playerListText.text = playerNames;
