@@ -4,27 +4,42 @@ using Photon.Pun;
 public class PacMan3DMovement : MonoBehaviourPun
 {
     public float speed = 5f;  // Player movement speed
-    public DynamicJoystick joystick;  // Reference to the joystick
-
+    private DynamicJoystick joystick;  // Reference to the joystick
     private Vector3 direction;
     private Vector3 lastMovementDirection; // To store the last movement direction
 
     void Start()
     {
-        // You can set up any additional initializations here
+        if (photonView.IsMine)
+        {
+            // Dynamically find the joystick component in the scene
+            joystick = FindObjectOfType<DynamicJoystick>();
+
+            // Optional: Add a check to ensure the joystick is found
+            if (joystick == null)
+            {
+                Debug.LogError("Joystick not found in the scene!");
+            }
+        }
     }
 
     void Update()
     {
-        if (!photonView.IsMine) return;  // Ensure only local player controls the movement
+        if (!photonView.IsMine || joystick == null) return;  // Ensure local control and that joystick is detected
 
-        // Get direction from joystick
-        direction.x = joystick.Horizontal;  // Get horizontal input
-        direction.z = joystick.Vertical;  // Get vertical input
+        // Capture joystick input for local player
+        direction.x = joystick.Horizontal;  
+        direction.z = joystick.Vertical;
 
-        // Normalize direction to ensure consistent speed
-        if (direction.magnitude > 1)
-            direction.Normalize();
+        // Ensure direction is constrained to up, down, left, and right (no diagonal)
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
+        {
+            direction.z = 0;  // Disable vertical movement if horizontal is stronger
+        }
+        else
+        {
+            direction.x = 0;  // Disable horizontal movement if vertical is stronger
+        }
 
         // Update last movement direction
         lastMovementDirection = direction;
@@ -37,7 +52,7 @@ public class PacMan3DMovement : MonoBehaviourPun
         // Move the player in the direction calculated
         transform.Translate(direction * speed * Time.deltaTime, Space.World);
 
-        // Send movement updates to other clients
+        // Send movement updates to other clients if the player is moving
         if (direction != Vector3.zero)
         {
             photonView.RPC("SyncMovement", RpcTarget.Others, direction);
@@ -47,11 +62,11 @@ public class PacMan3DMovement : MonoBehaviourPun
     [PunRPC]
     void SyncMovement(Vector3 moveDirection)
     {
-        // Move the player in the direction received from the RPC
+        // Sync the movement for other players in the network
         transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
     }
 
-    // New method to get the last movement direction
+    // Method to get the last movement direction (if needed)
     public Vector3 GetLastMovementDirection()
     {
         return lastMovementDirection; // Return the last recorded direction

@@ -9,11 +9,14 @@ public class PowerUp : MonoBehaviourPun
     public float effectDuration = 5f;
     private GameObject[] ghosts;
 
+    public GameObject pickupEffectPrefab;  // Reference to the prefab animation, assign in the editor
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             ActivatePowerUp();
+            PlayPickupEffect(); // Play the prefab animation
             onPickedUp?.Invoke(this); // Notify that the power-up has been picked up
         }
     }
@@ -28,7 +31,8 @@ public class PowerUp : MonoBehaviourPun
             if (movement != null)
             {
                 Debug.Log("Power-Up Activated!");
-                // movement.speed *= -1; // Example effect, reverse speed
+                // Example effect on ghost, e.g. freeze movement or reverse speed
+                // movement.speed *= -1; 
             }
         }
 
@@ -36,6 +40,19 @@ public class PowerUp : MonoBehaviourPun
         GetComponent<Collider>().enabled = false;
 
         StartCoroutine(UnfreezeAfterDelay());
+    }
+
+    private void PlayPickupEffect()
+    {
+        if (pickupEffectPrefab != null)
+        {
+            // Instantiate the animation prefab at the power-up's position with its current rotation
+            Instantiate(pickupEffectPrefab, transform.position, transform.rotation);
+        }
+        else
+        {
+            Debug.LogError("Pickup Effect Prefab is not assigned!");
+        }
     }
 
     private IEnumerator UnfreezeAfterDelay()
@@ -48,14 +65,15 @@ public class PowerUp : MonoBehaviourPun
             if (movement != null)
             {
                 Debug.Log("Power-Up Deactivated!");
-                // movement.speed *= -1; // Revert the effect
+                // Revert the effect
+                // movement.speed *= -1; 
             }
         }
 
         if (photonView.IsMine || PhotonNetwork.IsMasterClient)
         {
-            // PhotonNetwork.Destroy(gameObject);
-            // Debug.Log("Galti ho gai mere se");
+            // PhotonNetwork.Destroy(gameObject);  // Destroy the power-up after usage
+            // Debug.Log("Power-up destroyed");
         }
     }
 }
