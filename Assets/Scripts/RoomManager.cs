@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;  // Import UI for Image manipulation
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +12,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
 {
     public TMP_InputField roomKeyInput;
     public TextMeshProUGUI occupancyRateText;
-    public TextMeshProUGUI playerNameDisplay;  // TextMeshProUGUI for displaying the player's name
+    public TextMeshProUGUI playerNameDisplay;  // Display for player's name
     public GameObject nameEditPanel;           // Panel for editing the name
-    public TMP_InputField nameInputField;      // Input field for new player name
-    public GameObject loadingBufferUI;
+    public TMP_InputField nameInputField;      // Input field for player name
+    public GameObject loadingScreen;           // Reference to the loading screen UI
+    public Image loadingBar;                   // Loading bar UI (Image component)
 
     private string mapType;
     public static string RoomKey;
     private bool isDisconnecting = false;
 
-    private const int MaxPlayersInRoom = 4; // Max players per room
+    private const int MaxPlayersInRoom = 4;    // Max players in a room
     private List<RoomInfo> availableRooms = new List<RoomInfo>();  // Store available rooms
 
     private void Start()
     {
+        // Ensure loading UI is hidden on start
+        if (loadingScreen != null) loadingScreen.SetActive(false);
+
         PhotonNetwork.AutomaticallySyncScene = true;
 
         if (!PhotonNetwork.IsConnectedAndReady)
@@ -33,7 +38,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            PhotonNetwork.JoinLobby();  // Join the lobby to get the room list updates
+            PhotonNetwork.JoinLobby();  // Join the lobby to get room updates
         }
 
         // Retrieve and display the player's Photon nickname
@@ -42,12 +47,16 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
 
     #region UI Callback Methods
-    // For creating a private room (play with friends)
     public void OnCreateRoomButtonClicked()
     {
         RoomKey = GenerateRoomKey();
         Debug.Log($"Creating a private room with key: {RoomKey}");
-        TryCreateAndJoinRoom(isPrivateRoom: true);  // Create a private room
+
+        // Fake loading before creating the room
+        StartCoroutine(FakeLoadingRoutine(1.5f, () =>
+        {
+            TryCreateAndJoinRoom(isPrivateRoom: true);  // Create a private room
+        }));
     }
 
     public void OnJoinRoomButtonClicked()
@@ -55,7 +64,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         RoomKey = roomKeyInput.text.Trim();
         if (!string.IsNullOrEmpty(RoomKey))
         {
-            TryJoinRoom();
+            // Fake loading before joining the room
+            StartCoroutine(FakeLoadingRoutine(1.5f, TryJoinRoom));
         }
         else
         {
@@ -94,15 +104,15 @@ public class RoomManager : MonoBehaviourPunCallbacks
         if (!isDisconnecting)
         {
             isDisconnecting = true;
-            if (loadingBufferUI != null) loadingBufferUI.SetActive(true);
+            if (loadingScreen != null) loadingScreen.SetActive(true);
             StartCoroutine(DisconnectAndReturnWithBuffer());
         }
     }
 
-    // Play button to join a random public room
     public void OnPlayButtonClicked()
     {
-        TryJoinRoomWithQueue();  // Join a public room
+        // Fake loading before joining a random public room
+        StartCoroutine(FakeLoadingRoutine(2f, TryJoinRoomWithQueue));
     }
     #endregion
 
@@ -151,14 +161,13 @@ public class RoomManager : MonoBehaviourPunCallbacks
         if (isDisconnecting)
         {
             isDisconnecting = false;
-            if (loadingBufferUI != null) loadingBufferUI.SetActive(false);
+            if (loadingScreen != null) loadingScreen.SetActive(false);
             SceneManager.LoadScene("JoinRoom");
         }
     }
     #endregion
 
     #region Private Methods
-    // Try to join a public room with the queuing system
     private void TryJoinRoomWithQueue()
     {
         StartCoroutine(CheckForAvailableRoom());
@@ -177,20 +186,18 @@ public class RoomManager : MonoBehaviourPunCallbacks
             }
         }
 
-        // No suitable public room found, create a new public room
         Debug.Log("No public room available. Creating a new public room...");
         RoomKey = GenerateRoomKey();
         TryCreateAndJoinRoom(isPrivateRoom: false);  // Create a public room
     }
 
-    // Create a room, can be public or private
     private void TryCreateAndJoinRoom(bool isPrivateRoom)
     {
         RoomOptions roomOptions = new RoomOptions
         {
             MaxPlayers = MaxPlayersInRoom,
-            IsVisible = !isPrivateRoom,  // Set visibility based on whether the room is private or public
-            IsOpen = true,  // Allow players to join
+            IsVisible = !isPrivateRoom,
+            IsOpen = true,
             CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
             {
                 { "RoomKey", RoomKey },
@@ -220,6 +227,30 @@ public class RoomManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(2f);
         while (PhotonNetwork.IsConnected) yield return null;
         SceneManager.LoadScene("JoinRoom");
+    }
+
+    // Fake loading screen routine for actions
+    private IEnumerator FakeLoadingRoutine(float duration, System.Action onComplete)
+    {
+        if (loadingScreen != null) loadingScreen.SetActive(true);  // Show loading screen
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            // Update loading bar fill amount based on elapsed time
+            if (loadingBar != null)
+            {
+                loadingBar.fillAmount = elapsedTime / duration;
+            }
+
+            yield return null;
+        }
+
+        // Hide loading screen and call the completion action
+        if (loadingScreen != null) loadingScreen.SetActive(false);
+        onComplete?.Invoke();
     }
     #endregion
 }
