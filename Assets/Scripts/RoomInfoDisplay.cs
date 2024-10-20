@@ -61,6 +61,10 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            // Make the room private so no one else can join
+            PhotonNetwork.CurrentRoom.IsOpen = false;  // This will close the room for any new players
+            PhotonNetwork.CurrentRoom.IsVisible = false;  // This will make the room invisible in the lobby
+
             // Get the number of players in the room
             int playerCount = PhotonNetwork.PlayerList.Length;
 
