@@ -355,8 +355,10 @@ MonoBehaviour:
   respawnDelay: 1
   scaleTransitionDuration: 0.5
   preTeleportBuffer: 0.5
-  objectToDisable: {fileID: 0}
+  objectToDisable: {fileID: 22651873678508220}
   textToDisable: {fileID: 2746102397553431144}
+  hitAnimationPrefab: {fileID: 2433282508537954060, guid: 3b28e241e117b594ebd890cf55f78db3,
+    type: 3}
 --- !u!54 &-6860914649217156247
 Rigidbody:
   m_ObjectHideFlags: 0
