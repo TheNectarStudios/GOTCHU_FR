@@ -14,7 +14,7 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
     private void Start()
     {
         // Display the current room key in the UI
-        roomKeyText.text = $"Room Key: {RoomManager.RoomKey}";
+        roomKeyText.text = $"<b><color=#FFD700>Room Code: {RoomManager.RoomKey}</color></b>";
         UpdatePlayerList();
 
         // Enable the start game button only for the host (the player who created the room)
@@ -33,12 +33,14 @@ public class RoomInfoDisplay : MonoBehaviourPunCallbacks
     {
         string playerNames = "Players in Room:\n";
 
-        foreach (Player player in PhotonNetwork.PlayerList)
+        // Number and list each player's name
+        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
         {
-            // Use the player's Photon NickName instead of PlayerPrefs
-            string playerName = !string.IsNullOrEmpty(player.NickName) ? player.NickName : "Unknown Player"; 
-            
-            playerNames += playerName + "\n";
+            Player player = PhotonNetwork.PlayerList[i];
+            string playerName = !string.IsNullOrEmpty(player.NickName) ? player.NickName : "Unknown Player";
+
+            // Add player number and name to the list
+            playerNames += $"{i + 1}. {playerName}\n";
         }
 
         playerListText.text = playerNames;
