@@ -4,30 +4,54 @@ using Photon.Realtime;
 using System.Collections;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;  // Import UI for image manipulation
+using UnityEngine.UI;  // Import UI for button handling
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
-    public PanelShake panelShake;  // Reference to the PanelShake script
-    public Image loadingBar;  // Reference to the UI Image for the progress bar
-    public GameObject loadingScreen;  // Reference to the loading screen panel (optional)
-    
+    public Button singlePlayerButton;  // Reference to the Single Player button
+    public Button multiplayerButton;   // Reference to the Multiplayer button
+    public PanelShake panelShake;      // Reference to the PanelShake script
+    public Image loadingBar;           // Reference to the UI Image for the progress bar
+    public GameObject loadingScreen;   // Reference to the loading screen panel (optional)
+
     private void Start()
     {
+        // Assign button listeners
+        if (singlePlayerButton != null)
+        {
+            singlePlayerButton.onClick.AddListener(StartSinglePlayer);
+        }
+
+        if (multiplayerButton != null)
+        {
+            multiplayerButton.onClick.AddListener(StartMultiplayer);
+        }
+
         // Ensure any UI setup if needed
         if (panelShake == null)
         {
             panelShake = FindObjectOfType<PanelShake>(); // Find the PanelShake script in the scene if not assigned
         }
+    }
+
+    // Method to handle Single Player button click
+    private void StartSinglePlayer()
+    {
+        Debug.Log("Starting Single Player...");
+        // You can load your single-player scene here
+        StartCoroutine(LoadSceneAsync("SinglePlayerScene")); // Replace with your single-player scene name
+    }
+
+    // Method to handle Multiplayer button click
+    private void StartMultiplayer()
+    {
+        Debug.Log("Starting Multiplayer...");
 
         // Generate a random player name
         string randomPlayerName = "Player" + Random.Range(100, 1000).ToString();
-        Debug.Log("Assigned Player Name: " + randomPlayerName);
-
-        // Set the Photon Network player nickname directly
         PhotonNetwork.NickName = randomPlayerName;
 
-        // Connect to the Photon Master Server
+        // Connect to the Photon Master Server only when multiplayer is selected
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -40,9 +64,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-
-        // Start the loading process for the next scene asynchronously
-        StartCoroutine(LoadSceneAsync("CreateRoom"));
+        StartCoroutine(LoadSceneAsync("CreateRoom"));  // Replace with your multiplayer room scene
     }
 
     public override void OnDisconnected(DisconnectCause cause)
