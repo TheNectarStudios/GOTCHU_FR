@@ -22,10 +22,14 @@ public class SpawnManagerOffline : MonoBehaviour
     public Sprite speedBoostSprite;
 
     private int spawnedGhostsCount = 0;
+    private int numberOfAntagonists = 1;  // Default to 1 if not set in PlayerPrefs
     private string currentPowerUp = null;
 
     private void Start()
     {
+        // Fetch the number of bots from PlayerPrefs
+        numberOfAntagonists = PlayerPrefs.GetInt("NumberOfBots", 1);
+
         StartCoroutine(SpawnEntitiesAfterDelay());
     }
 
@@ -58,17 +62,16 @@ public class SpawnManagerOffline : MonoBehaviour
 
     private void SpawnAntagonists()
     {
-        for (int i = 0; i < antagonistSpawnPoints.Length; i++)
+        int spawnLimit = Mathf.Min(numberOfAntagonists, antagonistSpawnPoints.Length);
+
+        for (int i = 0; i < spawnLimit; i++)
         {
-            if (spawnedGhostsCount < antagonistSpawnPoints.Length)
-            {
-                Transform spawnPoint = antagonistSpawnPoints[spawnedGhostsCount];
-                Instantiate(antagonistPrefab, spawnPoint.position, spawnPoint.rotation);
-                spawnedGhostsCount++;
-            }
+            Transform spawnPoint = antagonistSpawnPoints[i];
+            Instantiate(antagonistPrefab, spawnPoint.position, spawnPoint.rotation);
+            spawnedGhostsCount++;
         }
 
-        EnableJoystick(); // Enable joystick for antagonists as well, if required
+        EnableJoystick(); // Enable joystick for antagonists if required
     }
 
     private void EnableJoystick()

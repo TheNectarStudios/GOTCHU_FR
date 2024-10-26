@@ -147,11 +147,13 @@ GameObject:
   - component: {fileID: 6435029994198529038}
   - component: {fileID: 2713707471372533173}
   - component: {fileID: 3255677996356333664}
+  - component: {fileID: 2894484422394148500}
   - component: {fileID: 3688067829407932854}
   - component: {fileID: 2185268708530859807}
   - component: {fileID: 6374145964093070952}
   - component: {fileID: -6860914649217156247}
   - component: {fileID: 5697373984318056121}
+  - component: {fileID: 1988817399257292320}
   m_Layer: 0
   m_Name: vilenoffline
   m_TagString: Ghost
@@ -262,6 +264,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+--- !u!114 &2894484422394148500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2916944212718552625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49decafe1fbecaf43ad66c4f21abbc3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeed: 5
 --- !u!114 &3688067829407932854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,6 +373,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerNameText: {fileID: 2746102397553431144}
+--- !u!195 &1988817399257292320
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2916944212718552625}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.5
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3709611900429734695
 GameObject:
   m_ObjectHideFlags: 0

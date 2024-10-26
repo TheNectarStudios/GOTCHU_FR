@@ -10,17 +10,18 @@ public class BotSelectionManager : MonoBehaviour
 
     private void Start()
     {
-        // Ensure the dropdown has options (for example, you can set 0-10 bots)
+        // Ensure the dropdown has options for 1, 2, or 3 bots
         if (botDropdown != null)
         {
             botDropdown.ClearOptions();
-            for (int i = 1; i <= 3; i++)
-            {
-                botDropdown.options.Add(new TMP_Dropdown.OptionData(i.ToString()));
-            }
+            botDropdown.options.Add(new TMP_Dropdown.OptionData("1"));
+            botDropdown.options.Add(new TMP_Dropdown.OptionData("2"));
+            botDropdown.options.Add(new TMP_Dropdown.OptionData("3"));
 
-            // Set default value (you can modify this as needed)
+            // Set default value to 1 bot
             botDropdown.value = 0;
+            PlayerPrefs.SetInt(playerPrefsKey, 1); // Default number of bots is 1
+            PlayerPrefs.Save();
         }
     }
 
@@ -28,7 +29,7 @@ public class BotSelectionManager : MonoBehaviour
     public void OnDropdownValueChanged()
     {
         // Get the selected value (number of bots) and store it in PlayerPrefs
-        int numberOfBots = botDropdown.value;
+        int numberOfBots = botDropdown.value + 1; // Dropdown value 0 = 1 bot, 1 = 2 bots, 2 = 3 bots
         PlayerPrefs.SetInt(playerPrefsKey, numberOfBots);
         PlayerPrefs.Save();  // Save the changes
     }
