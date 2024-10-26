@@ -98,7 +98,8 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 2a37db4674cc46a4d967bb24ccfbdfb7,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -6748,27 +6749,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protagonistSpawnPoint: {fileID: 1741618737}
-  freezeEffectMaterial: {fileID: -876546973899608171, guid: 24be58abd9025204b8c7378d74fd5418,
+  protagonistPrefab: {fileID: 2916944212718552625, guid: 30f1294df409f3b48bfbb6ddf3478b8c,
     type: 3}
-  antagonistSpawnPoints: []
-  powerButton: {fileID: 0}
-  protagonistPrefab: {fileID: 0}
-  antagonistPrefab: {fileID: 0}
-  bulletPrefab: {fileID: 0}
-  bufferTime: 3
-  powerUpThumbnail: {fileID: 0}
-  freezeSprite: {fileID: 0}
-  bulletSprite: {fileID: 0}
-  speedBoostSprite: {fileID: 0}
-  protagonistPanel: {fileID: 0}
-  antagonistPanel: {fileID: 0}
-  controlUI: {fileID: 0}
-  loadingScreen: {fileID: 0}
-  timerObject: {fileID: 0}
+  antagonistSpawnPoints:
+  - {fileID: 1268174209}
+  - {fileID: 613464511}
+  - {fileID: 163798532}
+  antagonistPrefab: {fileID: 2916944212718552625, guid: 02ad4d2563de5a44b8def252d382af40,
+    type: 3}
   joystickPrefab: {fileID: 0}
-  antagonistInvisibilityPanel: {fileID: 0}
-  antagonistDashPanel: {fileID: 0}
-  antagonistTrapPanel: {fileID: 0}
+  controlUI: {fileID: 757584328}
+  loadingScreen: {fileID: 674048501}
+  timerObject: {fileID: 1727832292}
+  powerUpThumbnail: {fileID: 0}
+  freezeSprite: {fileID: 1401011104, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  bulletSprite: {fileID: 2047992146, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  speedBoostSprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
 --- !u!1 &536046782 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1502877291743220047, guid: bd720f4507430f649a9f071c00819e67,
@@ -20372,6 +20368,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1281747978}
+  - {fileID: 2112785430}
   - {fileID: 1276467641}
   - {fileID: 540084568}
   - {fileID: 1695430891}
@@ -20381,4 +20378,3 @@ SceneRoots:
   - {fileID: 419960219}
   - {fileID: 1696784220}
   - {fileID: 470721527}
-  - {fileID: 2112785430}
