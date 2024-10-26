@@ -6990,7 +6990,7 @@ GameObject:
   - component: {fileID: 777803892}
   - component: {fileID: 777803891}
   - component: {fileID: 777803890}
-  - component: {fileID: 777803893}
+  - component: {fileID: 777803895}
   - component: {fileID: 777803894}
   m_Layer: 0
   m_Name: Main Camera
@@ -7073,23 +7073,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 180, z: 180}
---- !u!114 &777803893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 777803889}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 018db5c82d0502741992dc06aa7317d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  offset: {x: 0, y: 30, z: 0}
-  smoothSpeed: 2
-  shakeDuration: 0.5
-  shakeMagnitude: 0.8
 --- !u!114 &777803894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7134,6 +7117,22 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &777803895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777803889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d980a6b6c14ac714a9f4bb1634a1f93c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: 30, z: 0}
+  smoothSpeed: 2
+  shakeDuration: 0.5
+  shakeMagnitude: 0.8
 --- !u!64 &782982108
 MeshCollider:
   m_ObjectHideFlags: 0

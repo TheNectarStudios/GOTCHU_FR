@@ -22,7 +22,7 @@ public class GhostHitManagerOffline : MonoBehaviour
 
     private Vector3 originalScale; // Store the original scale of the object
 
-    private TopDownCameraFollow cameraFollow; // Reference to the camera follow script
+    private TopDownFollowCameraOffline cameraFollow; // Reference to the camera follow script
 
     private void Start()
     {
@@ -47,10 +47,10 @@ public class GhostHitManagerOffline : MonoBehaviour
             originalScale = objectToDisable.transform.localScale;
         }
 
-        cameraFollow = FindObjectOfType<TopDownCameraFollow>();
+        cameraFollow = FindObjectOfType<TopDownFollowCameraOffline>();
         if (cameraFollow == null)
         {
-            Debug.LogError("No TopDownCameraFollow script found on the camera!");
+            Debug.LogError("No TopDownFollowCameraOffline script found on the camera!");
         }
     }
 
