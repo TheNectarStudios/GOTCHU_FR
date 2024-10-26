@@ -8638,7 +8638,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 812126120}
-  - component: {fileID: 812126121}
+  - component: {fileID: 812126124}
   - component: {fileID: 812126122}
   - component: {fileID: 812126123}
   m_Layer: 0
@@ -8663,46 +8663,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2116181170}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &812126121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812126119}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30f67d5925299d944b8205a73bb0fdb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  protagonistSpawnPoint: {fileID: 371680272}
-  freezeEffectMaterial: {fileID: 2100000, guid: abf05f3b1ac19a645bf81d62be07f541,
-    type: 2}
-  antagonistSpawnPoints:
-  - {fileID: 46739880}
-  - {fileID: 1775479156}
-  - {fileID: 1751649893}
-  powerButton: {fileID: 171810064}
-  protagonistPrefab: {fileID: 2916944212718552625, guid: 829138fe791dbf74da1acef6dfbe56c2,
-    type: 3}
-  antagonistPrefab: {fileID: 2916944212718552625, guid: a8404dadc135f0947b077ef1d74cfa03,
-    type: 3}
-  bulletPrefab: {fileID: 3820103123359011567, guid: d2ba9348fa1b06f4283c9df1d7fac1e6,
-    type: 3}
-  bufferTime: 3
-  powerUpThumbnail: {fileID: 805926946}
-  freezeSprite: {fileID: 1401011104, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  bulletSprite: {fileID: 2047992146, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  speedBoostSprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  protagonistPanel: {fileID: 1961417074}
-  antagonistPanel: {fileID: 0}
-  controlUI: {fileID: 1172944779}
-  loadingScreen: {fileID: 1612524564}
-  timerObject: {fileID: 1290347057}
-  joystickPrefab: {fileID: 0}
-  antagonistInvisibilityPanel: {fileID: 1653359032}
-  antagonistDashPanel: {fileID: 159148479}
-  antagonistTrapPanel: {fileID: 1437281750}
 --- !u!114 &812126122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8821,6 +8781,35 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &812126124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812126119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77a61d17b9e09ec4bbc5629826096759, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  protagonistSpawnPoint: {fileID: 371680272}
+  protagonistPrefab: {fileID: 2916944212718552625, guid: 30f1294df409f3b48bfbb6ddf3478b8c,
+    type: 3}
+  antagonistSpawnPoints:
+  - {fileID: 46739880}
+  - {fileID: 1775479156}
+  - {fileID: 1751649893}
+  antagonistPrefab: {fileID: 2916944212718552625, guid: 02ad4d2563de5a44b8def252d382af40,
+    type: 3}
+  joystickPrefab: {fileID: 0}
+  controlUI: {fileID: 1172944779}
+  loadingScreen: {fileID: 1612524564}
+  timerObject: {fileID: 1290347057}
+  powerUpThumbnail: {fileID: 805926946}
+  freezeSprite: {fileID: 1401011104, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  bulletSprite: {fileID: 2047992146, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  speedBoostSprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
 --- !u!1001 &815695436
 PrefabInstance:
   m_ObjectHideFlags: 0

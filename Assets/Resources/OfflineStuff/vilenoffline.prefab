@@ -147,9 +147,9 @@ GameObject:
   - component: {fileID: 6435029994198529038}
   - component: {fileID: 2713707471372533173}
   - component: {fileID: 3255677996356333664}
-  - component: {fileID: 239865805036464957}
-  - component: {fileID: 6475696533587563428}
-  - component: {fileID: 7976114083214170860}
+  - component: {fileID: 3688067829407932854}
+  - component: {fileID: 2185268708530859807}
+  - component: {fileID: 6374145964093070952}
   - component: {fileID: -6860914649217156247}
   - component: {fileID: 5697373984318056121}
   m_Layer: 0
@@ -256,13 +256,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2916944212718552625}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c9edf0df75f4f94c8c7fd14b57aa747, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
---- !u!114 &239865805036464957
+--- !u!114 &3688067829407932854
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -271,7 +271,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4eae4061865d684a8815901d2b88ec9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c24dd9d57bf623428af11d1f8d60013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
@@ -280,7 +280,7 @@ MonoBehaviour:
     type: 3}
   pearlHolder: {fileID: 4766628923474102866}
   autoDropTime: 20
---- !u!114 &6475696533587563428
+--- !u!114 &2185268708530859807
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -289,14 +289,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cca2fa5c48b43514083e17392201a72c, type: 3}
+  m_Script: {fileID: 11500000, guid: c6203b6fb851cba41bad7cddb5019ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectToDisable: {fileID: 22651873678508220}
   textToDisable: {fileID: 2746102397553431144}
   invisibilityDuration: 5
   cooldownTime: 15
---- !u!114 &7976114083214170860
+--- !u!114 &6374145964093070952
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -305,14 +305,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd3e181f8c750e54e9f2666e4f75886c, type: 3}
+  m_Script: {fileID: 11500000, guid: f792feb3e8065244caaa21fc3c60c7d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
     type: 3}
   spawnPointTag: GhostSpawn
-  respawnDelay: 1
-  scaleTransitionDuration: 0.5
+  respawnDelay: 3
+  scaleTransitionDuration: 1
   preTeleportBuffer: 0.5
   objectToDisable: {fileID: 22651873678508220}
   textToDisable: {fileID: 2746102397553431144}

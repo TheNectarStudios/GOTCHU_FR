@@ -4199,7 +4199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botDropdown: {fileID: 1889279448}
   playerPrefsKey: NumberOfBots
-  gameSceneName: SinglePlayerArena
+  gameSceneName: SinglePlayerArenaFinal
 --- !u!4 &629283108
 Transform:
   m_ObjectHideFlags: 0

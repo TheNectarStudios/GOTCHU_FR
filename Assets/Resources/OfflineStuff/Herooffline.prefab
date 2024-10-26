@@ -115,10 +115,10 @@ GameObject:
   - component: {fileID: 6435029994198529038}
   - component: {fileID: 2713707471372533173}
   - component: {fileID: 5696095754703642143}
-  - component: {fileID: 7370725955950724425}
-  - component: {fileID: 3255677996356333664}
-  - component: {fileID: 6688423891973947437}
-  - component: {fileID: 8124430747488892725}
+  - component: {fileID: 8434164396251260680}
+  - component: {fileID: 733751781164781516}
+  - component: {fileID: 8805083892650506944}
+  - component: {fileID: 81419187844885858}
   - component: {fileID: 4522973827373353153}
   - component: {fileID: -6977413545443638515}
   m_Layer: 0
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerNameText: {fileID: 7865734813063716629}
---- !u!114 &7370725955950724425
+--- !u!114 &8434164396251260680
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -240,14 +240,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a8fe53de6a295c44bafaf5b427e33d6, type: 3}
+  m_Script: {fileID: 11500000, guid: 8bd43ede1aa96214faf9cadf2f8ef8d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 3820103123359011567, guid: d2ba9348fa1b06f4283c9df1d7fac1e6,
     type: 3}
   firePoint: {fileID: 466337331178679867}
   bulletForce: 1000
---- !u!114 &3255677996356333664
+--- !u!114 &733751781164781516
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,11 +256,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c9edf0df75f4f94c8c7fd14b57aa747, type: 3}
+  m_Script: {fileID: 11500000, guid: bad4c0ba556aae547a56988fca3bc63a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
---- !u!114 &6688423891973947437
+--- !u!114 &8805083892650506944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,11 +269,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 769d103aa2389eb44861340ad2d9f157, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f17a5c7f6c01ee41a59f57e499b617c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   collectedPearls: 0
---- !u!114 &8124430747488892725
+--- !u!114 &81419187844885858
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -282,7 +282,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2916944212718552625}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07525449bb4a1a94988fa44a4ed8b696, type: 3}
+  m_Script: {fileID: 11500000, guid: 900fd98a7035a984eb44b354cebaf714, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   targetPrefab: {fileID: 8802387135186228559}
