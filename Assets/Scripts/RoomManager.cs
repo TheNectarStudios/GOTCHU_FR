@@ -25,12 +25,31 @@ public class RoomManager : MonoBehaviourPunCallbacks
     private const int MaxPlayersInRoom = 4;    // Max players in a room
     private List<RoomInfo> availableRooms = new List<RoomInfo>();  // Store available rooms
 
+    private const string PlayerNameKey = "PlayerName";  // Key for storing player name
+
     private void Start()
     {
         // Ensure loading UI is hidden on start
         if (loadingScreen != null) loadingScreen.SetActive(false);
 
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        // Check if a player name is saved in PlayerPrefs
+        if (PlayerPrefs.HasKey(PlayerNameKey))
+        {
+            string savedPlayerName = PlayerPrefs.GetString(PlayerNameKey);
+            PhotonNetwork.NickName = savedPlayerName; // Set the saved name to Photon Network
+            playerNameDisplay.text = savedPlayerName; // Display the saved name in the UI
+        }
+        else
+        {
+            // Generate a random player name
+            string randomPlayerName = "Player" + Random.Range(100, 1000).ToString();
+            PhotonNetwork.NickName = randomPlayerName; // Set the random name to Photon Network
+            playerNameDisplay.text = randomPlayerName; // Display the player name in the UI
+            PlayerPrefs.SetString(PlayerNameKey, randomPlayerName); // Save the new name
+            PlayerPrefs.Save(); // Ensure data is saved
+        }
 
         if (!PhotonNetwork.IsConnectedAndReady)
         {
@@ -40,10 +59,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.JoinLobby();  // Join the lobby to get room updates
         }
-
-        // Retrieve and display the player's Photon nickname
-        string playerName = PhotonNetwork.NickName != null ? PhotonNetwork.NickName : "Player";
-        playerNameDisplay.text = playerName; // Display the player name in the UI
     }
 
     #region UI Callback Methods
@@ -86,6 +101,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             playerNameDisplay.text = newName; // Update the displayed name
             PhotonNetwork.NickName = newName; // Save the new name in PhotonNetwork's NickName
+            PlayerPrefs.SetString(PlayerNameKey, newName); // Save new name in PlayerPrefs
+            PlayerPrefs.Save(); // Ensure data is saved
             nameEditPanel.SetActive(false); // Hide the name edit panel
         }
         else
