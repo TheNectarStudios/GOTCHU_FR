@@ -1,13 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SpawnManagerOffline : MonoBehaviour
 {
-    public Transform protagonistSpawnPoint;
-    public GameObject protagonistPrefab;
-
+    public GameObject protagonist; // Reference to the protagonist already in the scene
     public Transform[] antagonistSpawnPoints;
     public GameObject antagonistPrefab;
 
@@ -39,8 +36,9 @@ public class SpawnManagerOffline : MonoBehaviour
 
         HideLoadingScreen();
 
-        // Spawn protagonist
-        SpawnProtagonist();
+        // Enable protagonist after 7 seconds
+        yield return new WaitForSeconds(7.0f);
+        EnableProtagonist();
 
         // Spawn antagonists
         SpawnAntagonists();
@@ -51,12 +49,16 @@ public class SpawnManagerOffline : MonoBehaviour
         StartTimer();
     }
 
-    private void SpawnProtagonist()
+    private void EnableProtagonist()
     {
-        if (protagonistPrefab != null && protagonistSpawnPoint != null)
+        if (protagonist != null)
         {
-            GameObject protagonist = Instantiate(protagonistPrefab, protagonistSpawnPoint.position, protagonistSpawnPoint.rotation);
+            protagonist.SetActive(true);
             EnableJoystick(); // Enable joystick for protagonist
+        }
+        else
+        {
+            Debug.LogWarning("Protagonist reference is missing.");
         }
     }
 
