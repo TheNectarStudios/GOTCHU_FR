@@ -276,7 +276,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49decafe1fbecaf43ad66c4f21abbc3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
+  movementSpeed: 3.5
+  guardRadius: 5
+  timelineBufferTime: 3
+  initialBufferTime: 13
+  pearlDeploymentTime: 18
+  pearlDropAreaCenter: {x: 0, y: 0, z: 0}
+  pearlDropAreaRadius: 10
 --- !u!114 &3688067829407932854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,7 +300,6 @@ MonoBehaviour:
   dropAnimationPrefab: {fileID: 5112403345868107898, guid: 8b85151945364814dacc0d16ab69e566,
     type: 3}
   pearlHolder: {fileID: 4766628923474102866}
-  autoDropTime: 20
 --- !u!114 &2185268708530859807
 MonoBehaviour:
   m_ObjectHideFlags: 0
