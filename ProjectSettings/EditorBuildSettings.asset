@@ -8,15 +8,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/LAN.unity
     guid: 694a47f196c27004195583550181a1a7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/JoinRoom.unity
     guid: 19cf3fd6cebbc834d8f9d0499859f1f8
   - enabled: 1
-    path: Assets/Scenes/ResultScene.unity
-    guid: c27e1171f1061224fbfc82f2dd8e450d
-  - enabled: 1
     path: Assets/Scenes/CreateRoom.unity
     guid: 7ff13953da1b05a46a369d6c300b25ca
+  - enabled: 1
+    path: Assets/Scenes/ResultScene.unity
+    guid: c27e1171f1061224fbfc82f2dd8e450d
   - enabled: 1
     path: Assets/Scenes/RoomCreated.unity
     guid: c20ae8173554d254b98c19948ab99cb3
