@@ -279,10 +279,8 @@ MonoBehaviour:
   movementSpeed: 3.5
   guardRadius: 5
   timelineBufferTime: 3
-  initialBufferTime: 13
-  pearlDeploymentTime: 18
-  pearlDropAreaCenter: {x: 0, y: 0, z: 0}
-  pearlDropAreaRadius: 10
+  separationRadius: 3
+  pathDiversionTime: 4
 --- !u!114 &3688067829407932854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,7 +293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c24dd9d57bf623428af11d1f8d60013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
+  pearlPrefab: {fileID: 5694190962491151853, guid: 8670f14a24ec02d4c97ad83a8fc174f2,
     type: 3}
   dropAnimationPrefab: {fileID: 5112403345868107898, guid: 8b85151945364814dacc0d16ab69e566,
     type: 3}

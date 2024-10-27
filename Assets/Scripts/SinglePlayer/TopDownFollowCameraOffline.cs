@@ -88,4 +88,5 @@ public class TopDownFollowCameraOffline : MonoBehaviour
         transform.position = originalPosition;
         isShaking = false;
     }
+    
 }
