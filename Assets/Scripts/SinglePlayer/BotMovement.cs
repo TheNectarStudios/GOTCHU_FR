@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using System.Collections.Generic;
 
 public class BotMovement : MonoBehaviour
 {
@@ -16,9 +15,12 @@ public class BotMovement : MonoBehaviour
     private bool guardingPearl = false;
     private Vector3 guardPosition;
     private bool isPatrolling = false;
-    public float separationRadius = 3f;  // Radius to check for nearby antagonists
-    public float pathDiversionTime = 4f; // Time to stay close to another bot before diverting
+    public float separationRadius = 3f;
+    public float pathDiversionTime = 4f;
     private float proximityTimer = 0f;
+
+    [Header("Invisibility Settings")]
+    private InvisibilityOffline invisibilityScript;
 
     private void Start()
     {
@@ -33,6 +35,13 @@ public class BotMovement : MonoBehaviour
         else
         {
             Debug.LogWarning("Player not found. Ensure there is a GameObject tagged 'Player' in the scene.");
+        }
+
+        // Access the InvisibilityOffline script
+        invisibilityScript = GetComponent<InvisibilityOffline>();
+        if (invisibilityScript == null)
+        {
+            Debug.LogError("InvisibilityOffline script not found on the bot.");
         }
 
         StartCoroutine(TimelineBuffer(timelineBufferTime));
@@ -56,6 +65,12 @@ public class BotMovement : MonoBehaviour
 
             // Check for proximity with other antagonists
             CheckAndDiversifyPath();
+
+            // Trigger invisibility if guarding a pearl and not on cooldown
+            if (invisibilityScript != null)
+            {
+                invisibilityScript.ActivateInvisibility();
+            }
         }
         else if (trackingPlayer && player != null)
         {
