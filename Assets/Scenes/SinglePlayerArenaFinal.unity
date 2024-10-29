@@ -2818,7 +2818,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 397441665}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &397441669
 Camera:
   m_ObjectHideFlags: 0
@@ -7208,7 +7208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d980a6b6c14ac714a9f4bb1634a1f93c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 30, z: 0}
+  offset: {x: 0, y: 25, z: 0}
   smoothSpeed: 2
   shakeDuration: 0.5
   shakeMagnitude: 0.8
@@ -11072,7 +11072,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1290347058}
   - component: {fileID: 1290347059}
-  - component: {fileID: 1290347060}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -11104,33 +11103,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1290347057}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ad6244afb46bed45ad993d0f58649a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 5115183b024718c43a7e0a37d9349fbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 80
+  gameDuration: 500
   timerText: {fileID: 1060130840}
---- !u!114 &1290347060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1290347057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 2
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &1303067586 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7749646088101624262, guid: 1447d62ebdf21d14aa18557de0e4056f,
