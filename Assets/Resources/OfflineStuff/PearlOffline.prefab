@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8004004596876854810}
   - component: {fileID: 6473318907770812808}
   - component: {fileID: 549989681112979107}
+  - component: {fileID: 2530091110487198540}
   m_Layer: 0
   m_Name: PearlOffline
   m_TagString: Pearl
@@ -118,3 +119,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fa53dced9fb0284da4c116d3acf82b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2530091110487198540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5694190962491151853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b77be7196f39741a07ddf4bfeee2ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereCollider: {fileID: 6473318907770812808}
