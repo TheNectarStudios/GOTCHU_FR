@@ -312,6 +312,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectToDisable: {fileID: 22651873678508220}
   textToDisable: {fileID: 2746102397553431144}
+  invisibilityAnimationPrefab: {fileID: 2708598583397607911, guid: 4af77eb2856f9ca429a792d6eb3cca46,
+    type: 3}
   invisibilityDuration: 5
   cooldownTime: 15
 --- !u!114 &6374145964093070952
