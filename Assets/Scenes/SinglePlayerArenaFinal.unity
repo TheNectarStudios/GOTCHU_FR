@@ -486,7 +486,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 46739880}
-  spawnDelay: 8
+  spawnDelay: 9
 --- !u!64 &73768602
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2568,7 +2568,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 9157105887711914197, guid: 9e69c72046b9c544691570866634ed80,
     type: 3}
   spawnPoint: {fileID: 371680272}
-  spawnDelay: 8
+  spawnDelay: 9
 --- !u!1001 &381370039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19008,7 +19008,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 1751649893}
-  spawnDelay: 8
+  spawnDelay: 9
 --- !u!1 &1775479155
 GameObject:
   m_ObjectHideFlags: 0
@@ -19056,7 +19056,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 1775479156}
-  spawnDelay: 8
+  spawnDelay: 9
 --- !u!1 &1778800700
 GameObject:
   m_ObjectHideFlags: 0
