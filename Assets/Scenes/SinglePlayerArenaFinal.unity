@@ -8864,6 +8864,9 @@ MonoBehaviour:
   controlUI: {fileID: 1172944779}
   loadingScreen: {fileID: 1612524564}
   timerObject: {fileID: 1290347057}
+  bulletPrefab: {fileID: 3820103123359011567, guid: 1c25a381a3a031c40b0b1ff0740206d4,
+    type: 3}
+  powerButton: {fileID: 171810064}
   powerUpThumbnail: {fileID: 805926946}
   freezeSprite: {fileID: 1401011104, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   bulletSprite: {fileID: 2047992146, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}

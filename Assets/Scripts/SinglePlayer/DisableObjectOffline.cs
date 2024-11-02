@@ -24,7 +24,7 @@ public class DisableObjectOffline : MonoBehaviour
 
         while (timeLeft > 0)
         {
-            Debug.Log("Time left to re-enable collider: " + timeLeft + " seconds");
+            // Debug.Log("Time left to re-enable collider: " + timeLeft + " seconds");
             yield return new WaitForSeconds(1f);
             timeLeft--;
         }

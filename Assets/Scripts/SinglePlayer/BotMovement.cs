@@ -18,6 +18,7 @@ public class BotMovement : MonoBehaviour
     public float separationRadius = 3f;
     public float pathDiversionTime = 4f;
     private float proximityTimer = 0f;
+    private bool isFrozen = false; // New flag to track freeze state
 
     [Header("Invisibility Settings")]
     private InvisibilityOffline invisibilityScript;
@@ -49,6 +50,12 @@ public class BotMovement : MonoBehaviour
 
     private void Update()
     {
+        // Skip updates if the bot is frozen
+        if (isFrozen)
+        {
+            return;
+        }
+
         if (guardingPearl)
         {
             if (!isPatrolling)
@@ -99,6 +106,13 @@ public class BotMovement : MonoBehaviour
 
         while (guardingPearl)
         {
+            // Pause if the bot is frozen
+            if (isFrozen)
+            {
+                yield return null;
+                continue;
+            }
+
             Vector3 patrolPoint = guardPosition + Random.insideUnitSphere * guardRadius;
             patrolPoint.y = guardPosition.y;
             agent.SetDestination(patrolPoint);
@@ -130,5 +144,32 @@ public class BotMovement : MonoBehaviour
             }
         }
         proximityTimer = 0f;
+    }
+
+    // Method to freeze the bot
+    public void FreezeBot()
+    {
+        if (agent != null)
+        {
+            agent.isStopped = true; // Stop the agent's pathfinding
+            agent.velocity = Vector3.zero; // Ensure the agent's current movement stops immediately
+        }
+        isFrozen = true;
+
+        // Debug message to confirm FreezeBot is called
+        Debug.Log("Bot frozen: " + gameObject.name);
+    }
+
+    // Method to unfreeze the bot
+    public void UnfreezeBot()
+    {
+        if (agent != null)
+        {
+            agent.isStopped = false; // Resume the agent's pathfinding
+        }
+        isFrozen = false;
+
+        // Debug message to confirm UnfreezeBot is called
+        Debug.Log("Bot unfrozen: " + gameObject.name);
     }
 }

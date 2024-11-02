@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class SpawnManagerOffline : MonoBehaviour
 {
-    public GameObject protagonist; // Reference to the protagonist already in the scene
+    public GameObject protagonist;
     public Transform[] antagonistSpawnPoints;
     public GameObject antagonistPrefab;
 
@@ -13,38 +13,39 @@ public class SpawnManagerOffline : MonoBehaviour
     public GameObject loadingScreen;
     public GameObject timerObject;
 
+    public Button powerButton; // Reference to the power-up button
     public Image powerUpThumbnail;
     public Sprite freezeSprite;
     public Sprite bulletSprite;
     public Sprite speedBoostSprite;
 
-    private int spawnedGhostsCount = 0;
-    private int numberOfAntagonists = 1;  // Default to 1 if not set in PlayerPrefs
+    public GameObject bulletPrefab;
+
     private string currentPowerUp = null;
+    private bool isCooldown = false;
 
     private void Start()
     {
-        // Fetch the number of bots from PlayerPrefs
-        numberOfAntagonists = PlayerPrefs.GetInt("NumberOfBots", 1);
+        if (powerButton != null)
+        {
+            powerButton.onClick.AddListener(ActivateStoredPowerUp);
+            powerButton.interactable = false; // Initially disable until power-up is ready
+        }
 
-        StartCoroutine(SpawnEntitiesAfterDelay());
+        StartCoroutine(InitializeGameSequence());
     }
 
-    private IEnumerator SpawnEntitiesAfterDelay()
+    private IEnumerator InitializeGameSequence()
     {
-        yield return new WaitForSeconds(3.0f); // Optional delay before spawning
-
+        yield return new WaitForSeconds(3.0f);
         HideLoadingScreen();
 
-        // Enable protagonist after 7 seconds
         yield return new WaitForSeconds(7.0f);
         EnableProtagonist();
 
-        // Spawn antagonists
         SpawnAntagonists();
 
         yield return new WaitForSeconds(2f);
-
         ShowControlUI();
         StartTimer();
     }
@@ -54,7 +55,7 @@ public class SpawnManagerOffline : MonoBehaviour
         if (protagonist != null)
         {
             protagonist.SetActive(true);
-            EnableJoystick(); // Enable joystick for protagonist
+            EnableJoystick();
         }
         else
         {
@@ -64,16 +65,13 @@ public class SpawnManagerOffline : MonoBehaviour
 
     private void SpawnAntagonists()
     {
-        int spawnLimit = Mathf.Min(numberOfAntagonists, antagonistSpawnPoints.Length);
-
+        int spawnLimit = Mathf.Min(PlayerPrefs.GetInt("NumberOfBots", 1), antagonistSpawnPoints.Length);
         for (int i = 0; i < spawnLimit; i++)
         {
             Transform spawnPoint = antagonistSpawnPoints[i];
             Instantiate(antagonistPrefab, spawnPoint.position, spawnPoint.rotation);
-            spawnedGhostsCount++;
         }
-
-        EnableJoystick(); // Enable joystick for antagonists if required
+        EnableJoystick();
     }
 
     private void EnableJoystick()
@@ -112,7 +110,100 @@ public class SpawnManagerOffline : MonoBehaviour
     public void UpdateInventory(string powerUpName)
     {
         currentPowerUp = powerUpName;
+        powerButton.interactable = true; // Enable the button when a power-up is available
         ShowPowerUpThumbnail(GetPowerUpSprite(powerUpName));
+    }
+
+    private void ActivateStoredPowerUp()
+    {
+        if (isCooldown || string.IsNullOrEmpty(currentPowerUp)) return;
+
+        switch (currentPowerUp)
+        {
+            case "Freeze":
+                ActivateFreezePowerUp();
+                break;
+            case "ReverseControls":
+                ActivateBulletPowerUp();
+                break;
+            case "SpeedBoost":
+                ActivateSpeedBoostPowerUp();
+                break;
+            default:
+                Debug.LogWarning("Invalid power-up type: " + currentPowerUp);
+                break;
+        }
+
+        currentPowerUp = null; // Clear current power-up after use
+        HidePowerUpThumbnail();
+        powerButton.interactable = false;
+    }
+
+    private void ActivateFreezePowerUp()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Ghost");
+        foreach (GameObject enemy in enemies)
+        {
+            var botMovement = enemy.GetComponent<BotMovement>();
+            if (botMovement != null)
+            {
+                // Call the FreezeBot method if it exists in BotMovement
+                botMovement.FreezeBot();
+                StartCoroutine(ReEnableBotMovement(botMovement, 5f));
+            }
+        }
+    }
+
+    private IEnumerator ReEnableBotMovement(BotMovement botMovement, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (botMovement != null)
+        {
+            // Call the UnfreezeBot method to restore the bot's functionality
+            botMovement.UnfreezeBot();
+        }
+    }
+
+    private void ActivateBulletPowerUp()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            FireBullet(player.transform);
+        }
+    }
+
+    private void FireBullet(Transform playerTransform)
+    {
+        if (bulletPrefab != null)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, playerTransform.rotation);
+            Rigidbody rb = bullet.GetComponent<Rigidbody>();
+            rb.velocity = playerTransform.forward * 10f;
+        }
+    }
+
+    private void ActivateSpeedBoostPowerUp()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            PlayerMovementOffline movementScript = player.GetComponent<PlayerMovementOffline>();
+            if (movementScript != null)
+            {
+                movementScript.speed += 2.0f; // Increase speed
+                StartCoroutine(ResetSpeedAfterDelay(movementScript, 5f));
+            }
+        }
+    }
+
+    private IEnumerator ResetSpeedAfterDelay(PlayerMovementOffline movementScript, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (movementScript != null)
+        {
+            movementScript.speed -= 2.0f; // Reset speed to original
+        }
     }
 
     private void ShowPowerUpThumbnail(Sprite powerUpSprite)
@@ -134,21 +225,12 @@ public class SpawnManagerOffline : MonoBehaviour
 
     private Sprite GetPowerUpSprite(string powerUpName)
     {
-        Debug.Log("Received power-up name: " + powerUpName);
         switch (powerUpName)
         {
-            case "Freeze":
-                return freezeSprite;
-            case "Bullet":
-                return bulletSprite;
-            case "SpeedBoost":
-                return speedBoostSprite;
-            // Add additional cases for other power-ups if necessary
-            default:
-                Debug.LogWarning("Power-up name '" + powerUpName + "' does not match any available power-up sprites.");
-                return null;
+            case "Freeze": return freezeSprite;
+            case "ReverseControls": return bulletSprite;
+            case "SpeedBoost": return speedBoostSprite;
+            default: return null;
         }
     }
-
-
 }
