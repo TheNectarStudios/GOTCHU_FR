@@ -134,12 +134,21 @@ public class SpawnManagerOffline : MonoBehaviour
 
     private Sprite GetPowerUpSprite(string powerUpName)
     {
+        Debug.Log("Received power-up name: " + powerUpName);
         switch (powerUpName)
         {
-            case "Freeze": return freezeSprite;
-            case "Bullet": return bulletSprite;
-            case "SpeedBoost": return speedBoostSprite;
-            default: return null;
+            case "Freeze":
+                return freezeSprite;
+            case "Bullet":
+                return bulletSprite;
+            case "SpeedBoost":
+                return speedBoostSprite;
+            // Add additional cases for other power-ups if necessary
+            default:
+                Debug.LogWarning("Power-up name '" + powerUpName + "' does not match any available power-up sprites.");
+                return null;
         }
     }
+
+
 }

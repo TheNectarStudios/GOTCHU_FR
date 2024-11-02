@@ -486,7 +486,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 46739880}
-  spawnDelay: 9
+  spawnDelay: 10
 --- !u!64 &73768602
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2568,7 +2568,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 9157105887711914197, guid: 9e69c72046b9c544691570866634ed80,
     type: 3}
   spawnPoint: {fileID: 371680272}
-  spawnDelay: 9
+  spawnDelay: 10
 --- !u!1001 &381370039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19008,7 +19008,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 1751649893}
-  spawnDelay: 9
+  spawnDelay: 10
 --- !u!1 &1775479155
 GameObject:
   m_ObjectHideFlags: 0
@@ -19056,7 +19056,7 @@ MonoBehaviour:
   prefabToSpawn: {fileID: 5642766282230003982, guid: 324380463eee84e4bbe853e7c8595cb7,
     type: 3}
   spawnPoint: {fileID: 1775479156}
-  spawnDelay: 9
+  spawnDelay: 10
 --- !u!1 &1778800700
 GameObject:
   m_ObjectHideFlags: 0
@@ -20755,7 +20755,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1939257719}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 742a53347b6c07044abc88d358c9971f, type: 3}
+  m_Script: {fileID: 11500000, guid: 15be5153a8693244ab5d7635338a8c4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints:
@@ -20766,9 +20766,9 @@ MonoBehaviour:
   - {fileID: 218154022}
   - {fileID: 1866120002}
   - {fileID: 2007571667}
-  - {fileID: 96869962}
   - {fileID: 768205354}
-  - {fileID: 1352204869}
+  - {fileID: 96869962}
+  - {fileID: 133264341}
   - {fileID: 1977675693}
   - {fileID: 328693272}
   - {fileID: 2043715498}
@@ -20777,9 +20777,9 @@ MonoBehaviour:
   - {fileID: 1352204869}
   - {fileID: 1396122464}
   powerUpPrefabs:
-  - {fileID: 5287299460218222280, guid: 8517f9e5440daf94ea8a954d9d822ac9, type: 3}
-  - {fileID: 2056009038309261749, guid: 4f61233481a1961419a826e6883351cd, type: 3}
-  - {fileID: 8620414434606916835, guid: 76468de4246ab3644817181255da1245, type: 3}
+  - {fileID: 5287299460218222280, guid: 6fdb663b73854854d84d0574ae55b44e, type: 3}
+  - {fileID: 2056009038309261749, guid: 4b1c783597942504ca890daa9f134382, type: 3}
+  - {fileID: 8620414434606916835, guid: da0cd98c7da969243be18764302318ee, type: 3}
   maxPowerUps: 3
 --- !u!1001 &1944696966
 PrefabInstance:
