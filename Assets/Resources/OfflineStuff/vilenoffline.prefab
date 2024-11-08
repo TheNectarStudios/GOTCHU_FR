@@ -328,15 +328,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f792feb3e8065244caaa21fc3c60c7d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pearlPrefab: {fileID: 5694190962491151853, guid: 3444f3e9e5d95a343b7b598c05082a50,
+  pearlPrefab: {fileID: 5694190962491151853, guid: 8670f14a24ec02d4c97ad83a8fc174f2,
     type: 3}
   spawnPointTag: GhostSpawn
   respawnDelay: 3
   scaleTransitionDuration: 1
   preTeleportBuffer: 0.5
   objectToDisable: {fileID: 22651873678508220}
-  textToDisable: {fileID: 2746102397553431144}
-  hitAnimationPrefab: {fileID: 2433282508537954060, guid: 3b28e241e117b594ebd890cf55f78db3,
+  textToDisable: {fileID: 0}
+  hitAnimationPrefab: {fileID: 9157105887711914197, guid: bf8e0ed7d55bffe4abd3929f09d9e830,
     type: 3}
 --- !u!54 &-6860914649217156247
 Rigidbody:

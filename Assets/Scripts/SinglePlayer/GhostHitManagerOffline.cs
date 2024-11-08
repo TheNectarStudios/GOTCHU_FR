@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 
-public class GhostHitManagerOffline : MonoBehaviour
+public class GhostManagerOffline : MonoBehaviour
 {
     public GameObject pearlPrefab; // Reference to the pearl prefab
     private GameObject placedPearl; // Reference to the pearl placed by the ghost
@@ -21,8 +21,6 @@ public class GhostHitManagerOffline : MonoBehaviour
     public GameObject hitAnimationPrefab; // Reference to the animation prefab to be played when hit by a bullet
 
     private Vector3 originalScale; // Store the original scale of the object
-
-    private TopDownFollowCameraOffline cameraFollow; // Reference to the camera follow script
 
     private void Start()
     {
@@ -46,24 +44,30 @@ public class GhostHitManagerOffline : MonoBehaviour
         {
             originalScale = objectToDisable.transform.localScale;
         }
-
-        cameraFollow = FindObjectOfType<TopDownFollowCameraOffline>();
-        if (cameraFollow == null)
-        {
-            Debug.LogError("No TopDownFollowCameraOffline script found on the camera!");
-        }
     }
 
-    private void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        if (other.CompareTag("Bullet"))
         {
-            Debug.Log("H key pressed! Triggering camera shake.");
+            Debug.Log("Ghost hit by bullet!");
 
-            if (cameraFollow != null)
+            // Play hit animation
+            if (hitAnimationPrefab != null)
             {
-                cameraFollow.ShakeCamera();
+                Instantiate(hitAnimationPrefab, transform.position, Quaternion.identity);
+                Debug.Log("Hit animation played!");
             }
+            else
+            {
+                Debug.LogError("Hit animation prefab is not assigned!");
+            }
+
+            TeleportToSpawnPoint();
+        }
+        else
+        {
+            Debug.Log("Triggered by non-bullet object: " + other.gameObject.name);
         }
     }
 
@@ -84,7 +88,7 @@ public class GhostHitManagerOffline : MonoBehaviour
         else
         {
             Debug.LogError("Neither pearl nor natural spawn point found! Teleporting to current position as a fallback.");
-            lastPosition = transform.position; 
+            lastPosition = transform.position;
         }
 
         StartCoroutine(ShrinkThenTeleport());
@@ -96,13 +100,9 @@ public class GhostHitManagerOffline : MonoBehaviour
 
         yield return new WaitForSeconds(preTeleportBuffer);
 
-        TeleportGhost(lastPosition);
-    }
-
-    private void TeleportGhost(Vector3 teleportPosition)
-    {
-        Debug.Log("Teleporting ghost to position: " + teleportPosition);
-        transform.position = teleportPosition;
+        // Teleport the ghost to the last determined position
+        transform.position = lastPosition;
+        Debug.Log("Teleporting ghost to position: " + lastPosition);
 
         StartCoroutine(ScaleAndDisable(respawnDelay));
     }
@@ -123,13 +123,13 @@ public class GhostHitManagerOffline : MonoBehaviour
 
         if (ghostRigidbody != null)
         {
-            ghostRigidbody.isKinematic = true; 
+            ghostRigidbody.isKinematic = true;
             Debug.Log("Ghost movement is disabled.");
         }
 
         if (ghostMovementScript != null)
         {
-            ghostMovementScript.enabled = false; 
+            ghostMovementScript.enabled = false;
             Debug.Log("Ghost movement script is disabled.");
         }
 
@@ -175,59 +175,5 @@ public class GhostHitManagerOffline : MonoBehaviour
         }
 
         objectToDisable.transform.localScale = targetScale;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Bullet"))
-        {
-            Debug.Log("Ghost hit by bullet!");
-
-            if (cameraFollow != null)
-            {
-                cameraFollow.ShakeCamera();
-                Debug.Log("Camera shake triggered!");
-            }
-            else
-            {
-                Debug.LogError("Camera follow script is missing!");
-            }
-
-            // Play hit animation
-            if (hitAnimationPrefab != null)
-            {
-                Instantiate(hitAnimationPrefab, transform.position, Quaternion.identity);
-                Debug.Log("Hit animation played!");
-            }
-            else
-            {
-                Debug.LogError("Hit animation prefab is not assigned!");
-            }
-
-            TeleportToSpawnPoint();
-        }
-        else
-        {
-            Debug.Log("Collision with non-bullet object: " + collision.gameObject.name);
-        }
-    }
-
-    public void PlacePearl(Vector3 position)
-    {
-        if (placedPearl == null)
-        {
-            placedPearl = Instantiate(pearlPrefab, position, Quaternion.identity);
-            Debug.Log("Pearl placed at: " + position);
-        }
-    }
-
-    public void DestroyPearl()
-    {
-        if (placedPearl != null)
-        {
-            Destroy(placedPearl);
-            placedPearl = null;
-            Debug.Log("Pearl destroyed.");
-        }
     }
 }

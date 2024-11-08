@@ -37,7 +37,7 @@ public class BulletCollisionOffline : MonoBehaviour
             // If it's a ghost, handle ghost-specific logic
             if (other.CompareTag("Ghost"))
             {
-                Debug.Log("Bullet hit the ghost!");
+                // Debug.Log("Bullet hit the ghost!");
 
                 // Access the GhostHitManager component from the ghost
                 GhostHitManager ghostHitManager = other.GetComponent<GhostHitManager>();
