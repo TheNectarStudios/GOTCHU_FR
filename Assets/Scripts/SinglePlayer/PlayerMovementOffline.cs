@@ -9,10 +9,8 @@ public class PlayerMovementOffline : MonoBehaviour
 
     void Start()
     {
-        // Dynamically find the joystick component in the scene
         joystick = FindObjectOfType<DynamicJoystick>();
 
-        // Optional: Add a check to ensure the joystick is found
         if (joystick == null)
         {
             Debug.LogError("Joystick not found in the scene!");
@@ -21,37 +19,39 @@ public class PlayerMovementOffline : MonoBehaviour
 
     void Update()
     {
-        if (joystick == null) return;  // Ensure that joystick is detected
+        if (joystick == null) return;
 
-        // Capture joystick input for local player
-        direction.x = joystick.Horizontal;  
+        // Capture joystick input
+        direction.x = joystick.Horizontal;
         direction.z = joystick.Vertical;
 
-        // Ensure direction is constrained to up, down, left, and right (no diagonal)
+        // Ensure direction is constrained to up, down, left, and right
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
         {
-            direction.z = 0;  // Disable vertical movement if horizontal is stronger
+            direction.z = 0;
         }
         else
         {
-            direction.x = 0;  // Disable horizontal movement if vertical is stronger
+            direction.x = 0;
         }
 
-        // Update last movement direction
-        lastMovementDirection = direction;
+        // Update last movement direction only if there is movement
+        if (direction != Vector3.zero)
+        {
+            lastMovementDirection = direction;
+        }
 
-        MovePlayer();  // Move the player based on joystick input
+        MovePlayer();
     }
 
     void MovePlayer()
     {
-        // Move the player in the direction calculated
         transform.Translate(direction * speed * Time.deltaTime, Space.World);
     }
 
-    // Method to get the last movement direction (if needed)
+    // Method to get the last movement direction
     public Vector3 GetLastMovementDirection()
     {
-        return lastMovementDirection; // Return the last recorded direction
+        return lastMovementDirection;
     }
 }

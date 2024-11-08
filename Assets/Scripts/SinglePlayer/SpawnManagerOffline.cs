@@ -23,6 +23,7 @@ public class SpawnManagerOffline : MonoBehaviour
 
     private string currentPowerUp = null;
     private bool isCooldown = false;
+    private PlayerMovementOffline playerMovementScript;
 
     private void Start()
     {
@@ -30,6 +31,16 @@ public class SpawnManagerOffline : MonoBehaviour
         {
             powerButton.onClick.AddListener(ActivateStoredPowerUp);
             powerButton.interactable = false; // Initially disable until power-up is ready
+        }
+
+        // Get the PlayerMovementOffline script from the protagonist
+        if (protagonist != null)
+        {
+            playerMovementScript = protagonist.GetComponent<PlayerMovementOffline>();
+            if (playerMovementScript == null)
+            {
+                Debug.LogWarning("PlayerMovementOffline script is missing on the protagonist.");
+            }
         }
 
         StartCoroutine(InitializeGameSequence());
@@ -147,7 +158,6 @@ public class SpawnManagerOffline : MonoBehaviour
             var botMovement = enemy.GetComponent<BotMovement>();
             if (botMovement != null)
             {
-                // Call the FreezeBot method if it exists in BotMovement
                 botMovement.FreezeBot();
                 StartCoroutine(ReEnableBotMovement(botMovement, 5f));
             }
@@ -159,27 +169,73 @@ public class SpawnManagerOffline : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if (botMovement != null)
         {
-            // Call the UnfreezeBot method to restore the bot's functionality
             botMovement.UnfreezeBot();
         }
     }
 
-    private void ActivateBulletPowerUp()
+    public void ActivateBulletPowerUp()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        if (playerMovementScript == null) return;
+
+        // Use the last movement direction from the player movement script
+        Vector3 lastDirection = playerMovementScript.GetLastMovementDirection();
+
+        // Determine the fixed direction (0°, 90°, 180°, 270°)
+        Vector3 bulletDirection = Vector3.zero;
+
+        if (lastDirection.x > 0) // Right
         {
-            FireBullet(player.transform);
+            bulletDirection = Vector3.right;
+        }
+        else if (lastDirection.x < 0) // Left
+        {
+            bulletDirection = Vector3.left;
+        }
+        else if (lastDirection.z > 0) // Up
+        {
+            bulletDirection = Vector3.forward;
+        }
+        else if (lastDirection.z < 0) // Down
+        {
+            bulletDirection = Vector3.back;
+        }
+
+        // Fire the bullet in the fixed direction
+        if (bulletDirection != Vector3.zero)
+        {
+            FireBullet(protagonist.transform, bulletDirection);
+        }
+        else
+        {
+            Debug.LogWarning("Bullet direction is zero, but firing in last known direction.");
         }
     }
 
-    private void FireBullet(Transform playerTransform)
+    private void FireBullet(Transform playerTransform, Vector3 direction)
     {
         if (bulletPrefab != null)
         {
-            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, playerTransform.rotation);
+            // Instantiate the bullet at the player's position
+            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, Quaternion.identity);
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
-            rb.velocity = playerTransform.forward * 10f;
+
+            if (rb != null)
+            {
+                // Apply velocity in the fixed direction
+                rb.velocity = direction * 10f; // Adjust speed as needed
+
+                // Rotate the bullet to face the direction it's moving
+                bullet.transform.rotation = Quaternion.LookRotation(direction);
+                Debug.Log("Bullet fired in direction: " + direction);
+            }
+            else
+            {
+                Debug.LogWarning("Rigidbody component is missing on the bullet prefab!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Bullet prefab is missing!");
         }
     }
 
