@@ -1,19 +1,24 @@
-using System.Collections;  // Required for IEnumerator
+using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine.SceneManagement;  // Required for scene management
 
 public class PlayerPearlCollector : MonoBehaviourPun
 {
     public int collectedPearls = 0;  // Track the number of collected pearls
     private int totalPearlsToCollect;  // This will be set dynamically
 
+    // Reference to the DecisionMaker script
+    private DecisionMaker decisionMaker;
+
     private void Start()
     {
         // Find all GameObjects tagged as "Ghost" and set the totalPearlsToCollect based on that
         GameObject[] ghosts = GameObject.FindGameObjectsWithTag("Ghost");
         totalPearlsToCollect = ghosts.Length;  // Number of Ghosts equals the number of pearls to collect
+
+        // Get the reference to the DecisionMaker script in the scene
+        decisionMaker = FindObjectOfType<DecisionMaker>();
 
         Debug.Log("Total pearls to collect: " + totalPearlsToCollect);
     }
@@ -54,36 +59,35 @@ public class PlayerPearlCollector : MonoBehaviourPun
             }
         }
 
-        // Check if collected pearls reach the totalPearlsToCollect and then change the scene
+        // Check if collected pearls reach the totalPearlsToCollect and then notify the DecisionMaker
         if (collectedPearls >= totalPearlsToCollect)
         {
             Debug.Log("Collected all pearls! Protagonist won.");
-            
+
             // Store a message indicating the Protagonist has won by collecting all pearls
             PlayerPrefs.SetString("GameResult", "The Protagonist has won by collecting all the pearls!");
 
-            // Send the result to all players
-            photonView.RPC("SetGameResultForAll", RpcTarget.All, "The Protagonist has won by collecting all the pearls!");
-
-            // Transition to the next scene for all players
-            photonView.RPC("ChangeSceneForAllPlayers", RpcTarget.All);
+            // Notify the DecisionMaker to change the scene
+            if (decisionMaker != null)
+            {
+                decisionMaker.OnAllPearlsCollected();
+            }
+            else
+            {
+                Debug.LogError("DecisionMaker script not found in the scene.");
+            }
         }
     }
 
     void RequestOwnershipAndDestroy(PhotonView pearlView)
     {
-        // If the current player is the MasterClient
         if (PhotonNetwork.IsMasterClient)
         {
-            // MasterClient should request ownership first, even though it can destroy objects
-            Debug.Log("MasterClient requesting ownership of pearl before destroying.");
             pearlView.RequestOwnership();
             StartCoroutine(WaitAndDestroy(pearlView));
         }
         else
         {
-            // If not the MasterClient, destroy after ownership transfer
-            Debug.Log("Requesting ownership and waiting to destroy.");
             pearlView.RequestOwnership();
             StartCoroutine(WaitAndDestroy(pearlView));
         }
@@ -91,34 +95,15 @@ public class PlayerPearlCollector : MonoBehaviourPun
 
     IEnumerator WaitAndDestroy(PhotonView pearlView)
     {
-        // Wait for ownership transfer to complete
         yield return new WaitForSeconds(0.2f);
 
-        // Check if ownership is transferred to this client
         if (pearlView.IsMine)
         {
-            // Now the local player owns the pearl, so destroy it
-            Debug.Log("Ownership transfer successful, destroying pearl.");
             PhotonNetwork.Destroy(pearlView.gameObject);
         }
         else
         {
             Debug.LogError("Failed to take ownership of the pearl. Unable to destroy.");
         }
-    }
-
-    [PunRPC]
-    void ChangeSceneForAllPlayers()
-    {
-        // Load the RoomCreated scene for all players in the room
-        Debug.Log("Loading RoomCreated scene for all players...");
-        PhotonNetwork.LoadLevel("ResultScene");
-    }
-
-    [PunRPC]
-    void SetGameResultForAll(string resultMessage)
-    {
-        // Store the result message in PlayerPrefs for all players
-        PlayerPrefs.SetString("GameResult", resultMessage);
     }
 }
