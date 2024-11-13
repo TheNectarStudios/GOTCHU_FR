@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using Photon.Pun;
-using UnityEngine.SceneManagement;
 
 public class PlayerHitDetection : MonoBehaviourPunCallbacks
 {
@@ -10,7 +9,7 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
     public int blinkCount = 3;               // Number of times the object blinks
     private bool isBlinking = false;         // Boolean to prevent multiple hit registrations during blinking
     private int hitCounter = 0;              // Player's hit counter
-    public int maxHits = 3;                  // Maximum hits allowed before returning to the RoomCreated scene
+    public int maxHits = 3;                  // Maximum hits allowed before taking action
 
     private TopDownCameraFollow cameraFollow; // Reference to the camera follow script
 
@@ -28,7 +27,7 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        // Trigger camera shake when the G key is pressed using camera's own shake settings
+        // Trigger camera shake when the G key is pressed using the camera's own shake settings
         if (Input.GetKeyDown(KeyCode.G))
         {
             if (cameraFollow != null)
@@ -48,7 +47,7 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
             // Trigger the camera shake using the camera script's variables
             if (cameraFollow != null)
             {
-                cameraFollow.ShakeCamera(cameraFollow.shakeDuration, cameraFollow.shakeMagnitude);  // Use camera's variables
+                cameraFollow.ShakeCamera(cameraFollow.shakeDuration, cameraFollow.shakeMagnitude); // Use camera's variables
             }
 
             // Increment the hit counter and start the blink effect
@@ -61,13 +60,21 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
             // Check if the player has reached the maximum allowed hits
             if (hitCounter >= maxHits)
             {
-                Debug.Log("Player reached max hits. Reverting to ResultScene...");
+                Debug.Log("Player reached max hits. Ghosts win.");
 
-                // Send a network-wide result message (Ghost wins)
-                photonView.RPC("BroadcastGameResult", RpcTarget.All, "Ghosts won by eliminating the protagonist!");
+                // Store a message indicating the Ghosts have won by eliminating the protagonist
+                PlayerPrefs.SetString("GameResult", "Ghosts won by eliminating the protagonist!");
 
-                // Trigger a network-wide scene change using Photon
-                photonView.RPC("ReturnToResultScene", RpcTarget.All);
+                // Use the DecisionMaker script to change the scene
+                DecisionMaker decisionMaker = FindObjectOfType<DecisionMaker>();
+                if (decisionMaker != null)
+                {
+                    decisionMaker.OnPlayerEliminated(); // Call a new method in DecisionMaker to handle scene change
+                }
+                else
+                {
+                    Debug.LogError("DecisionMaker script not found in the scene.");
+                }
             }
         }
     }
@@ -95,19 +102,5 @@ public class PlayerHitDetection : MonoBehaviourPunCallbacks
 
         // Reset the blinking flag after the blinking period is over
         isBlinking = false;
-    }
-
-    [PunRPC]
-    private void BroadcastGameResult(string resultMessage)
-    {
-        // Store the result message in PlayerPrefs on all clients
-        PlayerPrefs.SetString("GameResult", resultMessage);
-    }
-
-    [PunRPC]
-    private void ReturnToResultScene()
-    {
-        // Load the ResultScene scene on all clients
-        SceneManager.LoadScene("ResultScene");
     }
 }
