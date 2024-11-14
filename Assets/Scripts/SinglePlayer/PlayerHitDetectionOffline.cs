@@ -99,6 +99,6 @@ public class PlayerHitDetectionOffline : MonoBehaviour
     private void ReturnToResultScene()
     {
         // Load the ResultScene
-        SceneManager.LoadScene("ResultScene");
+        SceneManager.LoadScene("ResultSceneOffline");
     }
 }
