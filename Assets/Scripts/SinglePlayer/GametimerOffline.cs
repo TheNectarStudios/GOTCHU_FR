@@ -44,7 +44,7 @@ public class GameTimerOffline : MonoBehaviour
         PlayerPrefs.SetString("GameResult", "The Protagonist has won by surviving the timer!");
 
         // Load the "ResultScene" scene
-        SceneManager.LoadScene("ResultScene");
+        SceneManager.LoadScene("ResultSceneOffline");
     }
 
     private void UpdateTimerDisplay(float timeLeft)

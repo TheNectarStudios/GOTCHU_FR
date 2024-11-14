@@ -52,6 +52,6 @@ public class PlayerPearlCollectonOffline : MonoBehaviour
     {
         // Load the ResultScene for all players
         Debug.Log("Loading ResultScene...");
-        SceneManager.LoadScene("ResultScene");
+        SceneManager.LoadScene("ResultSceneOffline");
     }
 }
