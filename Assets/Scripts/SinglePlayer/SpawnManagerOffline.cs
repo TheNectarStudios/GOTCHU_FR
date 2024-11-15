@@ -13,7 +13,7 @@ public class SpawnManagerOffline : MonoBehaviour
     public GameObject loadingScreen;
     public GameObject timerObject;
 
-    public Button powerButton; // Reference to the power-up button
+    public Button powerButton;
     public Image powerUpThumbnail;
     public Sprite freezeSprite;
     public Sprite bulletSprite;
@@ -24,16 +24,17 @@ public class SpawnManagerOffline : MonoBehaviour
     private string currentPowerUp = null;
     private bool isCooldown = false;
     private PlayerMovementOffline playerMovementScript;
+    private int bulletCount = 0; // Counter for the number of bullets fired
+    private const int maxBullets = 3; // Maximum number of bullets allowed
 
     private void Start()
     {
         if (powerButton != null)
         {
             powerButton.onClick.AddListener(ActivateStoredPowerUp);
-            powerButton.interactable = false; // Initially disable until power-up is ready
+            powerButton.interactable = false; // Initially disable until a power-up is available
         }
 
-        // Get the PlayerMovementOffline script from the protagonist
         if (protagonist != null)
         {
             playerMovementScript = protagonist.GetComponent<PlayerMovementOffline>();
@@ -121,7 +122,7 @@ public class SpawnManagerOffline : MonoBehaviour
     public void UpdateInventory(string powerUpName)
     {
         currentPowerUp = powerUpName;
-        powerButton.interactable = true; // Enable the button when a power-up is available
+        powerButton.interactable = true;
         ShowPowerUpThumbnail(GetPowerUpSprite(powerUpName));
     }
 
@@ -129,25 +130,77 @@ public class SpawnManagerOffline : MonoBehaviour
     {
         if (isCooldown || string.IsNullOrEmpty(currentPowerUp)) return;
 
-        switch (currentPowerUp)
+        if (currentPowerUp == "ReverseControls")
         {
-            case "Freeze":
-                ActivateFreezePowerUp();
-                break;
-            case "ReverseControls":
-                ActivateBulletPowerUp();
-                break;
-            case "SpeedBoost":
-                ActivateSpeedBoostPowerUp();
-                break;
-            default:
-                Debug.LogWarning("Invalid power-up type: " + currentPowerUp);
-                break;
+            // Handle bullet power-up, firing one bullet per button press
+            if (bulletCount < maxBullets)
+            {
+                FireBullet(protagonist.transform, playerMovementScript.GetLastMovementDirection());
+                bulletCount++;
+                if (bulletCount >= maxBullets)
+                {
+                    // Clear the bullet power-up after all bullets are fired
+                    currentPowerUp = null;
+                    HidePowerUpThumbnail();
+                    powerButton.interactable = false;
+                }
+            }
         }
+        else
+        {
+            // Handle other power-ups, which are used once
+            switch (currentPowerUp)
+            {
+                case "Freeze":
+                    ActivateFreezePowerUp();
+                    break;
+                case "SpeedBoost":
+                    ActivateSpeedBoostPowerUp();
+                    break;
+                default:
+                    Debug.LogWarning("Invalid power-up type: " + currentPowerUp);
+                    break;
+            }
 
-        currentPowerUp = null; // Clear current power-up after use
-        HidePowerUpThumbnail();
-        powerButton.interactable = false;
+            // Clear the power-up after it is used
+            currentPowerUp = null;
+            HidePowerUpThumbnail();
+            powerButton.interactable = false;
+        }
+    }
+
+    private void FireBullet(Transform playerTransform, Vector3 direction)
+    {
+        if (bulletPrefab != null)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, Quaternion.identity);
+            Rigidbody rb = bullet.GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                Vector3 bulletDirection = DetermineFixedDirection(direction);
+                rb.velocity = bulletDirection * 10f;
+                bullet.transform.rotation = Quaternion.LookRotation(bulletDirection);
+                Debug.Log("Bullet fired in direction: " + bulletDirection);
+            }
+            else
+            {
+                Debug.LogWarning("Rigidbody component is missing on the bullet prefab!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Bullet prefab is missing!");
+        }
+    }
+
+    private Vector3 DetermineFixedDirection(Vector3 lastDirection)
+    {
+        if (lastDirection.x > 0) return Vector3.right;
+        if (lastDirection.x < 0) return Vector3.left;
+        if (lastDirection.z > 0) return Vector3.forward;
+        if (lastDirection.z < 0) return Vector3.back;
+        return Vector3.zero;
     }
 
     private void ActivateFreezePowerUp()
@@ -173,72 +226,6 @@ public class SpawnManagerOffline : MonoBehaviour
         }
     }
 
-    public void ActivateBulletPowerUp()
-    {
-        if (playerMovementScript == null) return;
-
-        // Use the last movement direction from the player movement script
-        Vector3 lastDirection = playerMovementScript.GetLastMovementDirection();
-
-        // Determine the fixed direction (0°, 90°, 180°, 270°)
-        Vector3 bulletDirection = Vector3.zero;
-
-        if (lastDirection.x > 0) // Right
-        {
-            bulletDirection = Vector3.right;
-        }
-        else if (lastDirection.x < 0) // Left
-        {
-            bulletDirection = Vector3.left;
-        }
-        else if (lastDirection.z > 0) // Up
-        {
-            bulletDirection = Vector3.forward;
-        }
-        else if (lastDirection.z < 0) // Down
-        {
-            bulletDirection = Vector3.back;
-        }
-
-        // Fire the bullet in the fixed direction
-        if (bulletDirection != Vector3.zero)
-        {
-            FireBullet(protagonist.transform, bulletDirection);
-        }
-        else
-        {
-            Debug.LogWarning("Bullet direction is zero, but firing in last known direction.");
-        }
-    }
-
-    private void FireBullet(Transform playerTransform, Vector3 direction)
-    {
-        if (bulletPrefab != null)
-        {
-            // Instantiate the bullet at the player's position
-            GameObject bullet = Instantiate(bulletPrefab, playerTransform.position, Quaternion.identity);
-            Rigidbody rb = bullet.GetComponent<Rigidbody>();
-
-            if (rb != null)
-            {
-                // Apply velocity in the fixed direction
-                rb.velocity = direction * 10f; // Adjust speed as needed
-
-                // Rotate the bullet to face the direction it's moving
-                bullet.transform.rotation = Quaternion.LookRotation(direction);
-                Debug.Log("Bullet fired in direction: " + direction);
-            }
-            else
-            {
-                Debug.LogWarning("Rigidbody component is missing on the bullet prefab!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Bullet prefab is missing!");
-        }
-    }
-
     private void ActivateSpeedBoostPowerUp()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -247,7 +234,7 @@ public class SpawnManagerOffline : MonoBehaviour
             PlayerMovementOffline movementScript = player.GetComponent<PlayerMovementOffline>();
             if (movementScript != null)
             {
-                movementScript.speed += 2.0f; // Increase speed
+                movementScript.speed += 2.0f;
                 StartCoroutine(ResetSpeedAfterDelay(movementScript, 5f));
             }
         }
@@ -258,7 +245,7 @@ public class SpawnManagerOffline : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if (movementScript != null)
         {
-            movementScript.speed -= 2.0f; // Reset speed to original
+            movementScript.speed -= 2.0f;
         }
     }
 
