@@ -9,6 +9,7 @@ public class BotMovement : MonoBehaviour
 
     [Header("Bot Settings")]
     public float movementSpeed = 3.5f;
+    public float acceleration = 8f; // New acceleration setting
     public float guardRadius = 5f;
     public float timelineBufferTime = 3f;
     private bool trackingPlayer = false;
@@ -18,16 +19,20 @@ public class BotMovement : MonoBehaviour
     public float separationRadius = 3f;
     public float pathDiversionTime = 4f;
     private float proximityTimer = 0f;
-    private bool isFrozen = false; // New flag to track freeze state
+    private bool isFrozen = false;
 
     [Header("Invisibility Settings")]
     private InvisibilityOffline invisibilityScript;
 
     private void Start()
     {
+        // Initialize the NavMeshAgent
         agent = GetComponent<NavMeshAgent>();
         agent.speed = movementSpeed;
+        agent.acceleration = acceleration; // Apply acceleration
+        agent.angularSpeed = 120f; // Adjust angular speed if needed for smoother turning
 
+        // Find the player GameObject with the "Player" tag
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
@@ -81,6 +86,7 @@ public class BotMovement : MonoBehaviour
         }
         else if (trackingPlayer && player != null)
         {
+            agent.isStopped = false; // Ensure the agent is not stopped
             agent.SetDestination(player.position);
         }
     }
@@ -106,7 +112,6 @@ public class BotMovement : MonoBehaviour
 
         while (guardingPearl)
         {
-            // Pause if the bot is frozen
             if (isFrozen)
             {
                 yield return null;
@@ -146,30 +151,24 @@ public class BotMovement : MonoBehaviour
         proximityTimer = 0f;
     }
 
-    // Method to freeze the bot
     public void FreezeBot()
     {
         if (agent != null)
         {
-            agent.isStopped = true; // Stop the agent's pathfinding
-            agent.velocity = Vector3.zero; // Ensure the agent's current movement stops immediately
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
         }
         isFrozen = true;
-
-        // Debug message to confirm FreezeBot is called
         Debug.Log("Bot frozen: " + gameObject.name);
     }
 
-    // Method to unfreeze the bot
     public void UnfreezeBot()
     {
         if (agent != null)
         {
-            agent.isStopped = false; // Resume the agent's pathfinding
+            agent.isStopped = false;
         }
         isFrozen = false;
-
-        // Debug message to confirm UnfreezeBot is called
         Debug.Log("Bot unfrozen: " + gameObject.name);
     }
 }
