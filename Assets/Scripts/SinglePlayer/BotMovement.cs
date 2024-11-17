@@ -9,7 +9,7 @@ public class BotMovement : MonoBehaviour
 
     [Header("Bot Settings")]
     public float movementSpeed = 3.5f;
-    public float acceleration = 8f; // New acceleration setting
+    public float acceleration = 8f;
     public float guardRadius = 5f;
     public float timelineBufferTime = 3f;
     private bool trackingPlayer = false;
@@ -24,15 +24,18 @@ public class BotMovement : MonoBehaviour
     [Header("Invisibility Settings")]
     private InvisibilityOffline invisibilityScript;
 
+    [Header("UFO Rotation Settings")]
+    public float pitchAmount = 15f; // Maximum pitch angle
+    public float yawAmount = 15f;   // Maximum yaw angle
+    public float rotationSmoothing = 5f; // How smoothly the UFO tilts
+
     private void Start()
     {
-        // Initialize the NavMeshAgent
         agent = GetComponent<NavMeshAgent>();
         agent.speed = movementSpeed;
-        agent.acceleration = acceleration; // Apply acceleration
-        agent.angularSpeed = 120f; // Adjust angular speed if needed for smoother turning
+        agent.acceleration = acceleration;
+        agent.angularSpeed = 120f;
 
-        // Find the player GameObject with the "Player" tag
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
@@ -43,7 +46,6 @@ public class BotMovement : MonoBehaviour
             Debug.LogWarning("Player not found. Ensure there is a GameObject tagged 'Player' in the scene.");
         }
 
-        // Access the InvisibilityOffline script
         invisibilityScript = GetComponent<InvisibilityOffline>();
         if (invisibilityScript == null)
         {
@@ -55,7 +57,6 @@ public class BotMovement : MonoBehaviour
 
     private void Update()
     {
-        // Skip updates if the bot is frozen
         if (isFrozen)
         {
             return;
@@ -75,10 +76,8 @@ public class BotMovement : MonoBehaviour
                 }
             }
 
-            // Check for proximity with other antagonists
             CheckAndDiversifyPath();
 
-            // Trigger invisibility if guarding a pearl and not on cooldown
             if (invisibilityScript != null)
             {
                 invisibilityScript.ActivateInvisibility();
@@ -86,8 +85,28 @@ public class BotMovement : MonoBehaviour
         }
         else if (trackingPlayer && player != null)
         {
-            agent.isStopped = false; // Ensure the agent is not stopped
+            agent.isStopped = false;
             agent.SetDestination(player.position);
+        }
+
+        // Apply UFO pitch and yaw
+        ApplyUFORotation();
+    }
+
+    private void ApplyUFORotation()
+    {
+        Vector3 velocity = agent.velocity;
+        if (velocity.magnitude > 0.1f)
+        {
+            // Calculate pitch and yaw based on velocity
+            float pitch = Mathf.Clamp(-velocity.z * pitchAmount, -pitchAmount, pitchAmount);
+            float yaw = Mathf.Clamp(velocity.x * yawAmount, -yawAmount, yawAmount);
+
+            // Create target rotation with pitch and yaw
+            Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
+
+            // Smoothly interpolate to the target rotation
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothing);
         }
     }
 
@@ -109,7 +128,6 @@ public class BotMovement : MonoBehaviour
     private IEnumerator PatrolAroundPearl()
     {
         isPatrolling = true;
-
         while (guardingPearl)
         {
             if (isFrozen)
@@ -124,7 +142,6 @@ public class BotMovement : MonoBehaviour
 
             yield return new WaitForSeconds(Random.Range(3f, 5f));
         }
-
         isPatrolling = false;
     }
 
