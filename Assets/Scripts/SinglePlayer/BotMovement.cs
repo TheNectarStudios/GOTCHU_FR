@@ -12,12 +12,12 @@ public class BotMovement : MonoBehaviour
     public float acceleration = 8f;
     public float guardRadius = 5f;
     public float timelineBufferTime = 3f;
+    public float separationRadius = 3f;
+    public float pathDiversionTime = 4f;
     private bool trackingPlayer = false;
     private bool guardingPearl = false;
     private Vector3 guardPosition;
     private bool isPatrolling = false;
-    public float separationRadius = 3f;
-    public float pathDiversionTime = 4f;
     private float proximityTimer = 0f;
     private bool isFrozen = false;
 
@@ -25,9 +25,14 @@ public class BotMovement : MonoBehaviour
     private InvisibilityOffline invisibilityScript;
 
     [Header("UFO Rotation Settings")]
-    public float pitchAmount = 15f; // Maximum pitch angle
-    public float yawAmount = 15f;   // Maximum yaw angle
-    public float rotationSmoothing = 5f; // How smoothly the UFO tilts
+    public float pitchAmount = 15f;
+    public float yawAmount = 15f;
+    public float rotationSmoothing = 5f;
+
+    [Header("Game Duration Settings")]
+    public float gameDuration = 120f; // Total duration of the game in seconds
+    public float finalSpeedMultiplier = 2f; // Speed multiplier towards the end of the game
+    private float elapsedTime = 0f; // Timer to track elapsed time
 
     private void Start()
     {
@@ -62,6 +67,11 @@ public class BotMovement : MonoBehaviour
             return;
         }
 
+        elapsedTime += Time.deltaTime; // Update elapsed time
+
+        // Gradually increase speed as the game progresses
+        AdjustSpeedOverTime();
+
         if (guardingPearl)
         {
             if (!isPatrolling)
@@ -89,8 +99,13 @@ public class BotMovement : MonoBehaviour
             agent.SetDestination(player.position);
         }
 
-        // Apply UFO pitch and yaw
         ApplyUFORotation();
+    }
+
+    private void AdjustSpeedOverTime()
+    {
+        float progress = Mathf.Clamp01(elapsedTime / gameDuration); // Normalize elapsed time to a value between 0 and 1
+        agent.speed = Mathf.Lerp(movementSpeed, movementSpeed * finalSpeedMultiplier, progress);
     }
 
     private void ApplyUFORotation()
@@ -98,14 +113,10 @@ public class BotMovement : MonoBehaviour
         Vector3 velocity = agent.velocity;
         if (velocity.magnitude > 0.1f)
         {
-            // Calculate pitch and yaw based on velocity
             float pitch = Mathf.Clamp(-velocity.z * pitchAmount, -pitchAmount, pitchAmount);
             float yaw = Mathf.Clamp(velocity.x * yawAmount, -yawAmount, yawAmount);
 
-            // Create target rotation with pitch and yaw
             Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
-
-            // Smoothly interpolate to the target rotation
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothing);
         }
     }
