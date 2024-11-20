@@ -21,6 +21,11 @@ public class SpawnManagerOffline : MonoBehaviour
 
     public GameObject bulletPrefab;
 
+    // Recoil configuration
+    public float recoilIntensity = 0.2f; // Increased intensity for more pronounced recoil
+    public float recoilDuration = 0.15f; // Slightly longer duration
+    public float recoilWobbleFactor = 0.1f; // More wobble for added effect
+
     private string currentPowerUp = null;
     private bool isCooldown = false;
     private PlayerMovementOffline playerMovementScript;
@@ -182,6 +187,9 @@ public class SpawnManagerOffline : MonoBehaviour
                 rb.velocity = bulletDirection * 10f;
                 bullet.transform.rotation = Quaternion.LookRotation(bulletDirection);
                 Debug.Log("Bullet fired in direction: " + bulletDirection);
+
+                // Apply recoil effect in the opposite direction of the bullet
+                StartCoroutine(ApplyRecoil(bulletDirection));
             }
             else
             {
@@ -201,6 +209,34 @@ public class SpawnManagerOffline : MonoBehaviour
         if (lastDirection.z > 0) return Vector3.forward;
         if (lastDirection.z < 0) return Vector3.back;
         return Vector3.zero;
+    }
+
+    private IEnumerator ApplyRecoil(Vector3 bulletDirection)
+    {
+        float elapsedTime = 0f;
+        Vector3 originalPosition = protagonist.transform.localPosition;
+        Quaternion originalRotation = protagonist.transform.localRotation;
+
+        // Calculate recoil direction as the opposite of bullet direction
+        Vector3 recoilDirection = -bulletDirection.normalized * recoilIntensity;
+
+        while (elapsedTime < recoilDuration)
+        {
+            // Apply recoil and add wobble effect
+            float wobbleX = Random.Range(-recoilWobbleFactor, recoilWobbleFactor);
+            float wobbleY = Random.Range(-recoilWobbleFactor, recoilWobbleFactor);
+            float wobbleZ = Random.Range(-recoilWobbleFactor, recoilWobbleFactor);
+
+            protagonist.transform.localPosition = originalPosition + recoilDirection;
+            protagonist.transform.localRotation = originalRotation * Quaternion.Euler(wobbleX, wobbleY, wobbleZ);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Reset to original position and rotation
+        protagonist.transform.localPosition = originalPosition;
+        protagonist.transform.localRotation = originalRotation;
     }
 
     private void ActivateFreezePowerUp()
