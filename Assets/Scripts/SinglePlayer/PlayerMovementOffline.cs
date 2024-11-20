@@ -2,10 +2,15 @@ using UnityEngine;
 
 public class PlayerMovementOffline : MonoBehaviour
 {
-    public float speed = 5f;  // Player movement speed
+    public float speed = 5f;  // Original player movement speed
+    public float maxSpeed = 5f;  // Maximum speed the player can reach
+    public float acceleration = 5f;  // How fast the player accelerates
+    public float deceleration = 5f;  // How fast the player decelerates
+    private float currentSpeed = 0f;  // The current speed of the player
+
     private DynamicJoystick joystick;  // Reference to the joystick
     private Vector3 direction;
-    private Vector3 lastMovementDirection; // To store the last movement direction
+    private Vector3 lastMovementDirection;  // To store the last movement direction
 
     void Start()
     {
@@ -15,6 +20,9 @@ public class PlayerMovementOffline : MonoBehaviour
         {
             Debug.LogError("Joystick not found in the scene!");
         }
+
+        // Initialize speed with maxSpeed
+        speed = maxSpeed;
     }
 
     void Update()
@@ -41,12 +49,25 @@ public class PlayerMovementOffline : MonoBehaviour
             lastMovementDirection = direction;
         }
 
+        // Handle acceleration and deceleration
+        if (direction.magnitude > 0)
+        {
+            // Accelerate
+            currentSpeed = Mathf.Min(currentSpeed + acceleration * Time.deltaTime, maxSpeed);
+        }
+        else
+        {
+            // Decelerate
+            currentSpeed = Mathf.Max(currentSpeed - deceleration * Time.deltaTime, 0f);
+        }
+
+        // Move the player using the current speed
         MovePlayer();
     }
 
     void MovePlayer()
     {
-        transform.Translate(direction * speed * Time.deltaTime, Space.World);
+        transform.Translate(direction.normalized * currentSpeed * Time.deltaTime, Space.World);
     }
 
     // Method to get the last movement direction
