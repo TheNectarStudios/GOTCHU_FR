@@ -12,12 +12,10 @@ Material:
   m_Parent: {fileID: 2100000, guid: eb6ba090c955a694391663ee06848d39, type: 2}
   m_ModifiedSerializedProperties: 2
   m_ValidKeywords:
-  - _EMISSION
   - _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  - _SPECULAR_SETUP
   m_InvalidKeywords:
   - _GLOSSYREFLECTIONS_OFF
-  m_LightmapFlags: 1
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -29,10 +27,12 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _Smoothness: 0.5
+    - _WorkflowMode: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 0.025920104, b: 0, a: 1}
-    - _Color: {r: 1, g: 0.025920102, b: 0, a: 1}
+    - _BaseColor: {r: 0.54509807, g: 0.27058825, b: 0.07450981, a: 1}
+    - _Color: {r: 0.545098, g: 0.2705882, b: 0.07450979, a: 1}
     - _EmissionColor: {r: 1, g: 0, b: 0.017761707, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &4123373882901285873
