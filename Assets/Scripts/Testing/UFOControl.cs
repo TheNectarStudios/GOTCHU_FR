@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 public class UFOControl : MonoBehaviour
@@ -13,18 +12,26 @@ public class UFOControl : MonoBehaviour
     public float wobbleSpeed = 2f;          // Speed of the wobble
 
     private Rigidbody rb;
-    private Vector2 moveInput;              // Movement input from the player
-    private Vector2 rotateInput;            // Rotation input from the player
-    private Vector3 wobbleOffset;
+    private Vector2 moveInput;              // Movement input from the joystick
+    private float yawInput;                 // Rotation input for yaw
     private Vector3 desiredTilt;            // Desired tilt direction
     private Quaternion initialRotation;     // UFO's initial upright rotation
+
+    private DynamicJoystick joystick;       // Reference to the joystick
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;  // UFOs don't need gravity!
-        rb.drag = 1f;           // Helps with realistic inertia
-        initialRotation = transform.rotation; // Store initial upright rotation
+        rb.useGravity = false;              // UFOs don't need gravity!
+        rb.drag = 1f;                       // Helps with realistic inertia
+        initialRotation = transform.rotation;
+
+        // Find the joystick in the scene
+        joystick = FindObjectOfType<DynamicJoystick>();
+        if (joystick == null)
+        {
+            Debug.LogError("Joystick not found in the scene!");
+        }
     }
 
     private void Update()
@@ -42,26 +49,19 @@ public class UFOControl : MonoBehaviour
 
     private void HandleInput()
     {
-        // Get input from Unity's Input System
-        var keyboard = Keyboard.current;
-
-        if (keyboard != null)
+        if (joystick != null)
         {
-            // Movement (WASD)
-            moveInput = new Vector2(
-                (keyboard.aKey.isPressed ? -1 : 0) + (keyboard.dKey.isPressed ? 1 : 0),
-                (keyboard.sKey.isPressed ? -1 : 0) + (keyboard.wKey.isPressed ? 1 : 0)
-            );
+            // Get movement input from the joystick
+            moveInput = new Vector2(joystick.Horizontal, joystick.Vertical);
 
-            // Rotation (Mouse movement)
-            var mouse = Mouse.current;
-            if (mouse != null)
+            // Ensure moveInput magnitude is clamped between -1 and 1
+            if (moveInput.magnitude > 1f)
             {
-                rotateInput = new Vector2(
-                    mouse.delta.x.ReadValue(),
-                    mouse.delta.y.ReadValue()
-                );
+                moveInput.Normalize();
             }
+
+            // Use the joystick's horizontal axis for yaw rotation (or modify for another joystick)
+            yawInput = joystick.Horizontal;
         }
     }
 
@@ -77,10 +77,8 @@ public class UFOControl : MonoBehaviour
 
     private void HandleRotation()
     {
-        // Use rotateInput for yaw
-        float yaw = rotateInput.x * rotationSpeed * Time.fixedDeltaTime;
-
-        // Apply yaw rotation
+        // Apply yaw rotation based on joystick input
+        float yaw = yawInput * rotationSpeed * Time.fixedDeltaTime;
         Quaternion yawRotation = Quaternion.Euler(0, yaw, 0);
         rb.MoveRotation(rb.rotation * yawRotation);
     }
@@ -91,7 +89,7 @@ public class UFOControl : MonoBehaviour
         float wobbleX = Mathf.Sin(Time.time * wobbleSpeed) * wobbleIntensity;
         float wobbleZ = Mathf.Cos(Time.time * wobbleSpeed) * wobbleIntensity;
 
-        wobbleOffset = new Vector3(wobbleX, 0, wobbleZ);
+        Vector3 wobbleOffset = new Vector3(wobbleX, 0, wobbleZ);
 
         // Add wobble to the UFO's position
         rb.position += wobbleOffset * Time.fixedDeltaTime;
