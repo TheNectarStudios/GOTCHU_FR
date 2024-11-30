@@ -637,7 +637,7 @@ MonoBehaviour:
   rotationSpeed: 50
   tiltIntensity: 30
   tiltSmoothing: 7
-  wobbleIntensity: 0.5
+  wobbleIntensity: 0
   wobbleSpeed: 2
 --- !u!54 &1477304281
 Rigidbody:
@@ -927,8 +927,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d980a6b6c14ac714a9f4bb1634a1f93c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 60, z: 0}
-  smoothSpeed: 0.005
+  offset: {x: 0, y: 30, z: 0}
+  smoothSpeed: 0.001
   shakeDuration: 0.5
   shakeMagnitude: 0.2
 --- !u!1660057539 &9223372036854775807
