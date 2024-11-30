@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI; // Import for UI Button
+using System.Collections; // Import for Coroutine
 
 [RequireComponent(typeof(Rigidbody))]
 public class UFOControl : MonoBehaviour
@@ -10,14 +12,17 @@ public class UFOControl : MonoBehaviour
     public float tiltSmoothing = 5f;        // Speed of tilt adjustment
     public float wobbleIntensity = 0.5f;    // Intensity of the wobble
     public float wobbleSpeed = 2f;          // Speed of the wobble
+    public float speedBoostMultiplier = 2f; // Multiplier for speed boost
+    public float boostDuration = 3f;        // Duration of the speed boost in seconds
+    public float jerkIntensity = 50f;       // Intensity of the initial jerk on boost
 
     private Rigidbody rb;
     private Vector2 moveInput;              // Movement input from the joystick
     private float yawInput;                 // Rotation input for yaw
     private Vector3 desiredTilt;            // Desired tilt direction
     private Quaternion initialRotation;     // UFO's initial upright rotation
-
     private DynamicJoystick joystick;       // Reference to the joystick
+    private bool isBoosting = false;        // To check if the boost is active
 
     private void Start()
     {
@@ -37,6 +42,12 @@ public class UFOControl : MonoBehaviour
     private void Update()
     {
         HandleInput();
+
+        // Check for speed boost activation via G key
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            TriggerSpeedBoost();
+        }
     }
 
     private void FixedUpdate()
@@ -68,8 +79,11 @@ public class UFOControl : MonoBehaviour
     private void HandleMovement()
     {
         // Calculate forces from input
-        Vector3 forwardForce = transform.forward * moveInput.y * thrustForce;
-        Vector3 rightForce = transform.right * moveInput.x * strafeForce;
+        float currentThrustForce = isBoosting ? thrustForce * speedBoostMultiplier : thrustForce;
+        float currentStrafeForce = isBoosting ? strafeForce * speedBoostMultiplier : strafeForce;
+
+        Vector3 forwardForce = transform.forward * moveInput.y * currentThrustForce;
+        Vector3 rightForce = transform.right * moveInput.x * currentStrafeForce;
 
         // Apply forces to the Rigidbody
         rb.AddForce(forwardForce + rightForce);
@@ -106,5 +120,36 @@ public class UFOControl : MonoBehaviour
 
         // Smoothly interpolate to the desired tilt rotation
         rb.MoveRotation(Quaternion.Lerp(rb.rotation, initialRotation * tiltRotation, Time.fixedDeltaTime * tiltSmoothing));
+    }
+
+    public void TriggerSpeedBoost()
+    {
+        if (!isBoosting)
+        {
+            StartCoroutine(SpeedBoostCoroutine());
+            ApplyJerk(); // Apply the initial jerk effect when boost is activated
+        }
+    }
+
+    private IEnumerator SpeedBoostCoroutine()
+    {
+        isBoosting = true;
+        yield return new WaitForSeconds(boostDuration);
+        isBoosting = false;
+    }
+
+    private void ApplyJerk()
+    {
+        // Calculate the current movement direction
+        Vector3 currentDirection = rb.velocity.normalized;
+
+        if (currentDirection == Vector3.zero)
+        {
+            // If there's no current movement, use the forward direction
+            currentDirection = transform.forward;
+        }
+
+        // Apply an instantaneous force in the current direction for the jerk effect
+        rb.AddForce(currentDirection * jerkIntensity, ForceMode.Impulse);
     }
 }
