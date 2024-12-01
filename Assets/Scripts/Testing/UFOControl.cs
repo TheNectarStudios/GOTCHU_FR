@@ -65,14 +65,17 @@ public class UFOControl : MonoBehaviour
             // Get movement input from the joystick
             moveInput = new Vector2(joystick.Horizontal, joystick.Vertical);
 
-            // Ensure moveInput magnitude is clamped between -1 and 1
-            if (moveInput.magnitude > 1f)
+            // Snap input to cardinal directions
+            if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
             {
-                moveInput.Normalize();
+                // Horizontal movement dominates
+                moveInput.y = 0;
             }
-
-            // Use the joystick's horizontal axis for yaw rotation (or modify for another joystick)
-            yawInput = joystick.Horizontal;
+            else
+            {
+                // Vertical movement dominates
+                moveInput.x = 0;
+            }
         }
     }
 
