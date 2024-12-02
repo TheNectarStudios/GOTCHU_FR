@@ -1,6 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI; // Import for UI Button
-using System.Collections; // Import for Coroutine
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class UFOControl : MonoBehaviour
@@ -15,6 +14,8 @@ public class UFOControl : MonoBehaviour
     public float speedBoostMultiplier = 2f; // Multiplier for speed boost
     public float boostDuration = 3f;        // Duration of the speed boost in seconds
     public float jerkIntensity = 50f;       // Intensity of the initial jerk on boost
+    public float raycastDistance = 2f;      // Distance for wall detection
+    public LayerMask mazeLayer;             // Layer for maze walls
 
     private Rigidbody rb;
     private Vector2 moveInput;              // Movement input from the joystick
@@ -37,6 +38,12 @@ public class UFOControl : MonoBehaviour
         {
             Debug.LogError("Joystick not found in the scene!");
         }
+
+        // Check if mazeLayer is properly assigned
+        if (mazeLayer.value == 0)
+        {
+            Debug.LogError("Maze LayerMask not set. Please assign the Maze layer in the Inspector.");
+        }
     }
 
     private void Update()
@@ -52,10 +59,17 @@ public class UFOControl : MonoBehaviour
 
     private void FixedUpdate()
     {
-        HandleMovement();
-        HandleRotation();
-        ApplyWobble();
-        ApplyTilt();
+        if (!IsBlockedByWall())
+        {
+            HandleMovement();
+            HandleRotation();
+            ApplyWobble();
+            ApplyTilt();
+        }
+        else
+        {
+            rb.velocity = Vector3.zero; // Stop movement when near walls
+        }
     }
 
     private void HandleInput()
@@ -154,5 +168,36 @@ public class UFOControl : MonoBehaviour
 
         // Apply an instantaneous force in the current direction for the jerk effect
         rb.AddForce(currentDirection * jerkIntensity, ForceMode.Impulse);
+    }
+
+    private bool IsBlockedByWall()
+    {
+        // Use raycasting in the direction of movement
+        Vector3 movementDirection = Vector3.zero;
+
+        // Determine movement direction based on input
+        if (moveInput.y > 0) movementDirection = transform.forward;       // Forward
+        else if (moveInput.y < 0) movementDirection = -transform.forward; // Backward
+        else if (moveInput.x > 0) movementDirection = transform.right;    // Right
+        else if (moveInput.x < 0) movementDirection = -transform.right;   // Left
+
+        if (movementDirection != Vector3.zero)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, movementDirection, out hit, raycastDistance, mazeLayer))
+            {
+                Debug.DrawRay(transform.position, movementDirection * raycastDistance, Color.red); // Debug
+                return true; // Wall detected
+            }
+        }
+
+        return false; // No wall detected
+    }
+
+    private void OnDrawGizmos()
+    {
+        // Visualize raycasting in the Scene view
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position, rb.velocity.normalized * raycastDistance);
     }
 }
