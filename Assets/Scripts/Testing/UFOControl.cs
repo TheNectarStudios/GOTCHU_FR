@@ -1,5 +1,6 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.UI; // Import for UI Button
+using System.Collections; // Import for Coroutine
 
 [RequireComponent(typeof(Rigidbody))]
 public class UFOControl : MonoBehaviour
@@ -59,7 +60,7 @@ public class UFOControl : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsBlockedByWall())
+        if (!IsNearWall())
         {
             HandleMovement();
             HandleRotation();
@@ -68,7 +69,7 @@ public class UFOControl : MonoBehaviour
         }
         else
         {
-            rb.velocity = Vector3.zero; // Stop movement when near walls
+            rb.velocity = Vector3.zero; // Stop movement near walls
         }
     }
 
@@ -79,17 +80,14 @@ public class UFOControl : MonoBehaviour
             // Get movement input from the joystick
             moveInput = new Vector2(joystick.Horizontal, joystick.Vertical);
 
-            // Snap input to cardinal directions
-            if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
+            // Ensure moveInput magnitude is clamped between -1 and 1
+            if (moveInput.magnitude > 1f)
             {
-                // Horizontal movement dominates
-                moveInput.y = 0;
+                moveInput.Normalize();
             }
-            else
-            {
-                // Vertical movement dominates
-                moveInput.x = 0;
-            }
+
+            // Use the joystick's horizontal axis for yaw rotation (or modify for another joystick)
+            yawInput = joystick.Horizontal;
         }
     }
 
@@ -170,34 +168,21 @@ public class UFOControl : MonoBehaviour
         rb.AddForce(currentDirection * jerkIntensity, ForceMode.Impulse);
     }
 
-    private bool IsBlockedByWall()
+    private bool IsNearWall()
     {
-        // Use raycasting in the direction of movement
-        Vector3 movementDirection = Vector3.zero;
-
-        // Determine movement direction based on input
-        if (moveInput.y > 0) movementDirection = transform.forward;       // Forward
-        else if (moveInput.y < 0) movementDirection = -transform.forward; // Backward
-        else if (moveInput.x > 0) movementDirection = transform.right;    // Right
-        else if (moveInput.x < 0) movementDirection = -transform.right;   // Left
+        // Cast a ray in the direction of movement
+        Vector3 movementDirection = rb.velocity.normalized;
 
         if (movementDirection != Vector3.zero)
         {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, movementDirection, out hit, raycastDistance, mazeLayer))
             {
-                Debug.DrawRay(transform.position, movementDirection * raycastDistance, Color.red); // Debug
-                return true; // Wall detected
+                Debug.DrawRay(transform.position, movementDirection * raycastDistance, Color.red);
+                return true; // Near a wall
             }
         }
 
         return false; // No wall detected
-    }
-
-    private void OnDrawGizmos()
-    {
-        // Visualize raycasting in the Scene view
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, rb.velocity.normalized * raycastDistance);
     }
 }
