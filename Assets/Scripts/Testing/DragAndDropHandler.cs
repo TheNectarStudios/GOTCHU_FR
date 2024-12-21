@@ -22,15 +22,13 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    // Unlock the Main Button once a new powerup is picked up
+    // Unlock the Main Button and reset states for the new powerup
     public void UnlockButton()
     {
-        // Reset the main button to allow for the next powerup usage
-        if (!isPowerupExecuted)
-        {
-            isDraggable = true; // Unlock the button to allow dragging
-            Debug.Log("Main Button Unlocked!");
-        }
+        isPowerupExecuted = false; // Reset execution state
+        isDraggable = true; // Unlock the button to allow dragging
+        ResetPowerupButtons(); // Reset the powerup buttons
+        Debug.Log("Main Button Unlocked!");
     }
 
     // Start dragging the button
