@@ -12,6 +12,8 @@ TagManager:
   - button_right
   - Pearl
   - GhostSpawn
+  - powerUp
+  - MainButton
   layers:
   - Default
   - TransparentFX
