@@ -57,7 +57,7 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     // When the button is pressed, activate powerup buttons
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!isDraggable) return; // Only activate powerup buttons if the Main Button is unlocked
+        if (!isDraggable || isPowerupExecuted) return; // Only activate powerup buttons if unlocked and not executed
         ActivatePowerupButtons();
         StopDeactivateCoroutine(); // Cancel deactivation if pressing again
     }
@@ -123,6 +123,7 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     // Mark the main button as having executed a powerup
     public void SetPowerupExecuted()
     {
+        if (isPowerupExecuted) return; // Prevent executing more than once per powerup
         isPowerupExecuted = true;
         Debug.Log("Powerup Executed!");
         DeactivatePowerupButtons(); // Immediately deactivate powerup buttons after execution
