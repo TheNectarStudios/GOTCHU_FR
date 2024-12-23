@@ -100,6 +100,10 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (!isDraggable) return; // Only activate powerup buttons if the Main Button is unlocked
         ActivatePowerupButtons();
         StopDeactivateCoroutine(); // Cancel deactivation if pressing again
+
+        // Add haptic feedback
+        Handheld.Vibrate(); 
+        Debug.Log("Haptic Feedback Activated!");
     }
 
     // When the pointer is lifted, start buffer for deactivation and reset position
