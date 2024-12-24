@@ -34,6 +34,8 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         new Vector2(0f, -1f).normalized  // Straight down
     };
 
+    private int vibrationCounter = 0; // Counter to log vibrations
+
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -101,9 +103,8 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         ActivatePowerupButtons();
         StopDeactivateCoroutine(); // Cancel deactivation if pressing again
 
-        // Add haptic feedback
-        Handheld.Vibrate(); 
-        Debug.Log("Haptic Feedback Activated!");
+        // Trigger haptic feedback (short vibration)
+        TriggerShortVibration();
     }
 
     // When the pointer is lifted, start buffer for deactivation and reset position
@@ -197,5 +198,34 @@ public class MainButtonDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             button.SetActive(false); // Deactivate all powerup buttons
         }
         Debug.Log("Powerup Buttons Reset!");
+    }
+
+    // Trigger a short vibration based on the platform and log the timing
+    private void TriggerShortVibration()
+    {
+        vibrationCounter++; // Increment the vibration counter
+        Debug.Log($"Vibration #{vibrationCounter} triggered at {Time.time} seconds.");
+
+        // Check the platform (Android or iOS) and use the appropriate vibration method
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // Android - Vibrate for 25 milliseconds (0.025 second), which is 25% of the usual intensity
+            Handheld.Vibrate();
+            StartCoroutine(VibrationDuration(0.05f)); // Vibrate for 50 milliseconds (half the original length)
+        }
+        else if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            // iOS - Use a lighter haptic feedback style to simulate a weaker vibration
+            Vibration.VibrateIOS(ImpactFeedbackStyle.Medium);
+            StartCoroutine(VibrationDuration(0.05f)); // Simulate a shorter vibration on iOS
+        }
+    }
+
+    // Coroutine to control the vibration duration
+    private IEnumerator VibrationDuration(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        // Log the time when vibration ends
+        Debug.Log($"Vibration #{vibrationCounter} ended at {Time.time} seconds.");
     }
 }
