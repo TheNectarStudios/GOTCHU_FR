@@ -50,31 +50,55 @@ public class BotControl : MonoBehaviour
             if (distance > stoppingDistance)
             {
                 Vector3 movementDirection = direction.normalized;
-                rb.velocity = movementDirection * movementSpeed;
+                rb.velocity = movementDirection * movementSpeed; // Apply velocity in both x and z
             }
             else
             {
-                rb.velocity = Vector3.zero;
+                rb.velocity = Vector3.zero; // Stop movement when within stopping distance
             }
         }
     }
 
     private void UpdateTiltAnimation()
     {
-        // Check the movement direction
-        Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
+        Vector3 velocity = rb.velocity;
 
-        if (localVelocity.z > 0.1f)
+        // No movement, reset animations
+        if (velocity.magnitude < 0.01f)
         {
-            animator.SetFloat("TiltDirection", 1f); // Forward
+            animator.SetFloat("TiltSide", 0f);
+            animator.SetFloat("TiltDirection", 0f);
+            return;
         }
-        else if (localVelocity.z < -0.1f)
+
+        // Calculate the angle in the XZ plane
+        float angle = Mathf.Atan2(velocity.z, velocity.x) * Mathf.Rad2Deg;
+        if (angle < 0) angle += 360f; // Ensure angle is in the range [0, 360]
+
+        // Determine the quadrant and apply the corresponding tilt
+        if (angle >= 0f && angle < 90f)
         {
-            animator.SetFloat("TiltDirection", -1f); // Backward
+            // Quadrant 1: Forward tilt
+            animator.SetFloat("TiltDirection", 1f); // Forward tilt
+            animator.SetFloat("TiltSide", 0f); // No sideways tilt
         }
-        else
+        else if (angle >= 90f && angle < 180f)
         {
-            animator.SetFloat("TiltDirection", 0f); // Idle
+            // Quadrant 2: Left tilt
+            animator.SetFloat("TiltSide", -1f); // Left tilt
+            animator.SetFloat("TiltDirection", 0f); // No forward/backward tilt
+        }
+        else if (angle >= 180f && angle < 270f)
+        {
+            // Quadrant 3: Backward tilt
+            animator.SetFloat("TiltDirection", -1f); // Backward tilt
+            animator.SetFloat("TiltSide", 0f); // No sideways tilt
+        }
+        else if (angle >= 270f && angle < 360f)
+        {
+            // Quadrant 4: Right tilt
+            animator.SetFloat("TiltSide", 1f); // Right tilt
+            animator.SetFloat("TiltDirection", 0f); // No forward/backward tilt
         }
     }
 }
