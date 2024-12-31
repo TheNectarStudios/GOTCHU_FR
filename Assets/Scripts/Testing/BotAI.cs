@@ -1,24 +1,25 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
 public class BotControl : MonoBehaviour
 {
-    public float movementSpeed = 5f;
     public float stoppingDistance = 0.5f;
     public string playerTag = "Player";
+    public float tiltSensitivity = 2f; // Sensitivity for animations
 
     private Transform targetPlayer;
-    private Rigidbody rb;
+    private NavMeshAgent navMeshAgent;
     private Animator animator;
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         FindPlayer();
 
-        rb.freezeRotation = true; // Prevent physics-based rotation
+        navMeshAgent.stoppingDistance = stoppingDistance; // Set stopping distance for NavMeshAgent
     }
 
     private void Update()
@@ -44,27 +45,16 @@ public class BotControl : MonoBehaviour
     {
         if (targetPlayer != null)
         {
-            Vector3 direction = targetPlayer.position - transform.position;
-            float distance = direction.magnitude;
-
-            if (distance > stoppingDistance)
-            {
-                Vector3 movementDirection = direction.normalized;
-                rb.velocity = movementDirection * movementSpeed; // Apply velocity in both x and z
-            }
-            else
-            {
-                rb.velocity = Vector3.zero; // Stop movement when within stopping distance
-            }
+            navMeshAgent.SetDestination(targetPlayer.position); // Navigate toward the player
         }
     }
 
     private void UpdateTiltAnimation()
     {
-        Vector3 velocity = rb.velocity;
+        Vector3 velocity = navMeshAgent.velocity;
 
         // No movement, reset animations
-        if (velocity.magnitude < 0.01f)
+        if (velocity.magnitude < 0.1f)
         {
             animator.SetFloat("TiltSide", 0f);
             animator.SetFloat("TiltDirection", 0f);
@@ -79,26 +69,26 @@ public class BotControl : MonoBehaviour
         if (angle >= 0f && angle < 90f)
         {
             // Quadrant 1: Forward tilt
-            animator.SetFloat("TiltDirection", 1f); // Forward tilt
-            animator.SetFloat("TiltSide", 0f); // No sideways tilt
+            animator.SetFloat("TiltDirection", 1f * tiltSensitivity);
+            animator.SetFloat("TiltSide", 0f);
         }
         else if (angle >= 90f && angle < 180f)
         {
             // Quadrant 2: Left tilt
-            animator.SetFloat("TiltSide", -1f); // Left tilt
-            animator.SetFloat("TiltDirection", 0f); // No forward/backward tilt
+            animator.SetFloat("TiltSide", -1f * tiltSensitivity);
+            animator.SetFloat("TiltDirection", 0f);
         }
         else if (angle >= 180f && angle < 270f)
         {
             // Quadrant 3: Backward tilt
-            animator.SetFloat("TiltDirection", -1f); // Backward tilt
-            animator.SetFloat("TiltSide", 0f); // No sideways tilt
+            animator.SetFloat("TiltDirection", -1f * tiltSensitivity);
+            animator.SetFloat("TiltSide", 0f);
         }
         else if (angle >= 270f && angle < 360f)
         {
             // Quadrant 4: Right tilt
-            animator.SetFloat("TiltSide", 1f); // Right tilt
-            animator.SetFloat("TiltDirection", 0f); // No forward/backward tilt
+            animator.SetFloat("TiltSide", 1f * tiltSensitivity);
+            animator.SetFloat("TiltDirection", 0f);
         }
     }
 }
