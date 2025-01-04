@@ -197,6 +197,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c3831521860964eafb35df5ae880a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTag: Player
+  chasingClonePrefab: {fileID: 6095829927837989397, guid: 566db717600371c47b3f8df3bd4a7447,
+    type: 3}
+  numberOfChasingClones: 2
+  cloneLifetime: 10
+  chaseDuration: 5
+  restDuration: 3
+  wanderRadius: 5
+  chaseRadius: 10
+  tiltSensitivity: 2
 --- !u!54 &6541406140098517116
 Rigidbody:
   m_ObjectHideFlags: 0

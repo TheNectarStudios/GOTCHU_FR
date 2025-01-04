@@ -8,7 +8,6 @@ public class DumbBot : MonoBehaviour
     public string playerTag = "Player";
     public GameObject chasingClonePrefab; // Prefab for chasing clones
     public int numberOfChasingClones = 2; // Number of clones to spawn
-    public float cloneSpawnRadius = 3f; // Radius around the bot to spawn clones
     public float cloneLifetime = 10f; // Lifetime of the chasing clones
 
     public float chaseDuration = 5f;
@@ -185,19 +184,15 @@ public class DumbBot : MonoBehaviour
 
         for (int i = 0; i < numberOfChasingClones; i++)
         {
-            // Random position within a spawn radius
-            Vector3 randomOffset = Random.insideUnitSphere * cloneSpawnRadius;
-            randomOffset.y = 0f; // Ensure the clones spawn on the ground
-            Vector3 spawnPosition = transform.position + randomOffset;
+            Vector3 spawnPosition = transform.position; // Spawn at DumbBot's position
 
-            // Instantiate the clone
             GameObject clone = Instantiate(chasingClonePrefab, spawnPosition, Quaternion.identity);
 
-            // Assign lifetime to the clone
+            // Debug position to ensure it's correct
+            Debug.Log($"Clone {i + 1} spawned at {spawnPosition}");
+
             Destroy(clone, cloneLifetime);
         }
-
-        Debug.Log($"{numberOfChasingClones} clones spawned and chasing the player!");
     }
 
     private void OnTriggerEnter(Collider other)
