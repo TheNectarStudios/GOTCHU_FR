@@ -2,63 +2,73 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class ChasingClone : MonoBehaviour
+public class CloneBot : MonoBehaviour
 {
-    public float lifetime = 10f; // How long the clone chases the player
-    public float stoppingDistance = 1f; // How close the clone gets to the player
-    public string playerTag = "Player"; // Tag for the player
+    public string playerTag = "Player"; // Tag to identify the player
+    public float chaseRadius = 15f; // Radius within which the clone will chase the player
+    public float updateFrequency = 0.2f; // How often the clone updates its destination
 
-    private Transform targetPlayer;
     private NavMeshAgent navMeshAgent;
+    private Transform player;
+    private bool isChasing = false;
 
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
 
-        if (navMeshAgent == null)
+        FindPlayer();
+
+        if (player != null)
         {
-            Debug.LogError("[ChasingClone] NavMeshAgent component is missing!");
-            return;
+            isChasing = true;
+            StartChasing();
         }
+        else
+        {
+            Debug.LogWarning("No player found with the specified tag. Clone will not chase.");
+        }
+    }
 
-        navMeshAgent.stoppingDistance = stoppingDistance;
-
-        // Find the player
+    private void FindPlayer()
+    {
         GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
         if (playerObject != null)
         {
-            targetPlayer = playerObject.transform;
-            Debug.Log("[ChasingClone] Player found: " + playerObject.name);
+            player = playerObject.transform;
         }
-        else
-        {
-            Debug.LogWarning("[ChasingClone] No player found with the specified tag.");
-        }
-
-        // Destroy the clone after its lifetime
-        Destroy(gameObject, lifetime);
     }
 
-    private void Update()
+    private void StartChasing()
     {
-        if (targetPlayer != null)
+        if (!isChasing) return;
+
+        InvokeRepeating(nameof(UpdateChase), 0f, updateFrequency);
+    }
+
+    private void UpdateChase()
+    {
+        if (player == null || navMeshAgent == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceToPlayer <= chaseRadius)
         {
-            if (navMeshAgent.isOnNavMesh)
-            {
-                navMeshAgent.SetDestination(targetPlayer.position);
-                Debug.Log("[ChasingClone] Chasing player at position: " + targetPlayer.position);
-            }
-            else
-            {
-                Debug.LogError("[ChasingClone] NavMeshAgent is not on the NavMesh.");
-            }
+            navMeshAgent.SetDestination(player.position);
         }
         else
         {
-            Debug.LogWarning("[ChasingClone] TargetPlayer is null.");
+            navMeshAgent.ResetPath(); // Stop moving if the player is out of range
         }
+    }
 
-        // Log NavMeshAgent state
-        Debug.Log("[ChasingClone] Velocity: " + navMeshAgent.velocity.magnitude);
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, chaseRadius);
+    }
+
+    private void OnDestroy()
+    {
+        CancelInvoke(nameof(UpdateChase)); // Clean up when the clone is destroyed
     }
 }
