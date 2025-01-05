@@ -1720,7 +1720,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1516558491
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1869,7 +1869,7 @@ PrefabInstance:
     - target: {fileID: 2406686848967654434, guid: 10317f2857a3a8e449ed074223ff02cb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 2406686848967654434, guid: 10317f2857a3a8e449ed074223ff02cb,
         type: 3}
@@ -1919,7 +1919,7 @@ PrefabInstance:
     - target: {fileID: 3039248448632284824, guid: 10317f2857a3a8e449ed074223ff02cb,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2403,7 +2403,7 @@ PrefabInstance:
     - target: {fileID: 4643600463040964158, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5420841537004452996, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
@@ -2458,22 +2458,22 @@ PrefabInstance:
     - target: {fileID: 6796814825131463893, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
       propertyPath: m_Size.x
-      value: 1.4701605
+      value: 1.2378883
       objectReference: {fileID: 0}
     - target: {fileID: 6796814825131463893, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
       propertyPath: m_Size.z
-      value: 1.702543
+      value: 1.4869295
       objectReference: {fileID: 0}
     - target: {fileID: 6796814825131463893, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
       propertyPath: m_Center.x
-      value: 0.012434891
+      value: 0.004704829
       objectReference: {fileID: 0}
     - target: {fileID: 6796814825131463893, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
       propertyPath: m_Center.z
-      value: 0.014004027
+      value: 0.015570096
       objectReference: {fileID: 0}
     - target: {fileID: 6796814825131463893, guid: 902c7743b0a63cb4e90bff59da8d087c,
         type: 3}
@@ -2506,7 +2506,7 @@ PrefabInstance:
     - target: {fileID: 3046940878144661914, guid: 072c7f1be2f44a742bf80db0d278b2b5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 2.683
       objectReference: {fileID: 0}
     - target: {fileID: 3046940878144661914, guid: 072c7f1be2f44a742bf80db0d278b2b5,
         type: 3}
@@ -2589,7 +2589,12 @@ PrefabInstance:
     - target: {fileID: 630543375060232591, guid: e58229b897f24e345b98173d91fb43f9,
         type: 3}
       propertyPath: m_Speed
-      value: 15
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 630543375060232591, guid: e58229b897f24e345b98173d91fb43f9,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 640501104449046565, guid: e58229b897f24e345b98173d91fb43f9,
         type: 3}
@@ -2646,6 +2651,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DumbBot
       objectReference: {fileID: 0}
+    - target: {fileID: 2578434805529460322, guid: e58229b897f24e345b98173d91fb43f9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5306743433485914488, guid: e58229b897f24e345b98173d91fb43f9,
         type: 3}
       propertyPath: chaseRadius
@@ -2658,10 +2668,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5306743433485914488, guid: e58229b897f24e345b98173d91fb43f9,
         type: 3}
+      propertyPath: cloneLifetime
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5306743433485914488, guid: e58229b897f24e345b98173d91fb43f9,
+        type: 3}
       propertyPath: chasingClonePrefab
       value: 
-      objectReference: {fileID: 2578434805529460322, guid: e89bb1e8fea760045ac52fe300d48086,
+      objectReference: {fileID: 6095829927837989397, guid: 566db717600371c47b3f8df3bd4a7447,
         type: 3}
+    - target: {fileID: 5306743433485914488, guid: e58229b897f24e345b98173d91fb43f9,
+        type: 3}
+      propertyPath: numberOfChasingClones
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
