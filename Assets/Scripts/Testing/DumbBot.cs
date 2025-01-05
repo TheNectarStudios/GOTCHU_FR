@@ -26,6 +26,9 @@ public class DumbBot : MonoBehaviour
     private float chaseTimer = 0f;
     private float restTimer = 0f;
 
+    private float cloneSpawnCooldownTimer = 0f; // Timer to track cooldown
+    private float cloneSpawnCooldownDuration = 40f; // Duration of the cooldown in seconds
+
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -49,6 +52,12 @@ public class DumbBot : MonoBehaviour
         }
 
         CheckForPlayerInRange();
+
+        // Reduce cooldown timer over time
+        if (cloneSpawnCooldownTimer > 0f)
+        {
+            cloneSpawnCooldownTimer -= Time.deltaTime;
+        }
     }
 
     private void FindPlayer()
@@ -72,7 +81,7 @@ public class DumbBot : MonoBehaviour
         navMeshAgent.SetDestination(player.position);
         UpdateTiltAnimation(); // Update tilting during chasing
 
-        if (!clonesSpawned)
+        if (!clonesSpawned && cloneSpawnCooldownTimer <= 0f)
         {
             SpawnChasingClones();
             clonesSpawned = true;
@@ -180,20 +189,48 @@ public class DumbBot : MonoBehaviour
 
     private void SpawnChasingClones()
     {
-        if (chasingClonePrefab == null) return;
+        if (chasingClonePrefab == null || cloneSpawnCooldownTimer > 0f || player == null) return;
 
         for (int i = 0; i < numberOfChasingClones; i++)
         {
-            Vector3 spawnPosition = transform.position; // Spawn at DumbBot's position
+            bool validPositionFound = false;
+            Vector3 spawnPosition = Vector3.zero;
 
-            GameObject clone = Instantiate(chasingClonePrefab, spawnPosition, Quaternion.identity);
+            for (int attempt = 0; attempt < 10; attempt++) // Try up to 10 times to find a valid position
+            {
+                Vector3 randomOffset = Random.insideUnitSphere * chaseRadius;
+                randomOffset.y = 0; // Keep clones on the ground level
 
-            // Debug position to ensure it's correct
-            Debug.Log($"Clone {i + 1} spawned at {spawnPosition}");
+                Vector3 potentialPosition = player.position + randomOffset;
+                NavMeshHit hit;
 
-            Destroy(clone, cloneLifetime);
+                if (NavMesh.SamplePosition(potentialPosition, out hit, chaseRadius, NavMesh.AllAreas))
+                {
+                    spawnPosition = hit.position;
+                    validPositionFound = true;
+                    break;
+                }
+            }
+
+            if (validPositionFound)
+            {
+                GameObject clone = Instantiate(chasingClonePrefab, spawnPosition, Quaternion.identity);
+                Destroy(clone, cloneLifetime);
+
+                // Debug position to ensure it's correct
+                Debug.Log($"Clone {i + 1} spawned at {spawnPosition}");
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to find a valid spawn position for clone {i + 1}.");
+            }
         }
+
+        // Start cooldown timer after spawning clones
+        cloneSpawnCooldownTimer = cloneSpawnCooldownDuration;
     }
+
+
 
     private void OnTriggerEnter(Collider other)
     {
